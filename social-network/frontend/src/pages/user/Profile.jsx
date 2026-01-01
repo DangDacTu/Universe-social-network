@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import userApi from '../api/userApi';
+import { useAuth } from '../../context/AuthContext';
+import userApi from '../../api/userApi';
 
 const Profile = () => {
     const { id } = useParams(); // Lấy ID từ URL (vd: /profile/123)

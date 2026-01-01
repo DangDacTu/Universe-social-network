@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import Register from './pages/Register'; // (Bạn tự tạo file Register tương tự Login nhé)
-import Home from './pages/Home'; // (Placeholder cho TV2)
-import Profile from './pages/Profile';
+
+// Chú ý: Đường dẫn đã được cập nhật theo cấu trúc mới của bạn
+import Login from './pages/user/Login';
+import Register from './pages/user/Register';
+import Profile from './pages/user/Profile';
+import Home from './pages/user/Home';
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -18,17 +20,20 @@ function App() {
             <AuthProvider>
                 <Routes>
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} /> {/* Cần tạo file này */}
-                    <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
-                    <Route path="/me" element={<PrivateRoute><Profile /></PrivateRoute>} /> {/* Route xem chính mình */}
+                    <Route path="/register" element={<Register />} />
+                    
+                    {/* Trang chủ */}
                     <Route 
                         path="/" 
                         element={
                             <PrivateRoute>
-                                <Home />
+                                <Home /> 
                             </PrivateRoute>
                         } 
                     />
+                    
+                    <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                    <Route path="/me" element={<PrivateRoute><Profile /></PrivateRoute>} />
                 </Routes>
             </AuthProvider>
         </Router>
