@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Chú ý: Đường dẫn đã được cập nhật theo cấu trúc mới của bạn
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import Profile from './pages/user/Profile';
 import Home from './pages/user/Home';
+import LoginSuccess from './pages/user/LoginSuccess'; // Import trang mới
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -22,7 +22,8 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     
-                    {/* Trang chủ */}
+                    <Route path="/login-success/:token" element={<LoginSuccess />} />
+
                     <Route 
                         path="/" 
                         element={

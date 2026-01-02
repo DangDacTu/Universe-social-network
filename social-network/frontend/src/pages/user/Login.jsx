@@ -12,10 +12,16 @@ const Login = () => {
         e.preventDefault();
         try {
             await login(email, password);
-            navigate('/'); // Chuyển hướng về trang chủ sau khi login
+            navigate('/');
         } catch (error) {
-            alert('Login failed! Check your credentials.');
+            alert('Login failed!');
         }
+    };
+
+    // Hàm gọi Google Login
+    const handleGoogleLogin = () => {
+        // Chuyển hướng trình duyệt sang Backend để bắt đầu quy trình
+        window.location.href = "http://localhost:5000/api/auth/google";
     };
 
     return (
@@ -38,7 +44,28 @@ const Login = () => {
                 />
                 <button type="submit">Login</button>
             </form>
-            <p>Don't have an account? <Link to="/register">Register</Link></p>
+            
+            {/* Nút Google Login */}
+            <div style={{ margin: '20px 0', textAlign: 'center' }}>
+                <span>OR</span>
+            </div>
+            <button 
+                onClick={handleGoogleLogin} 
+                style={{ 
+                    backgroundColor: '#DB4437', 
+                    color: 'white', 
+                    width: '100%', 
+                    border: 'none', 
+                    padding: '10px', 
+                    borderRadius: '5px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                }}
+            >
+                Login with Google
+            </button>
+
+            <p style={{ marginTop: '20px' }}>Don't have an account? <Link to="/register">Register</Link></p>
         </div>
     );
 };
