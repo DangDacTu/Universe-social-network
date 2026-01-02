@@ -5,7 +5,9 @@ import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import Profile from './pages/user/Profile';
 import Home from './pages/user/Home';
-import LoginSuccess from './pages/user/LoginSuccess'; // Import trang mới
+import LoginSuccess from './pages/user/LoginSuccess';
+import ForgotPassword from './pages/user/ForgotPassword';
+import ResetPassword from './pages/user/ResetPassword';
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -21,6 +23,9 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/resetpassword/:token" element={<ResetPassword />} />
                     
                     <Route path="/login-success/:token" element={<LoginSuccess />} />
 

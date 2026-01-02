@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { registerUser, loginUser } = require('../controllers/authController');
+const { registerUser, loginUser, forgotPassword, resetPassword } = require('../controllers/authController');
+
 const generateToken = require('../utils/generateToken');
 
-// Các route
+// --- Các route ---
+
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
@@ -23,5 +25,9 @@ router.get(
         res.redirect(`http://localhost:5173/login-success/${token}`);
     }
 );
+
+// 3. Quên mật khẩu & Reset
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resetToken', resetPassword);
 
 module.exports = router;

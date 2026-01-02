@@ -13,7 +13,7 @@ const Register = () => {
         e.preventDefault();
         try {
             await register(username, email, password);
-            navigate('/'); // Đăng ký thành công thì về trang chủ
+            navigate('/login', { replace: true }); // Đăng ký thành công thì về trang login
         } catch (error) {
             console.error(error);
             alert('Registration failed! Email might be taken.');

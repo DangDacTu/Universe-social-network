@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String,
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    
     profilePicture: {
         type: String,
         default: "", // Link ảnh avatar

@@ -66,6 +66,9 @@ const Login = () => {
             </button>
 
             <p style={{ marginTop: '20px' }}>Don't have an account? <Link to="/register">Register</Link></p>
+            <Link to="/forgot-password" style={{display: 'block', margin: '10px 0', fontSize: '14px'}}>
+                Forgot Password?
+            </Link>
         </div>
     );
 };
