@@ -98,4 +98,16 @@ const unfollowUser = async (req, res) => {
     }
 };
 
-module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser };
+const getAllUsers = async (req, res) => {
+    try {
+        // Lấy tất cả user nhưng giới hạn 20 người mới nhất
+        // .select() để chỉ lấy id, username, ảnh đại diện (không lấy password)
+        const users = await User.find().limit(20).select("_id username profilePicture email");
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+// Nhớ export thêm hàm getAllUsers này ra
+module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers };

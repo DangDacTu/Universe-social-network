@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
+import VerifyEmail from './pages/user/VerifyEmail';
 import Profile from './pages/user/Profile';
 import Home from './pages/user/Home';
 import LoginSuccess from './pages/user/LoginSuccess';
@@ -23,6 +24,7 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
 
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/resetpassword/:token" element={<ResetPassword />} />

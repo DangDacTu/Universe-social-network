@@ -1,24 +1,24 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom'; // Thêm Link để nút Back hoạt động
 import { useAuth } from '../../context/AuthContext';
 import userApi from '../../api/userApi';
+import './Profile.css'; // 👈 Import file CSS mới
 
 const Profile = () => {
-    const { id } = useParams(); // Lấy ID từ URL (vd: /profile/123)
-    const { user: currentUser } = useAuth(); // User đang đăng nhập
+    const { id } = useParams();
+    const { user: currentUser } = useAuth();
     const [profile, setProfile] = useState(null);
     const [followed, setFollowed] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                // Nếu không có id trên URL, mặc định lấy profile của người đang đăng nhập
                 const userId = id || currentUser._id;
                 const { data } = await userApi.getUser(userId);
                 setProfile(data);
 
-                // Kiểm tra xem current user đã follow người này chưa
-                if (data.followers.includes(currentUser._id)) {
+                // Check follow status
+                if (currentUser && data.followers.includes(currentUser._id)) {
                     setFollowed(true);
                 }
             } catch (error) {
@@ -33,55 +33,86 @@ const Profile = () => {
             if (followed) {
                 await userApi.unfollow(profile._id);
                 setFollowed(false);
-                // Giảm số lượng follower hiển thị tạm thời
-                setProfile(prev => ({...prev, followers: prev.followers.slice(0, -1)})); 
+                // Logic chuẩn: Lọc bỏ ID của mình ra khỏi danh sách followers
+                setProfile(prev => ({
+                    ...prev, 
+                    followers: prev.followers.filter(uid => uid !== currentUser._id)
+                })); 
             } else {
                 await userApi.follow(profile._id);
                 setFollowed(true);
-                // Tăng số lượng follower hiển thị tạm thời
-                setProfile(prev => ({...prev, followers: [...prev.followers, currentUser._id]}));
+                // Logic chuẩn: Thêm ID của mình vào danh sách
+                setProfile(prev => ({
+                    ...prev, 
+                    followers: [...prev.followers, currentUser._id]
+                }));
             }
         } catch (error) {
             console.error("Follow error", error);
         }
     };
 
-    if (!profile) return <div>Loading...</div>;
+    if (!profile) return <div className="profile-wrapper" style={{textAlign: 'center', paddingTop: '50px'}}>Loading...</div>;
+
+    // Kiểm tra xem đây có phải profile của chính mình không
+    const isMyProfile = currentUser._id === profile._id;
 
     return (
-        <div className="profile-container">
-            <div className="profile-header">
-                <img 
-                    src={profile.profilePicture || "https://via.placeholder.com/150"} 
-                    alt="Avatar" 
-                    className="avatar"
-                    style={{width: '100px', height: '100px', borderRadius: '50%'}}
-                />
-                <div>
-                    <h2>{profile.username}</h2>
-                    <p>{profile.bio || "No bio yet."}</p>
-                    <div className="stats">
-                        <span>{profile.followers.length} Followers</span>
-                        <span style={{marginLeft: '10px'}}>{profile.following.length} Following</span>
+        <div className="profile-wrapper">
+            <div className="profile-container">
+                {/* Nút quay về Home */}
+                <Link to="/" className="back-link">← Back to Feed</Link>
+
+                {/* Phần Header thông tin */}
+                <div className="profile-header">
+                    <div className="profile-info">
+                        <h2 className="profile-username">{profile.username}</h2>
+                        <span className="profile-handle">universe.net</span>
+                        
+                        <div className="profile-bio">
+                            {profile.bio || "No bio yet."}
+                        </div>
+
+                        <div className="profile-stats">
+                            <span><b>{profile.followers.length}</b> followers</span>
+                            <span><b>{profile.following.length}</b> following</span>
+                        </div>
                     </div>
-                    
-                    {/* Chỉ hiện nút Follow nếu profile không phải là của chính mình */}
-                    {currentUser._id !== profile._id && (
-                        <button onClick={handleFollow} style={{marginTop: '10px'}}>
+
+                    <div className="profile-avatar-container">
+                        <img 
+                            src={profile.profilePicture || "https://via.placeholder.com/150"} 
+                            alt="Avatar" 
+                            className="profile-avatar"
+                        />
+                    </div>
+                </div>
+
+                {/* Phần Nút bấm hành động */}
+                <div className="profile-actions">
+                    {isMyProfile ? (
+                        <button className="action-btn secondary">Edit Profile</button>
+                    ) : (
+                        <button 
+                            onClick={handleFollow} 
+                            className={`action-btn ${followed ? 'secondary' : 'primary'}`}
+                        >
                             {followed ? "Unfollow" : "Follow"}
                         </button>
                     )}
-                    
-                    {currentUser._id === profile._id && (
-                        <button style={{marginTop: '10px'}}>Edit Profile</button>
-                    )}
+                    {/* Nút Share giả lập */}
+                    <button className="action-btn secondary">Share Profile</button>
                 </div>
-            </div>
-            <hr />
-            <div className="profile-posts">
-                <h3>Posts</h3>
-                {/* Phần hiển thị bài viết sẽ do Thành viên 2 làm */}
-                <p>No posts yet.</p>
+
+                {/* Phần bài viết (Tabs) */}
+                <div className="profile-tabs">
+                    <div className="tab-item">Threads</div>
+                </div>
+
+                <div className="profile-posts">
+                    {/* Content bài viết sẽ hiển thị ở đây */}
+                    <p style={{color: '#777', textAlign: 'center', marginTop: '20px'}}>No threads yet.</p>
+                </div>
             </div>
         </div>
     );

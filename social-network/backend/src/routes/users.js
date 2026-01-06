@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserProfile, updateUserProfile, followUser, unfollowUser } = require('../controllers/userController');
+const { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers } = require('../controllers/userController');
 const { protect } = require('../middlewares/authMiddleware');
 
 // Lấy thông tin user (Ai cũng xem được hoặc cần login tùy bạn, ở đây để public xem profile)
@@ -14,5 +14,8 @@ router.put('/:id/follow', protect, followUser);
 
 // Unfollow user
 router.put('/:id/unfollow', protect, unfollowUser);
+
+// Lấy danh sách user
+router.get("/", getAllUsers);
 
 module.exports = router;

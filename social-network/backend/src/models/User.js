@@ -18,12 +18,25 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String,
     },
+    // Reset Password Fields
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-    
+
+    // Email Verification Fields
+    isVerified: { 
+        type: Boolean, 
+        default: false 
+    },
+    verificationToken: { 
+        type: String 
+    },
+    verificationTokenExpires: { 
+        type: Date 
+    },
+
     profilePicture: {
         type: String,
-        default: "", // Link ảnh avatar
+        default: "", 
     },
     bio: {
         type: String,

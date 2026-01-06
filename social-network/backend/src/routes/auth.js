@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const { registerUser, loginUser, forgotPassword, resetPassword } = require('../controllers/authController');
+const { registerUser, loginUser, forgotPassword, resetPassword, verifyEmail} = require('../controllers/authController');
 
 const generateToken = require('../utils/generateToken');
 
 // --- Các route ---
 
 router.post('/register', registerUser);
+router.post('/verify-email', verifyEmail);
 router.post('/login', loginUser);
 
 // 1. Gọi Google Login

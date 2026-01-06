@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 
-// @desc    Register new user
+// @desc    Register new user & Send Verification Email
 // @route   POST /api/auth/register
 const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -15,26 +15,81 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Hash password (Mã hóa mật khẩu khi đăng ký)
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Tạo mã xác thực 6 số ngẫu nhiên
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Tạo user mới (isVerified mặc định là false từ Model)
         const user = await User.create({
             username,
             email,
             password: hashedPassword,
+            verificationToken: verificationCode,
+            verificationTokenExpires: Date.now() + 3600000, // Mã hết hạn sau 1 giờ (1h * 60p * 60s * 1000ms)
         });
 
         if (user) {
-            res.status(201).json({
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                token: generateToken(user._id),
-            });
+            // Gửi email chứa mã
+            const message = `
+                <h1>Welcome to Universe</h1>
+                <p>Thank you for registering. Please use the code below to verify your account:</p>
+                <h2 style="color: blue;">${verificationCode}</h2>
+                <p>This code will expire in 1 hour.</p>
+            `;
+
+            try {
+                await sendEmail({
+                    to: user.email,
+                    subject: "Universe Account Verification",
+                    text: message, // Hoặc html: message tùy vào hàm sendEmail của bạn hỗ trợ gì
+                });
+
+                res.status(201).json({
+                    success: true,
+                    message: "Registration successful! Please check your email to verify account.",
+                    email: user.email // Trả về email để frontend điền sẵn vào form verify
+                });
+            } catch (error) {
+                // Nếu gửi mail lỗi, có thể xóa user để họ đăng ký lại (tùy chọn)
+                // await User.findByIdAndDelete(user._id);
+                return res.status(500).json({ message: "User created but failed to send verification email." });
+            }
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Verify Email with Code
+// @route   POST /api/auth/verify-email (Cần thêm route này vào auth.js)
+const verifyEmail = async (req, res) => {
+    const { email, code } = req.body;
+
+    try {
+        // Tìm user có email và mã code khớp, đồng thời mã chưa hết hạn
+        const user = await User.findOne({
+            email,
+            verificationToken: code,
+            verificationTokenExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired verification code" });
+        }
+
+        // Kích hoạt tài khoản
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpires = undefined;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Email verified successfully! You can login now." });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -48,8 +103,18 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
 
-        // So sánh mật khẩu nhập vào với mật khẩu đã mã hóa trong DB
+        // So sánh mật khẩu
         if (user && (await bcrypt.compare(password, user.password))) {
+            
+            //  Kiểm tra xem đã kích hoạt chưa
+            if (!user.isVerified) {
+                return res.status(401).json({ 
+                    message: 'Please verify your email first!', 
+                    needVerification: true, // Cờ hiệu để frontend biết chuyển hướng sang trang nhập code
+                    email: user.email 
+                });
+            }
+
             res.json({
                 _id: user._id,
                 username: user.username,
@@ -76,16 +141,13 @@ const forgotPassword = async (req, res) => {
             return res.status(404).json({ message: "Email not found" });
         }
 
-        // Tạo token ngẫu nhiên
         const resetToken = crypto.randomBytes(20).toString('hex');
 
-        // Lưu token vào DB (Hash nhẹ để bảo mật hơn)
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Hết hạn sau 10 phút
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; 
 
         await user.save();
 
-        // Tạo đường dẫn reset (Trỏ về Frontend)
         const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
 
         const message = `
@@ -98,7 +160,7 @@ const forgotPassword = async (req, res) => {
         try {
             await sendEmail({
                 to: user.email,
-                subject: "Chatsgram Password Reset",
+                subject: "Universe Password Reset",
                 text: message,
             });
             res.status(200).json({ success: true, data: "Email Sent" });
@@ -113,27 +175,24 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-// @desc    Reset Password - Đặt lại mật khẩu mới
+// @desc    Reset Password
 // @route   PUT /api/auth/resetpassword/:resetToken
 const resetPassword = async (req, res) => {
-    // Lấy token từ URL băm ra để so sánh với DB
     const resetPasswordToken = crypto.createHash('sha256').update(req.params.resetToken).digest('hex');
 
     try {
         const user = await User.findOne({
             resetPasswordToken,
-            resetPasswordExpire: { $gt: Date.now() }, // Kiểm tra token còn hạn không
+            resetPasswordExpire: { $gt: Date.now() },
         });
 
         if (!user) {
             return res.status(400).json({ message: "Invalid or Expired Token" });
         }
 
-        // 👇 QUAN TRỌNG: Mã hóa mật khẩu mới trước khi lưu
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);
         
-        // Xóa token reset đi (để không dùng lại được nữa)
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
 
@@ -145,4 +204,4 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword, verifyEmail };

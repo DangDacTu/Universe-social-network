@@ -1,0 +1,138 @@
+/* src/pages/user/Profile.css */
+
+/* 1. Layout chính */
+.profile-wrapper {
+    min-height: 100vh;
+    background-color: #101010; /* Nền đen chuẩn Threads */
+    color: #fff;
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding-bottom: 50px;
+}
+
+.profile-container {
+    max-width: 600px; /* Profile Threads thường hẹp ở giữa */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 2. Header Profile */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.profile-username {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+}
+
+.profile-handle {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 15px;
+    background: #1e1e1e;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 50px;
+}
+
+.profile-bio {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 20px;
+    color: #777;
+    font-size: 14px;
+}
+
+.profile-stats span b {
+    color: #fff; /* Số lượng màu trắng */
+}
+
+/* 3. Avatar */
+.profile-avatar-container {
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1e1e1e;
+}
+
+/* 4. Action Buttons (Follow/Edit) */
+.profile-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    flex: 1; /* Nút kéo dài hết chiều ngang */
+    padding: 10px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+}
+
+/* Nút chính (Follow): Màu trắng, chữ đen */
+.action-btn.primary {
+    background-color: #fff;
+    color: #000;
+    border: none;
+}
+
+.action-btn.primary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Nút phụ (Unfollow/Edit): Nền trong suốt, viền mờ */
+.action-btn.secondary {
+    background-color: transparent;
+    color: #fff;
+}
+
+.action-btn.secondary:hover {
+    background-color: #1e1e1e;
+}
+
+/* 5. Tabs / Posts section */
+.profile-tabs {
+    margin-top: 30px;
+    border-top: 1px solid #333;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.tab-item {
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #fff; /* Active tab indicator */
+    display: inline-block;
+    width: 50%;
+}
+
+.back-link {
+    color: #0095f6;
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 20px;
+}
