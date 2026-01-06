@@ -1,79 +1,123 @@
-/* Login.css - Threads Style */
+/* src/pages/user/Login.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 body {
     margin: 0;
     padding: 0;
-    /* Font chữ giống Threads/Instagram */
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #101010; /* Nền đen đặc trưng của Threads */
+    background-color: #000; /* Nền đen tuyệt đối */
     color: #fff;
+    overflow: hidden; /* Tránh thanh cuộn */
 }
 
+/* --- LAYOUT CHÍNH --- */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
-    /* Thêm một chút họa tiết nền Threads (dải ruy băng mờ ảo phía sau) */
-    background: 
-        radial-gradient(circle at 50% 10%, rgba(255, 255, 255, 0.03) 0%, transparent 60%),
-        #101010;
+    position: relative;
+    width: 100%;
 }
 
+/* Hiệu ứng nền Grid + Mask (Đồng bộ với các trang khác) */
+.login-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+        linear-gradient(to right, #333 1px, transparent 1px),
+        linear-gradient(to bottom, #333 1px, transparent 1px);
+    background-size: 50px 50px;
+    /* Mask giúp lưới mờ dần từ trên xuống dưới */
+    -webkit-mask-image: radial-gradient(circle at top, #000 0%, transparent 80%, transparent 100%);
+    mask-image: radial-gradient(circle at top, #000 0%, transparent 80%, transparent 100%);
+    opacity: 0.4;
+}
+
+/* --- KHUNG LOGIN (GLASS EFFECT) --- */
 .login-container {
     width: 100%;
-    max-width: 370px; /* Threads form thường nhỏ gọn */
+    max-width: 380px;
     text-align: center;
-    padding: 20px;
-    /* Không dùng khung viền, để hòa vào nền như app mobile */
-    background: transparent; 
+    padding: 30px;
+    background: rgba(10, 10, 10, 0.6); 
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* --- LOGO --- */
-.login-container h2 {
-    font-size: 24px;
+/* --- TYPOGRAPHY --- */
+.login-container h1 {
+    font-size: 28px;
     font-weight: 700;
     margin-bottom: 5px;
-    letter-spacing: -0.5px; /* Chữ xích lại gần nhau kiểu hiện đại */
+    margin-top: 0;
+    letter-spacing: -0.5px;
 }
 
 .sub-text {
-    color: #777; /* Màu xám đặc trưng của Meta */
+    color: #888;
     font-size: 14px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
+    line-height: 1.5;
 }
 
-/* --- INPUT FIELDS --- */
-/* Form group để căn chỉnh */
+/* --- FORM & INPUTS --- */
 form {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Khoảng cách giữa các ô input */
+    gap: 12px;
+}
+
+/* Wrapper để chứa Input + Icon con mắt */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .login-input {
     width: 100%;
     padding: 16px;
-    background-color: #1e1e1e; /* Màu xám đậm của input */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền cực mờ */
-    border-radius: 16px; /* Bo tròn lớn đặc trưng của Threads */
+    /* Padding phải lớn hơn để không bị icon che chữ */
+    padding-right: 45px; 
+    background-color: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
     color: #fff;
     font-size: 15px;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
     outline: none;
-    font-weight: 400;
-}
-
-.login-input::placeholder {
-    color: #777;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
 .login-input:focus {
-    border-color: #555; /* Sáng hơn chút khi focus */
+    border-color: #555;
     background-color: #262626;
+}
+
+/* Icon con mắt (Nút bấm) */
+.eye-icon {
+    position: absolute;
+    right: 15px; /* Cách lề phải 15px */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s;
+    height: 100%; /* Full chiều cao để dễ bấm */
+}
+
+.eye-icon:hover {
+    color: #fff;
 }
 
 /* --- BUTTONS --- */
@@ -81,7 +125,7 @@ form {
     width: 100%;
     padding: 16px;
     margin-top: 10px;
-    background-color: #ffffff; /* Nút trắng chữ đen tương phản */
+    background-color: #fff;
     color: #000;
     border: none;
     border-radius: 16px;
@@ -92,32 +136,10 @@ form {
 }
 
 .login-btn:hover {
-    opacity: 0.9; /* Hiệu ứng hover nhẹ */
+    opacity: 0.9;
 }
 
-/* --- GOOGLE BUTTON --- */
-.google-btn {
-    width: 100%;
-    padding: 16px;
-    background-color: #1e1e1e; /* Cùng màu với input */
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: background-color 0.2s;
-}
-
-.google-btn:hover {
-    background-color: #262626;
-}
-
-/* --- DIVIDER --- */
+/* --- DIVIDER (OR) --- */
 .divider {
     display: flex;
     align-items: center;
@@ -137,9 +159,42 @@ form {
     padding: 0 15px;
 }
 
+/* --- GOOGLE BUTTON --- */
+.google-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #1e1e1e;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background-color 0.2s;
+}
+
+.google-btn:hover {
+    background-color: #262626;
+}
+
+/* --- LOGO --- */
+.threads-logo-bg {
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/c/c8/Threads_logo.svg') no-repeat center center;
+    background-size: contain;
+    filter: invert(1);
+}
+
 /* --- LINKS --- */
 .auth-links {
-    margin-top: 30px;
+    margin-top: 25px;
     font-size: 13px;
     color: #777;
 }
@@ -153,15 +208,4 @@ form {
 .auth-links a:hover {
     text-decoration: underline;
     color: #ccc;
-}
-
-/* Biểu tượng Threads giả lập (Logo trang trí) */
-.threads-logo-bg {
-    margin-bottom: 20px;
-    display: inline-block;
-    width: 50px;
-    height: 50px;
-    background: url('https://upload.wikimedia.org/wikipedia/commons/c/c8/Threads_logo.svg') no-repeat center center;
-    background-size: contain;
-    filter: invert(1); /* Đổi màu logo sang trắng */
 }

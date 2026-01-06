@@ -47,7 +47,6 @@ const socketModule = (io) => {
 
         // --- SỰ KIỆN 3: NGẮT KẾT NỐI (Tắt tab/Trình duyệt) ---
         socket.on("disconnect", () => {
-            // console.log("A user disconnected!");
             removeUser(socket.id);
             io.emit("getUsers", users);
         });

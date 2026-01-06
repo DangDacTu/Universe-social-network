@@ -26,7 +26,6 @@ const ForgotPassword = () => {
     return (
         <div className="login-wrapper">
             <div className="login-container">
-                {/* Logo giả lập style Threads */}
                 <div className="threads-logo-bg"></div>
 
                 <h2>Reset Password</h2>

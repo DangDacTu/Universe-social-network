@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom'; // Thêm Link để nút Back hoạt động
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import userApi from '../../api/userApi';
-import './Profile.css'; // 👈 Import file CSS mới
+import './Profile.css';
 
 const Profile = () => {
     const { id } = useParams();
@@ -13,11 +13,12 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const userId = id || currentUser._id;
+                const userId = id || currentUser?._id;
+                if (!userId) return;
+
                 const { data } = await userApi.getUser(userId);
                 setProfile(data);
 
-                // Check follow status
                 if (currentUser && data.followers.includes(currentUser._id)) {
                     setFollowed(true);
                 }
@@ -33,7 +34,6 @@ const Profile = () => {
             if (followed) {
                 await userApi.unfollow(profile._id);
                 setFollowed(false);
-                // Logic chuẩn: Lọc bỏ ID của mình ra khỏi danh sách followers
                 setProfile(prev => ({
                     ...prev, 
                     followers: prev.followers.filter(uid => uid !== currentUser._id)
@@ -41,7 +41,6 @@ const Profile = () => {
             } else {
                 await userApi.follow(profile._id);
                 setFollowed(true);
-                // Logic chuẩn: Thêm ID của mình vào danh sách
                 setProfile(prev => ({
                     ...prev, 
                     followers: [...prev.followers, currentUser._id]
@@ -54,16 +53,13 @@ const Profile = () => {
 
     if (!profile) return <div className="profile-wrapper" style={{textAlign: 'center', paddingTop: '50px'}}>Loading...</div>;
 
-    // Kiểm tra xem đây có phải profile của chính mình không
-    const isMyProfile = currentUser._id === profile._id;
+    const isMyProfile = currentUser && currentUser._id === profile._id;
 
     return (
         <div className="profile-wrapper">
             <div className="profile-container">
-                {/* Nút quay về Home */}
                 <Link to="/" className="back-link">← Back to Feed</Link>
 
-                {/* Phần Header thông tin */}
                 <div className="profile-header">
                     <div className="profile-info">
                         <h2 className="profile-username">{profile.username}</h2>
@@ -80,6 +76,7 @@ const Profile = () => {
                     </div>
 
                     <div className="profile-avatar-container">
+                        {/* 👇 Hiển thị ảnh Avatar từ DB (Link DiceBear) */}
                         <img 
                             src={profile.profilePicture || "https://via.placeholder.com/150"} 
                             alt="Avatar" 
@@ -88,7 +85,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* Phần Nút bấm hành động */}
                 <div className="profile-actions">
                     {isMyProfile ? (
                         <button className="action-btn secondary">Edit Profile</button>
@@ -100,17 +96,14 @@ const Profile = () => {
                             {followed ? "Unfollow" : "Follow"}
                         </button>
                     )}
-                    {/* Nút Share giả lập */}
                     <button className="action-btn secondary">Share Profile</button>
                 </div>
 
-                {/* Phần bài viết (Tabs) */}
                 <div className="profile-tabs">
                     <div className="tab-item">Threads</div>
                 </div>
 
                 <div className="profile-posts">
-                    {/* Content bài viết sẽ hiển thị ở đây */}
                     <p style={{color: '#777', textAlign: 'center', marginTop: '20px'}}>No threads yet.</p>
                 </div>
             </div>

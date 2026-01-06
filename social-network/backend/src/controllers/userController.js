@@ -6,10 +6,12 @@ const getUserProfile = async (req, res) => {
     try {
         // Tìm user, loại bỏ password ra khỏi kết quả trả về
         const user = await User.findById(req.params.id).select('-password');
-        if (user) {
+        
+        // 👇 (Tùy chọn) Nếu bạn muốn chặn không cho xem profile của người chưa xác thực luôn:
+        if (user && user.isVerified) { 
             res.json(user);
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ message: 'User not found or not verified' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -28,10 +30,9 @@ const updateUserProfile = async (req, res) => {
             user.bio = req.body.bio || user.bio;
             user.profilePicture = req.body.profilePicture || user.profilePicture;
 
-            // Nếu đổi mật khẩu (Logic này có thể tách riêng nếu muốn bảo mật cao hơn)
+            // Nếu đổi mật khẩu
             if (req.body.password) {
                 user.password = req.body.password; 
-                // Middleware 'pre save' trong model User sẽ tự hash lại password nếu bạn đã setup (hoặc hash thủ công ở đây)
             }
 
             const updatedUser = await user.save();
@@ -42,7 +43,7 @@ const updateUserProfile = async (req, res) => {
                 email: updatedUser.email,
                 bio: updatedUser.bio,
                 profilePicture: updatedUser.profilePicture,
-                token: req.body.token, // Giữ lại token cũ
+                token: req.body.token, 
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -98,16 +99,20 @@ const unfollowUser = async (req, res) => {
     }
 };
 
+// @desc    Get All Users (For Home/Suggestions)
+// @route   GET /api/users
 const getAllUsers = async (req, res) => {
     try {
-        // Lấy tất cả user nhưng giới hạn 20 người mới nhất
-        // .select() để chỉ lấy id, username, ảnh đại diện (không lấy password)
-        const users = await User.find().limit(20).select("_id username profilePicture email");
+        // 👇👇👇 SỬA Ở ĐÂY 👇👇👇
+        // Thêm điều kiện { isVerified: true } để CHỈ lấy những người đã xác thực
+        const users = await User.find({ isVerified: true }) 
+                                .limit(20)
+                                .select("_id username profilePicture email");
+                                
         res.status(200).json(users);
     } catch (err) {
         res.status(500).json(err);
     }
 };
 
-// Nhớ export thêm hàm getAllUsers này ra
 module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers };
