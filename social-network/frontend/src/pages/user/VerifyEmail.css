@@ -38,7 +38,7 @@ body {
 /* --- Container (Đồng bộ kích thước với Register) --- */
 .verify-container {
     width: 100%;
-    max-width: 420px; /* 👇 Tăng lên 420px để bằng Register */
+    max-width: 420px;
     text-align: center;
     padding: 30px;
     background: rgba(10, 10, 10, 0.6); 

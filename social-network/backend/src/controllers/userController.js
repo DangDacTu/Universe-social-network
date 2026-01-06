@@ -7,7 +7,7 @@ const getUserProfile = async (req, res) => {
         // Tìm user, loại bỏ password ra khỏi kết quả trả về
         const user = await User.findById(req.params.id).select('-password');
         
-        // 👇 (Tùy chọn) Nếu bạn muốn chặn không cho xem profile của người chưa xác thực luôn:
+        // (Tùy chọn) Nếu bạn muốn chặn không cho xem profile của người chưa xác thực luôn:
         if (user && user.isVerified) { 
             res.json(user);
         } else {
@@ -103,7 +103,6 @@ const unfollowUser = async (req, res) => {
 // @route   GET /api/users
 const getAllUsers = async (req, res) => {
     try {
-        // 👇👇👇 SỬA Ở ĐÂY 👇👇👇
         // Thêm điều kiện { isVerified: true } để CHỈ lấy những người đã xác thực
         const users = await User.find({ isVerified: true }) 
                                 .limit(20)

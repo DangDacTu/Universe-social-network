@@ -1,4 +1,3 @@
-/* src/pages/user/Register.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 body {
@@ -71,7 +70,7 @@ form {
     gap: 12px;
 }
 
-/* 👇 Wrapper để chứa Input + Icon con mắt */
+/* Wrapper để chứa Input + Icon con mắt */
 .input-wrapper {
     position: relative;
     width: 100%;
@@ -82,7 +81,7 @@ form {
 .register-input {
     width: 100%;
     padding: 16px;
-    /* 👇 Quan trọng: Padding phải lớn hơn để không bị icon che chữ */
+    /* Quan trọng: Padding phải lớn hơn để không bị icon che chữ */
     padding-right: 45px; 
     background-color: #1e1e1e;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -99,7 +98,7 @@ form {
     background-color: #262626;
 }
 
-/* 👇 Icon con mắt (Nút bấm) */
+/* Icon con mắt (Nút bấm) */
 .eye-icon {
     position: absolute;
     right: 15px;

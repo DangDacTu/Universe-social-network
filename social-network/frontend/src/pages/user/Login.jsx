@@ -7,7 +7,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
-    // 👇 Thêm state để ẩn hiện password
+    // Thêm state để ẩn hiện password
     const [showPass, setShowPass] = useState(false);
 
     const { login } = useAuth();
@@ -56,7 +56,7 @@ const Login = () => {
                         required 
                     />
 
-                    {/* 👇 BỌC INPUT PASSWORD TRONG WRAPPER VÀ THÊM ICON */}
+                    {/* BỌC INPUT PASSWORD TRONG WRAPPER VÀ THÊM ICON */}
                     <div className="input-wrapper">
                         <input 
                             className="login-input"

@@ -9,7 +9,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     
-    // 👇 State quản lý ẩn/hiện mật khẩu
+    // State quản lý ẩn/hiện mật khẩu
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
 
@@ -87,7 +87,7 @@ const Register = () => {
                         required 
                     />
                     
-                    {/* 👇 PASSWORD INPUT */}
+                    {/* PASSWORD INPUT */}
                     <div className="input-wrapper">
                         <input 
                             className="register-input"
@@ -106,7 +106,7 @@ const Register = () => {
                         </button>
                     </div>
 
-                    {/* 👇 CONFIRM PASSWORD INPUT */}
+                    {/* CONFIRM PASSWORD INPUT */}
                     <div className="input-wrapper">
                         <input 
                             className="register-input"

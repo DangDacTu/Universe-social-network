@@ -60,7 +60,7 @@ const Home = () => {
                             />
                             <h4 style={{ margin: '5px 0', fontSize: '16px' }}>{friend.username}</h4>
                             
-                            {/* 👇 LINK QUAN TRỌNG: Dẫn sang trang Profile của người đó */}
+                            {/* LINK QUAN TRỌNG: Dẫn sang trang Profile của người đó */}
                             <Link to={`/profile/${friend._id}`}>
                                 <button style={{ 
                                     marginTop: '5px', 

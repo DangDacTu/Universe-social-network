@@ -45,7 +45,6 @@ const VerifyEmail = () => {
                 {/* Logo */}
                 <div className="threads-logo-bg"></div>
                 
-                {/* 👇 ĐỒNG BỘ: Tiêu đề H1 là Universe giống trang Register */}
                 <h1>Verify Account</h1>
                 <p className="sub-text">
                     Enter the code sent to <br/>
