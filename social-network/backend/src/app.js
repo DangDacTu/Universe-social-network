@@ -7,7 +7,16 @@ const app = express();
 
 // Middleware
 app.use(express.json()); // Parse JSON body
-app.use(cors());
+
+// CẤU HÌNH CORS CHO APP (Quan trọng)
+// Phải cho phép cả Localhost (để code máy nhà) và Vercel (để chạy online)
+app.use(cors({
+    origin: [
+        "http://localhost:5173",             // Cho phép máy local
+        "https://universe-social-network.vercel.app" //Cho phép Vercel
+    ],
+    credentials: true // Cho phép gửi cookie/token xác thực
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);
