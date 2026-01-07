@@ -6,9 +6,9 @@ const getUserProfile = async (req, res) => {
     try {
         // Tìm user, loại bỏ password ra khỏi kết quả trả về
         const user = await User.findById(req.params.id).select('-password');
-        
+
         // (Tùy chọn) Nếu bạn muốn chặn không cho xem profile của người chưa xác thực luôn:
-        if (user && user.isVerified) { 
+        if (user && user.isVerified) {
             res.json(user);
         } else {
             res.status(404).json({ message: 'User not found or not verified' });
@@ -32,7 +32,7 @@ const updateUserProfile = async (req, res) => {
 
             // Nếu đổi mật khẩu
             if (req.body.password) {
-                user.password = req.body.password; 
+                user.password = req.body.password;
             }
 
             const updatedUser = await user.save();
@@ -43,7 +43,7 @@ const updateUserProfile = async (req, res) => {
                 email: updatedUser.email,
                 bio: updatedUser.bio,
                 profilePicture: updatedUser.profilePicture,
-                token: req.body.token, 
+                token: req.body.token,
             });
         } else {
             res.status(404).json({ message: 'User not found' });
@@ -104,10 +104,10 @@ const unfollowUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         // Thêm điều kiện { isVerified: true } để CHỈ lấy những người đã xác thực
-        const users = await User.find({ isVerified: true }) 
-                                .limit(20)
-                                .select("_id username profilePicture email");
-                                
+        const users = await User.find({ isVerified: true })
+            .limit(20)
+            .select("_id username profilePicture email");
+
         res.status(200).json(users);
     } catch (err) {
         res.status(500).json(err);
