@@ -6,6 +6,7 @@ import "./EditProfileModal.css";
 const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
     const [username, setUsername] = useState(user?.username || "");
     const [bio, setBio] = useState(user?.bio || "");
+    const [gender, setGender] = useState(user?.gender || "other");
     const [imageFile, setImageFile] = useState(null);
     const [previewImage, setPreviewImage] = useState(user?.profilePicture || "https://via.placeholder.com/150");
     const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +62,7 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
             const updatedData = {
                 username,
                 bio,
+                gender,
                 profilePicture: profilePictureUrl,
             };
 
@@ -84,6 +86,7 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
                     <h3>Edit Profile</h3>
                     <button onClick={onClose} className="close-btn">✕</button>
                 </div>
+
                 <form onSubmit={handleSubmit}>
                     <div className="avatar-upload-section">
                         <img src={previewImage} alt="Avatar Preview" className="avatar-preview" />
@@ -94,6 +97,20 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
                         <label>Username</label>
                         <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="modal-input" required />
                     </div>
+
+                    <div className="form-group">
+                        <label>Gender</label>
+                        <select 
+                            value={gender} 
+                            onChange={(e) => setGender(e.target.value)}
+                            className="modal-input" // Dùng chung class với input để đẹp
+                        >
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
                     <div className="form-group">
                         <label>Bio</label>
                         <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="modal-input" rows="3" placeholder="Bio..." />

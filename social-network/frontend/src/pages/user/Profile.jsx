@@ -23,8 +23,11 @@ const Profile = () => {
                 const { data } = await userApi.getUser(userId);
                 setProfile(data);
 
+                // Kiểm tra xem mình đã follow người này chưa
                 if (currentUser && data.followers.includes(currentUser._id)) {
                     setFollowed(true);
+                } else {
+                    setFollowed(false);
                 }
             } catch (error) {
                 console.error("Failed to fetch profile", error);
@@ -33,9 +36,40 @@ const Profile = () => {
         fetchProfile();
     }, [id, currentUser]);
 
-    // ... (Giữ nguyên phần handleFollow) ...
+    // 👇👇👇 LOGIC FOLLOW/UNFOLLOW ĐÃ ĐƯỢC SỬA 👇👇👇
     const handleFollow = async () => {
-        /* ... code cũ ... */
+        if (!currentUser) {
+            alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+            return;
+        }
+
+        // Chặn follow chính mình (dù nút đã ẩn nhưng thêm cho chắc)
+        if (currentUser._id === profile._id) return;
+
+        try {
+            if (followed) {
+                // --- UNFOLLOW ---
+                await userApi.unfollow(profile._id);
+                setFollowed(false);
+                // Cập nhật số lượng follower ngay lập tức (giả lập)
+                setProfile(prev => ({
+                    ...prev, 
+                    followers: prev.followers.filter(uid => uid !== currentUser._id)
+                })); 
+            } else {
+                // --- FOLLOW ---
+                await userApi.follow(profile._id);
+                setFollowed(true);
+                // Cập nhật số lượng follower ngay lập tức (giả lập)
+                setProfile(prev => ({
+                    ...prev, 
+                    followers: [...prev.followers, currentUser._id]
+                }));
+            }
+        } catch (error) {
+            console.error("Follow error", error);
+            alert("Có lỗi xảy ra khi Follow/Unfollow");
+        }
     };
 
     // Hàm xử lý khi Update thành công từ Modal
@@ -79,7 +113,6 @@ const Profile = () => {
 
                 <div className="profile-actions">
                     {isMyProfile ? (
-                        // Sửa nút Edit Profile để mở Modal
                         <button 
                             className="action-btn secondary"
                             onClick={() => setIsEditing(true)}
@@ -97,15 +130,13 @@ const Profile = () => {
                     <button className="action-btn secondary">Share Profile</button>
                 </div>
 
-                {/* ... Tabs và Posts ... */}
-                 <div className="profile-tabs">
+                <div className="profile-tabs">
                     <div className="tab-item">Threads</div>
                 </div>
                 <div className="profile-posts">
                     <p style={{color: '#777', textAlign: 'center', marginTop: '20px'}}>No threads yet.</p>
                 </div>
 
-                {/* Hiển thị Modal khi isEditing = true */}
                 {isEditing && (
                     <EditProfileModal 
                         user={profile}

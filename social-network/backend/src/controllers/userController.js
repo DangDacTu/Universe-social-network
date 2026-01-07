@@ -29,6 +29,8 @@ const updateUserProfile = async (req, res) => {
             user.username = req.body.username || user.username;
             user.bio = req.body.bio || user.bio;
             user.profilePicture = req.body.profilePicture || user.profilePicture;
+            // giới tính   
+            user.gender = req.body.gender || user.gender;
 
             // Nếu đổi mật khẩu
             if (req.body.password) {
