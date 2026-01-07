@@ -27,14 +27,15 @@ const Register = () => {
             return;
         }
 
-        if (password.length < 6) {
-            setError("Password must be at least 6 characters.");
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters.");
             return;
         }
 
         setIsLoading(true);
 
         try {
+            // authApi phải dùng axiosClient thì mới nhận đúng link Render
             await authApi.register({ username, email, password });
             navigate('/verify-email', { state: { email: email } });
         } catch (err) {
@@ -47,7 +48,12 @@ const Register = () => {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:5000/api/auth/google";
+        // --- SỬA LỖI QUAN TRỌNG ---
+        // Lấy link API từ biến môi trường (Vercel) hoặc dùng localhost nếu chạy ở nhà
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        
+        // Chuyển hướng đến endpoint Google Login của Backend
+        window.location.href = `${API_URL}/auth/google`;
     };
 
     // Component Icon Mắt

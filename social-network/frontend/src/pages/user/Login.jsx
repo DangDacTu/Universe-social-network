@@ -16,14 +16,33 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            // 1. Chờ hàm login thực hiện xong (lúc này 'user' đã được lưu vào localStorage)
+            await login(email, password); 
+
+            // ============================================================
+            // ĐOẠN CODE SỬA: Lấy Token từ trong User ra và lưu riêng
+            // ============================================================
+            const userFromStorage = localStorage.getItem('user');
+            if (userFromStorage) {
+                const userObj = JSON.parse(userFromStorage);
+                if (userObj && userObj.token) {
+                    // Lưu riêng token ra ngoài để bạn của bạn dùng được ngay
+                    localStorage.setItem('token', userObj.token);
+                    console.log("Đã trích xuất và lưu Token thành công!");
+                }
+            }
+            // ============================================================
+
             navigate('/');
         } catch (error) {
+            console.error("Lỗi đăng nhập:", error);
             alert('Login failed!');
         }
     };
 
     const handleGoogleLogin = () => {
+        // Lưu ý: Nếu dùng Google Login, bạn cũng cần xử lý lưu token tương tự 
+        // ở trang nhận callback (thường là trang Home hoặc trang AuthCallback)
         window.location.href = "http://localhost:5000/api/auth/google";
     };
 
