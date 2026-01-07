@@ -1,56 +1,60 @@
-let users = [];
+/**
+ * @file socket.js
+ * @author moi
+ * @description
+ * Cấu hình Socket.IO cho chức năng chat realtime 1-1
+ * - Quản lý user online
+ * - Gửi/nhận tin nhắn realtime
+ * - Lưu lịch sử chat vào MongoDB
+ */
 
-// (Khi user đăng nhập, ta lưu userId của họ kèm với socketId của phiên kết nối)
-const addUser = (userId, socketId) => {
-    !users.some((user) => user.userId === userId) &&
-        users.push({ userId, socketId });
-};
+const Message = require("../models/Message");
 
-// 2. Hàm xóa user khi ngắt kết nối
-const removeUser = (socketId) => {
-    users = users.filter((user) => user.socketId !== socketId);
-};
+// Map lưu userId -> socketId để biết user nào đang online
+const onlineUsers = new Map();
 
-// 3. Hàm tìm socketId của người nhận để gửi tin
-const getUser = (userId) => {
-    return users.find((user) => user.userId === userId);
-};
-
-const socketModule = (io) => {
+const socketHandler = (io) => {
     io.on("connection", (socket) => {
-        // console.log("A user connected.");
+        console.log(" User connected:", socket.id);
 
-        // --- SỰ KIỆN 1: KHI USER VỪA VÀO APP ---
-        // Client sẽ gửi sự kiện "addUser" kèm theo ID của họ
-        socket.on("addUser", (userId) => {
-            addUser(userId, socket.id);
-            // Gửi danh sách những người đang online cho tất cả mọi người biết
-            io.emit("getUsers", users);
+        /**
+         * Client gửi userId khi online
+         * → lưu socketId tương ứng
+         */
+        socket.on("user-online", (userId) => {
+            onlineUsers.set(userId, socket.id);
+            socket.userId = userId;
         });
 
-        // --- SỰ KIỆN 2: GỬI TIN NHẮN ---
-        // Client gửi: người gửi, người nhận, nội dung
-        socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-            const user = getUser(receiverId);
-            
-            // Nếu người nhận đang Online thì gửi ngay lập tức
-            if (user) {
-                io.to(user.socketId).emit("getMessage", {
-                    senderId,
-                    text,
-                });
-            } else {
-                // Người nhận Offline -> Có thể xử lý thông báo sau này
-                console.log(`User ${receiverId} is offline.`);
+        /**
+         * Xử lý gửi tin nhắn realtime
+         * - Lưu tin nhắn vào DB
+         * - Gửi realtime nếu người nhận đang online
+         */
+        socket.on("send-message", async ({ senderId, receiverId, content }) => {
+            const message = await Message.create({
+                senderId,
+                receiverId,
+                content,
+            });
+
+            const receiverSocketId = onlineUsers.get(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit("receive-message", message);
             }
         });
 
-        // --- SỰ KIỆN 3: NGẮT KẾT NỐI (Tắt tab/Trình duyệt) ---
+        /**
+         * Khi user ngắt kết nối
+         * → xoá khỏi danh sách online
+         */
         socket.on("disconnect", () => {
-            removeUser(socket.id);
-            io.emit("getUsers", users);
+            if (socket.userId) {
+                onlineUsers.delete(socket.userId);
+            }
+            console.log(" User disconnected:", socket.id);
         });
     });
 };
 
-module.exports = socketModule;
+module.exports = socketHandler;
