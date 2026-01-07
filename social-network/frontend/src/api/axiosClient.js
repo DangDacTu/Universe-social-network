@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:5000/api',
+     // baseURL: 'http://localhost:5000/api',
+    // headers: {
+    //     'Content-Type': 'application/json',
+    // },
+    // Đã sửa: Trỏ về server trên Render thay vì localhost
+    baseURL: 'https://universe-social-network.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
     },
