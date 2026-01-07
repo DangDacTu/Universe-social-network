@@ -20,13 +20,12 @@ const Login = () => {
             await login(email, password); 
 
             // ============================================================
-            // ĐOẠN CODE SỬA: Lấy Token từ trong User ra và lưu riêng
+            // Lấy Token từ trong User ra và lưu riêng
             // ============================================================
             const userFromStorage = localStorage.getItem('user');
             if (userFromStorage) {
                 const userObj = JSON.parse(userFromStorage);
                 if (userObj && userObj.token) {
-                    // Lưu riêng token ra ngoài để bạn của bạn dùng được ngay
                     localStorage.setItem('token', userObj.token);
                     console.log("Đã trích xuất và lưu Token thành công!");
                 }
@@ -41,9 +40,12 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {
-        // Lưu ý: Nếu dùng Google Login, bạn cũng cần xử lý lưu token tương tự 
-        // ở trang nhận callback (thường là trang Home hoặc trang AuthCallback)
-        window.location.href = "http://localhost:5000/api/auth/google";
+        // --- SỬA LỖI QUAN TRỌNG Ở ĐÂY ---
+        // 1. Lấy đường dẫn API chuẩn (Nếu trên Vercel thì lấy link Render, nếu ở nhà thì lấy localhost)
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        
+        // 2. Chuyển hướng đến server backend
+        window.location.href = `${API_URL}/auth/google`;
     };
 
     // Component Icon Mắt
@@ -75,11 +77,10 @@ const Login = () => {
                         required 
                     />
 
-                    {/* BỌC INPUT PASSWORD TRONG WRAPPER VÀ THÊM ICON */}
                     <div className="input-wrapper">
                         <input 
                             className="login-input"
-                            type={showPass ? "text" : "password"} // Thay đổi type
+                            type={showPass ? "text" : "password"} 
                             placeholder="Password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
