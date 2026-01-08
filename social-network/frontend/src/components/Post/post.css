@@ -1,0 +1,120 @@
+/* POST INPUT */
+.post-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
+}
+
+.post-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.post-input button {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* AVATAR */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 500px;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 16px;
+}
+
+.user-row {
+  display: flex;
+  gap: 12px;
+}
+
+.preview img,
+.preview video {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.media-btn {
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.submit {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+.post-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.post-content {
+  flex: 1;
+}
+
+.post-header {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.post-content p {
+  margin: 4px 0;
+}
+
+.post-media img,
+.post-media video {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 8px;
+}
+.post-item {
+  border: 1px solid red;
+}

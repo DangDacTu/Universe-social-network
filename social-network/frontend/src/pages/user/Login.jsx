@@ -16,14 +16,28 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            // 1. Chờ hàm login thực hiện xong (lúc này 'user' đã được lưu vào localStorage)
+            await login(email, password); 
+
+            const userFromStorage = localStorage.getItem('user');
+            if (userFromStorage) {
+                const userObj = JSON.parse(userFromStorage);
+                if (userObj && userObj.token) {
+
+                    localStorage.setItem('token', userObj.token);
+                    console.log("Đã trích xuất và lưu Token thành công!");
+                }
+            }
+
             navigate('/');
         } catch (error) {
+            console.error("Lỗi đăng nhập:", error);
             alert('Login failed!');
         }
     };
 
     const handleGoogleLogin = () => {
+        // ở trang nhận callback
         window.location.href = "http://localhost:5000/api/auth/google";
     };
 
@@ -50,17 +64,16 @@ const Login = () => {
                     <input 
                         className="login-input"
                         type="email" 
-                        placeholder="Email" 
-                        value={email} 
+                        placeholder="Email"
+value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                         required 
                     />
 
-                    {/* BỌC INPUT PASSWORD TRONG WRAPPER VÀ THÊM ICON */}
                     <div className="input-wrapper">
                         <input 
                             className="login-input"
-                            type={showPass ? "text" : "password"} // Thay đổi type
+                            type={showPass ? "text" : "password"} 
                             placeholder="Password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
