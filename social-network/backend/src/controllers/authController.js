@@ -144,7 +144,8 @@ const forgotPassword = async (req, res) => {
         user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; 
         await user.save();
 
-        const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
+        const clientURL = process.env.CLIENT_URL || 'http://localhost:5173';
+        const resetUrl = `${clientURL}/resetpassword/${resetToken}`;
         const message = `<p>Click here to reset password: <a href="${resetUrl}">${resetUrl}</a></p>`;
 
         try {
