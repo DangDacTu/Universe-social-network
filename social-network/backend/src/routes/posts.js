@@ -4,7 +4,14 @@ const postController = require("../controllers/postController");
 const { protect } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
-router.post("/", protect, upload.single("media"), postController.createPost);
+// 🔥 upload nhiều file
+router.post(
+  "/",
+  protect,
+  upload.array("media", 10), // tối đa 10 file
+  postController.createPost
+);
+
 router.get("/", protect, postController.getAllPosts);
 
 module.exports = router;

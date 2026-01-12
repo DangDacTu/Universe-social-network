@@ -7,24 +7,27 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     content: {
       type: String,
-      required: true,
       trim: true,
-    },
-    image: {
-      type: String,
       default: "",
     },
-    media: {
-      type: String,
-      default: null,
-    },
-    mediaType: {
-      type: String,
-      enum: ["image", "video"],
-      default: null,
-    }, // image | video
+
+    // 🔥 MULTI MEDIA (image / video)
+    media: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        type: {
+          type: String,
+          enum: ["image", "video"],
+          required: true,
+        },
+      },
+    ],
 
     likes: [
       {

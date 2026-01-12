@@ -4,27 +4,27 @@ exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
-    if (!content && !req.file) {
+    // 🔥 kiểm tra có nội dung hoặc có file
+    if (!content && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Bài viết phải có nội dung hoặc media",
       });
     }
 
-    let media = null;
-    let mediaType = null;
+    let media = [];
 
-    if (req.file) {
-      media = `/uploads/${req.file.filename}`;
-      mediaType = req.file.mimetype.startsWith("image")
-        ? "image"
-        : "video";
+    // 🔥 xử lý nhiều file
+    if (req.files && req.files.length > 0) {
+      media = req.files.map((file) => ({
+        url: `/uploads/${file.filename}`,
+        type: file.mimetype.startsWith("image") ? "image" : "video",
+      }));
     }
 
     const post = await Post.create({
       author: req.user.id,
       content,
-      media,
-      mediaType,
+      media, // 🔥 mảng media
     });
 
     const populatedPost = await post.populate(
@@ -47,6 +47,7 @@ exports.getAllPosts = async (req, res) => {
 
     res.json(posts);
   } catch (error) {
+    console.error("Get posts error:", error);
     res.status(500).json({ message: error.message });
   }
 };

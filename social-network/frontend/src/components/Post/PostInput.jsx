@@ -1,9 +1,14 @@
 import "./post.css";
+const DEFAULT_AVATAR = "/avatar.jpg";
 
 export default function PostInput({ onOpen }) {
   return (
     <div className="post-input">
-      <img src="/avatar.png" className="avatar" />
+      <img
+        src={DEFAULT_AVATAR}
+        alt="avatar"
+        className="avatar"
+      />
 
       <input
         type="text"
