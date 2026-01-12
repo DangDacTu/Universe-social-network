@@ -40,7 +40,6 @@ const Login = () => {
     };
 
     const handleGoogleLogin = () => {
-        // --- SỬA LỖI QUAN TRỌNG Ở ĐÂY ---
         // 1. Lấy đường dẫn API chuẩn (Nếu trên Vercel thì lấy link Render, nếu ở nhà thì lấy localhost)
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
         
