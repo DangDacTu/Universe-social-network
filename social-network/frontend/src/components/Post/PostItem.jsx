@@ -1,5 +1,8 @@
 import { useState } from "react";
 import "./post.css";
+import axiosClient from "../../api/axiosClient";
+import { FiHeart } from "react-icons/fi";
+import { AiFillHeart } from "react-icons/ai";
 
 const BACKEND_URL = "http://localhost:5000";
 const DEFAULT_AVATAR = "/avatar.jpg";
@@ -7,6 +10,20 @@ const DEFAULT_AVATAR = "/avatar.jpg";
 export default function PostItem({ post }) {
   const [activeIndex, setActiveIndex] = useState(null);
 
+  // ======================
+  // LIKE STATE
+  // ======================
+  const currentUserId = localStorage.getItem("userId"); // hoặc context
+  const [liked, setLiked] = useState(
+    post.likes?.includes(currentUserId)
+  );
+  const [likeCount, setLikeCount] = useState(
+    post.likes?.length || 0
+  );
+
+  // ======================
+  // MEDIA VIEWER
+  // ======================
   const mediaList = post.media || [];
   const activeMedia =
     activeIndex !== null ? mediaList[activeIndex] : null;
@@ -25,9 +42,26 @@ export default function PostItem({ post }) {
     );
   };
 
+  // ======================
+  // TOGGLE LIKE
+  // ======================
+  const handleLike = async () => {
+    try {
+      setLiked(!liked);
+      setLikeCount((c) => (liked ? c - 1 : c + 1));
+
+      await axiosClient.post(`/posts/${post._id}/like`);
+    } catch (err) {
+      // rollback nếu lỗi
+      setLiked(liked);
+      setLikeCount((c) => (liked ? c + 1 : c - 1));
+      console.error("LIKE ERROR:", err);
+    }
+  };
+
   return (
     <>
-      {/* ================= FEED (KHÔNG ĐỔI) ================= */}
+      {/* ================= FEED ================= */}
       <div className="post-item">
         <img
           src={post.author?.avatar || DEFAULT_AVATAR}
@@ -49,6 +83,7 @@ export default function PostItem({ post }) {
             <div className="post-text">{post.content}</div>
           )}
 
+          {/* MEDIA */}
           {mediaList.length > 0 && (
             <div
               className={`post-media-scroll ${
@@ -70,18 +105,36 @@ export default function PostItem({ post }) {
               ))}
             </div>
           )}
+
+          {/* ================= ACTION BAR ================= */}
+          <div className="post-actions">
+            <button
+              className={`like-btn ${liked ? "liked" : ""}`}
+              onClick={handleLike}
+            >
+              {liked ? (
+                <AiFillHeart size={20} />
+              ) : (
+                <FiHeart size={20} />
+              )}
+            </button>
+
+            {likeCount > 0 && (
+              <span className="like-count">
+                {likeCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ================= FULLSCREEN VIEWER ================= */}
       {activeMedia && (
         <div className="media-viewer" onClick={closeViewer}>
-          {/* ❌ FIXED TOP LEFT */}
           <button className="viewer-close" onClick={closeViewer}>
             ✕
           </button>
 
-          {/* ◀ FIXED LEFT */}
           {activeIndex > 0 && (
             <button
               className="viewer-nav left"
@@ -91,7 +144,6 @@ export default function PostItem({ post }) {
             </button>
           )}
 
-          {/* ▶ FIXED RIGHT */}
           {activeIndex < mediaList.length - 1 && (
             <button
               className="viewer-nav right"
@@ -102,30 +154,29 @@ export default function PostItem({ post }) {
           )}
 
           <div
-  className="media-viewer-content"
-  onClick={(e) => e.stopPropagation()}
->
-  <div
-    className="media-slider"
-    style={{
-      transform: `translateX(-${activeIndex * 100}%)`,
-    }}
-  >
-    {mediaList.map((item, index) => (
-      <div className="media-slide" key={index}>
-        {item.type === "image" ? (
-          <img src={`${BACKEND_URL}${item.url}`} />
-        ) : (
-          <video
-            src={`${BACKEND_URL}${item.url}`}
-            controls
-          />
-        )}
-      </div>
-    ))}
-  </div>
-</div>
-
+            className="media-viewer-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="media-slider"
+              style={{
+                transform: `translateX(-${activeIndex * 100}%)`,
+              }}
+            >
+              {mediaList.map((item, index) => (
+                <div className="media-slide" key={index}>
+                  {item.type === "image" ? (
+                    <img src={`${BACKEND_URL}${item.url}`} />
+                  ) : (
+                    <video
+                      src={`${BACKEND_URL}${item.url}`}
+                      controls
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </>

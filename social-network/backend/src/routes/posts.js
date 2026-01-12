@@ -4,7 +4,9 @@ const postController = require("../controllers/postController");
 const { protect } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
-// 🔥 upload nhiều file
+// ======================
+// CREATE POST (MULTI MEDIA)
+// ======================
 router.post(
   "/",
   protect,
@@ -12,6 +14,18 @@ router.post(
   postController.createPost
 );
 
+// ======================
+// GET ALL POSTS
+// ======================
 router.get("/", protect, postController.getAllPosts);
+
+// ======================
+// 🔥 TOGGLE LIKE (THREADS)
+// ======================
+router.post(
+  "/:id/like",
+  protect,
+  postController.toggleLike
+);
 
 module.exports = router;

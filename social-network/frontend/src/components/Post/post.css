@@ -229,6 +229,7 @@ body {
   width: 240px;
   height: 320px;
 }
+
 /* ======================
    SCROLL FIX – THREADS
 ====================== */
@@ -356,7 +357,8 @@ body {
   align-items: center;
   justify-content: center;
 
-  padding: 24px; /* 🔥 khoảng thở giống Threads */
+  padding: 24px;
+  /* 🔥 khoảng thở giống Threads */
 }
 
 .media-viewer-content {
@@ -372,11 +374,13 @@ body {
 .media-viewer-content img,
 .media-viewer-content video {
   max-width: 100%;
-  max-height: 85vh; /* 🔥 quan trọng: KHÔNG chiếm full màn hình */
+  max-height: 85vh;
+  /* 🔥 quan trọng: KHÔNG chiếm full màn hình */
   width: auto;
   height: auto;
 
-  object-fit: contain; /* giữ nguyên tỉ lệ */
+  object-fit: contain;
+  /* giữ nguyên tỉ lệ */
   border-radius: 12px;
 }
 
@@ -465,7 +469,8 @@ body {
 /* SLIDER */
 .media-slider {
   display: flex;
-  transition: transform 0.35s ease; /* 🔥 animation trượt */
+  transition: transform 0.35s ease;
+  /* 🔥 animation trượt */
   width: 100%;
 }
 
@@ -484,4 +489,58 @@ body {
   max-height: 85vh;
   object-fit: contain;
   border-radius: 12px;
+}
+
+/* ===== FIX ROOT ===== */
+.post-content {
+  overflow: hidden;
+}
+
+/* ===== MEDIA ===== */
+.post-media-scroll {
+  display: flex;
+  gap: 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.post-media-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== ACTIONS ===== */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #555;
+  transition: transform 0.15s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.1);
+}
+
+.like-btn.liked {
+  color: #e0245e;
+}
+
+.like-count {
+  font-size: 13px;
+  color: #555;
 }
