@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 
+const commentSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
 const postSchema = new mongoose.Schema(
   {
     author: {
@@ -14,13 +30,10 @@ const postSchema = new mongoose.Schema(
       default: "",
     },
 
-    // 🔥 MULTI MEDIA (image / video)
+    // 🔥 MULTI MEDIA
     media: [
       {
-        url: {
-          type: String,
-          required: true,
-        },
+        url: { type: String, required: true },
         type: {
           type: String,
           enum: ["image", "video"],
@@ -29,12 +42,16 @@ const postSchema = new mongoose.Schema(
       },
     ],
 
+    // 🔥 LIKE
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
+
+    // 🔥 COMMENTS (Threads style)
+    comments: [commentSchema],
   },
   { timestamps: true }
 );

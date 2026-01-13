@@ -1,8 +1,9 @@
 import { useState } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
-import { FiHeart } from "react-icons/fi";
+import { FiHeart, FiMessageCircle } from "react-icons/fi";
 import { AiFillHeart } from "react-icons/ai";
+import CommentModal from "../CommentModal/CommentModal";
 
 const BACKEND_URL = "http://localhost:5000";
 const DEFAULT_AVATAR = "/avatar.jpg";
@@ -10,10 +11,11 @@ const DEFAULT_AVATAR = "/avatar.jpg";
 export default function PostItem({ post }) {
   const [activeIndex, setActiveIndex] = useState(null);
 
-  // ======================
-  // LIKE STATE
-  // ======================
-  const currentUserId = localStorage.getItem("userId"); // hoặc context
+  /* ======================
+     LIKE STATE
+  ====================== */
+  const currentUserId = localStorage.getItem("userId");
+
   const [liked, setLiked] = useState(
     post.likes?.includes(currentUserId)
   );
@@ -21,9 +23,21 @@ export default function PostItem({ post }) {
     post.likes?.length || 0
   );
 
-  // ======================
-  // MEDIA VIEWER
-  // ======================
+  /* ======================
+     COMMENT COUNT
+  ====================== */
+  const [commentCount, setCommentCount] = useState(
+    post.comments?.length || 0
+  );
+
+  /* ======================
+     COMMENT MODAL
+  ====================== */
+  const [openComment, setOpenComment] = useState(false);
+
+  /* ======================
+     MEDIA VIEWER
+  ====================== */
   const mediaList = post.media || [];
   const activeMedia =
     activeIndex !== null ? mediaList[activeIndex] : null;
@@ -42,18 +56,18 @@ export default function PostItem({ post }) {
     );
   };
 
-  // ======================
-  // TOGGLE LIKE
-  // ======================
+  /* ======================
+     TOGGLE LIKE
+  ====================== */
   const handleLike = async () => {
     try {
-      setLiked(!liked);
+      setLiked((prev) => !prev);
       setLikeCount((c) => (liked ? c - 1 : c + 1));
 
       await axiosClient.post(`/posts/${post._id}/like`);
     } catch (err) {
-      // rollback nếu lỗi
-      setLiked(liked);
+      // rollback
+      setLiked((prev) => !prev);
       setLikeCount((c) => (liked ? c + 1 : c - 1));
       console.error("LIKE ERROR:", err);
     }
@@ -61,7 +75,7 @@ export default function PostItem({ post }) {
 
   return (
     <>
-      {/* ================= FEED ================= */}
+      {/* ================= POST ITEM ================= */}
       <div className="post-item">
         <img
           src={post.author?.avatar || DEFAULT_AVATAR}
@@ -70,6 +84,7 @@ export default function PostItem({ post }) {
         />
 
         <div className="post-content">
+          {/* HEADER */}
           <div className="post-header">
             <span className="post-username">
               {post.author?.username || "Người dùng"}
@@ -79,6 +94,7 @@ export default function PostItem({ post }) {
             </span>
           </div>
 
+          {/* TEXT */}
           {post.content && (
             <div className="post-text">{post.content}</div>
           )}
@@ -108,27 +124,61 @@ export default function PostItem({ post }) {
 
           {/* ================= ACTION BAR ================= */}
           <div className="post-actions">
-            <button
-              className={`like-btn ${liked ? "liked" : ""}`}
-              onClick={handleLike}
-            >
-              {liked ? (
-                <AiFillHeart size={20} />
-              ) : (
-                <FiHeart size={20} />
-              )}
-            </button>
+            {/* LIKE */}
+            <div className="action-group">
+              <button
+                className={`like-btn ${liked ? "liked" : ""}`}
+                onClick={handleLike}
+              >
+                {liked ? (
+                  <AiFillHeart size={20} />
+                ) : (
+                  <FiHeart size={20} />
+                )}
+              </button>
 
-            {likeCount > 0 && (
-              <span className="like-count">
+              <span
+                className={`like-count ${
+                  likeCount === 0 ? "hidden" : ""
+                }`}
+              >
                 {likeCount}
               </span>
-            )}
+            </div>
+
+            {/* COMMENT */}
+            <div className="action-group">
+              <button
+                className="comment-btn"
+                onClick={() => setOpenComment(true)}
+              >
+                <FiMessageCircle size={20} />
+              </button>
+
+              <span
+                className={`comment-count ${
+                  commentCount === 0 ? "hidden" : ""
+                }`}
+              >
+                {commentCount}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ================= FULLSCREEN VIEWER ================= */}
+      {/* ================= COMMENT MODAL ================= */}
+      {openComment && (
+        <CommentModal
+          postId={post._id}
+          onClose={() => setOpenComment(false)}
+          onCommentAdded={() =>
+            setCommentCount((c) => c + 1)
+          }
+        />
+      )}
+
+      {/* ================= FULLSCREEN MEDIA VIEWER ================= */}
       {activeMedia && (
         <div className="media-viewer" onClick={closeViewer}>
           <button className="viewer-close" onClick={closeViewer}>

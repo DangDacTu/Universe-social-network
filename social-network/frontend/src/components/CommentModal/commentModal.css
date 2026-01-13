@@ -1,0 +1,217 @@
+.comment-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent; /* ❌ bỏ nền đen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.comment-modal {
+  width: 520px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+
+  /* nổi nhẹ như Threads */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* HEADER */
+.comment-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.comment-header button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* LIST */
+.comment-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+
+.comment-item {
+  margin-bottom: 12px;
+}
+
+.comment-item b {
+  font-size: 14px;
+}
+
+.comment-item p {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+/* INPUT */
+.comment-input {
+  border-top: 1px solid #eee;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.comment-input button {
+  padding: 0 16px;
+  border-radius: 20px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.comment-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* EMPTY */
+.no-comment {
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+}
+.comment-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.comment-modal {
+  width: 520px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+
+  /* 🔥 FIX QUAN TRỌNG */
+  color: #000;
+}
+
+/* HEADER */
+.comment-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+
+  /* 🔥 */
+  color: #000;
+}
+
+.comment-header button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+
+  /* 🔥 */
+  color: #000;
+}
+
+/* LIST */
+.comment-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+
+  /* 🔥 */
+  color: #000;
+}
+
+.comment-item {
+  margin-bottom: 12px;
+}
+
+.comment-item b {
+  font-size: 14px;
+  font-weight: 600;
+
+  /* 🔥 */
+  color: #000;
+}
+
+.comment-item p {
+  margin: 4px 0 0;
+  font-size: 14px;
+
+  /* 🔥 */
+  color: #333;
+}
+
+/* INPUT */
+.comment-input {
+  border-top: 1px solid #eee;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+
+  /* 🔥 */
+  color: #000;
+  background: #fff;
+}
+
+.comment-input input::placeholder {
+  color: #888;
+}
+
+.comment-input button {
+  padding: 0 16px;
+  border-radius: 20px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.comment-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* EMPTY */
+.no-comment {
+  color: #777;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+}

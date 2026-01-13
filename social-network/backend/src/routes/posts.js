@@ -10,7 +10,7 @@ const upload = require("../middlewares/uploadMiddleware");
 router.post(
   "/",
   protect,
-  upload.array("media", 10), // tối đa 10 file
+  upload.array("media", 10),
   postController.createPost
 );
 
@@ -20,12 +20,39 @@ router.post(
 router.get("/", protect, postController.getAllPosts);
 
 // ======================
-// 🔥 TOGGLE LIKE (THREADS)
+// 🔥 GET COMMENTS (THREADS)
+// ======================
+router.get(
+  "/:id/comments",
+  protect,
+  postController.getComments
+);
+
+// ======================
+// 🔥 TOGGLE LIKE
 // ======================
 router.post(
   "/:id/like",
   protect,
   postController.toggleLike
+);
+
+// ======================
+// 💬 ADD COMMENT
+// ======================
+router.post(
+  "/:id/comments",
+  protect,
+  postController.addComment
+);
+
+// ======================
+// 🗑 DELETE COMMENT
+// ======================
+router.delete(
+  "/:id/comments/:commentId",
+  protect,
+  postController.deleteComment
 );
 
 module.exports = router;

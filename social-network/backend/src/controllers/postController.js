@@ -41,12 +41,13 @@ exports.createPost = async (req, res) => {
 };
 
 /* ======================
-   GET ALL POSTS
+   GET ALL POSTS (FEED)
 ====================== */
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("author", "username avatar")
+      .populate("comments.user", "username avatar")
       .sort({ createdAt: -1 });
 
     res.json(posts);
@@ -57,7 +58,27 @@ exports.getAllPosts = async (req, res) => {
 };
 
 /* ======================
-   🔥 TOGGLE LIKE (THREADS)
+   🔥 GET COMMENTS (COMMENT MODAL)
+====================== */
+exports.getComments = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .select("comments")
+      .populate("comments.user", "username avatar");
+
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    res.json(post.comments);
+  } catch (error) {
+    console.error("Get comments error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ======================
+   TOGGLE LIKE
 ====================== */
 exports.toggleLike = async (req, res) => {
   try {
@@ -73,12 +94,10 @@ exports.toggleLike = async (req, res) => {
     const isLiked = post.likes.includes(userId);
 
     if (isLiked) {
-      // UNLIKE
       post.likes = post.likes.filter(
         (id) => id.toString() !== userId
       );
     } else {
-      // LIKE
       post.likes.push(userId);
     }
 
@@ -90,6 +109,81 @@ exports.toggleLike = async (req, res) => {
     });
   } catch (error) {
     console.error("Toggle like error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ======================
+   ADD COMMENT
+====================== */
+exports.addComment = async (req, res) => {
+  try {
+    const { content } = req.body;
+    const postId = req.params.id;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({
+        message: "Nội dung comment không được để trống",
+      });
+    }
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    post.comments.push({
+      user: req.user.id,
+      content,
+    });
+
+    await post.save();
+
+    await post.populate("comments.user", "username avatar");
+
+    const newComment =
+      post.comments[post.comments.length - 1];
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error("Add comment error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ======================
+   DELETE COMMENT
+====================== */
+exports.deleteComment = async (req, res) => {
+  try {
+    const { id: postId, commentId } = req.params;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    const comment = post.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment không tồn tại" });
+    }
+
+    if (
+      comment.user.toString() !== req.user.id &&
+      post.author.toString() !== req.user.id
+    ) {
+      return res.status(403).json({ message: "Không có quyền xóa" });
+    }
+
+    comment.deleteOne();
+    await post.save();
+
+    res.json({ message: "Đã xóa comment" });
+  } catch (error) {
+    console.error("Delete comment error:", error);
     res.status(500).json({ message: error.message });
   }
 };
