@@ -18,7 +18,7 @@ export default function ChatBox({
 }) {
     const messagesEndRef = useRef(null);
 
-    // ✅ FIX: state local chỉ để hiển thị optimistic media cho sender
+    // ✅ chỉ dùng cho optimistic media của sender
     const [localMediaMessages, setLocalMediaMessages] = useState([]);
 
     /* ===============================
@@ -41,7 +41,7 @@ export default function ChatBox({
 
     /* ===============================
         UPLOAD IMAGE / FILE / AUDIO
-        ✅ FIX: sender chỉ add LOCAL, receiver nhận qua socket
+        ✅ sender chỉ add LOCAL
     =============================== */
     const handleUpload = async (file) => {
         if (!file || !selectedUser) return;
@@ -54,7 +54,7 @@ export default function ChatBox({
             if (file.type.startsWith("image")) mediaType = "image";
             else if (file.type.startsWith("audio")) mediaType = "audio";
 
-            // ✅ MESSAGE TẠM – CHỈ HIỆN CHO SENDER
+            // ✅ optimistic message cho sender
             const tempMessage = {
                 _id: "temp-" + Date.now(),
                 senderId: currentUserId,
@@ -70,10 +70,10 @@ export default function ChatBox({
                 createdAt: new Date().toISOString(),
             };
 
-            // ✅ FIX: chỉ add vào LOCAL UI
+            // 👉 chỉ add local
             setLocalMediaMessages((prev) => [...prev, tempMessage]);
 
-            // ✅ CHỈ EMIT SOCKET – KHÔNG add message ở đây nữa
+            // 👉 chỉ emit socket
             socket.emit("send-message", {
                 receiverId: selectedUser._id,
                 content: "",
@@ -138,13 +138,18 @@ export default function ChatBox({
         }
     };
 
-    // ✅ FIX: gộp message thật + local optimistic (tránh trùng)
+    /* ===============================
+        ✅ FIX QUAN TRỌNG:
+        gộp + SORT theo createdAt
+    =============================== */
     const allMessages = [
         ...messages,
         ...localMediaMessages.filter(
             (m) => !messages.some((x) => x.mediaUrl === m.mediaUrl)
         ),
-    ];
+    ].sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    );
 
     return (
         <div style={styles.chatBox}>
@@ -160,7 +165,7 @@ export default function ChatBox({
 
                     return (
                         <div
-                            key={index}
+                            key={msg._id || index}
                             style={{
                                 ...styles.messageWrapper,
                                 alignSelf: isMe ? "flex-end" : "flex-start",
