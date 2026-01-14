@@ -114,4 +114,35 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers };
+/**
+ * @desc    Get users that current user can chat with (mutual follow)
+ * @route   GET /api/users/chat-available
+ * @access  Private
+ */
+const getChatAvailableUsers = async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.user._id);
+
+        if (!currentUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const users = await User.find({
+            _id: {
+                $ne: currentUser._id,           // không lấy chính mình
+                $in: currentUser.following      // mình follow họ
+            },
+            followers: {
+                $in: [currentUser._id]          // họ follow lại mình
+            },
+            isVerified: true,
+        }).select("_id username profilePicture");
+
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, };

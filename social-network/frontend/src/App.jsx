@@ -9,6 +9,8 @@ import Home from './pages/user/Home';
 import LoginSuccess from './pages/user/LoginSuccess';
 import ForgotPassword from './pages/user/ForgotPassword';
 import ResetPassword from './pages/user/ResetPassword';
+import Chat from './pages/user/Chat';
+
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -28,20 +30,21 @@ function App() {
 
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/resetpassword/:token" element={<ResetPassword />} />
-                    
+
                     <Route path="/login-success/:token" element={<LoginSuccess />} />
 
-                    <Route 
-                        path="/" 
+                    <Route
+                        path="/"
                         element={
                             <PrivateRoute>
-                                <Home /> 
+                                <Home />
                             </PrivateRoute>
-                        } 
+                        }
                     />
-                    
+
                     <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
                     <Route path="/me" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                    <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
                 </Routes>
             </AuthProvider>
         </Router>
