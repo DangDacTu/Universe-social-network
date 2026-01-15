@@ -175,3 +175,83 @@
     justify-content: center;
     align-items: center;
 }
+
+/* ================= IMAGE VIEWER ================= */
+.imageViewerOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.imageViewerImage {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* ❌ Close button */
+.imageViewerClose {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ◀ ▶ Navigation buttons */
+.imageNav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.imageNav:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.imageNav.left {
+    left: 30px;
+}
+
+.imageNav.right {
+    right: 30px;
+}
+
+/* 📱 Mobile tối ưu */
+@media (max-width: 768px) {
+    .imageNav {
+        width: 40px;
+        height: 40px;
+        font-size: 26px;
+    }
+
+    .imageNav.left {
+        left: 10px;
+    }
+
+    .imageNav.right {
+        right: 10px;
+    }
+}

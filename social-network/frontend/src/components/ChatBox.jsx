@@ -22,6 +22,10 @@ export default function ChatBox({
     const [previewFiles, setPreviewFiles] = useState([]);
     const [previewUrls, setPreviewUrls] = useState([]);
 
+    /* ================= IMAGE VIEWER ================= */
+    const [imageViewer, setImageViewer] = useState(null);
+    const touchStartX = useRef(0);
+
     /* ================= VOICE ================= */
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
@@ -59,7 +63,7 @@ export default function ChatBox({
         });
     }, [messages, selectedUser, currentUserId]);
 
-    /* ================= UPLOAD FILE ================= */
+    /* ================= UPLOAD ================= */
     const handleUpload = async (file) => {
         if (!file || !selectedUser) return;
 
@@ -98,7 +102,7 @@ export default function ChatBox({
         });
     };
 
-    /* ================= SEND PREVIEW IMAGES ================= */
+    /* ================= PREVIEW SEND ================= */
     const sendPreviewImages = async () => {
         for (const file of previewFiles) {
             await handleUpload(file);
@@ -131,7 +135,9 @@ export default function ChatBox({
                 return;
             }
 
-            const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+            const blob = new Blob(audioChunksRef.current, {
+                type: "audio/webm",
+            });
             const file = new File([blob], `voice-${Date.now()}.webm`, {
                 type: "audio/webm",
             });
@@ -177,6 +183,41 @@ export default function ChatBox({
         .filter((m) => m.senderId === currentUserId)
         .slice(-1)[0]?._id;
 
+    /* ================= IMAGE VIEWER ================= */
+    const openImageViewer = (url) => {
+        const images = allMessages
+            .filter((m) => m.mediaType === "image")
+            .map((m) => m.mediaUrl);
+
+        setImageViewer({
+            images,
+            index: images.indexOf(url),
+        });
+    };
+
+    const nextImage = () =>
+        setImageViewer((v) => ({
+            ...v,
+            index: (v.index + 1) % v.images.length,
+        }));
+
+    const prevImage = () =>
+        setImageViewer((v) => ({
+            ...v,
+            index: (v.index - 1 + v.images.length) % v.images.length,
+        }));
+
+    useEffect(() => {
+        if (!imageViewer) return;
+        const handler = (e) => {
+            if (e.key === "ArrowRight") nextImage();
+            if (e.key === "ArrowLeft") prevImage();
+            if (e.key === "Escape") setImageViewer(null);
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [imageViewer]);
+
     return (
         <div className="chatBox">
             <div className="header">
@@ -187,18 +228,27 @@ export default function ChatBox({
                 {allMessages.map((msg) => {
                     const isMe = msg.senderId === currentUserId;
                     const noBubble =
-                        msg.mediaType === "image" || msg.mediaType === "audio";
+                        msg.mediaType === "image" ||
+                        msg.mediaType === "audio";
 
                     return (
                         <div
                             key={msg._id}
-                            className={`messageWrapper ${isMe ? "me" : ""}`}
+                            className={`messageWrapper ${isMe ? "me" : ""
+                                }`}
                         >
                             <div
-                                className={`message ${noBubble ? "noBubble" : ""} ${isMe ? "me" : ""}`}
+                                className={`message ${noBubble ? "noBubble" : ""
+                                    } ${isMe ? "me" : ""}`}
                             >
                                 {msg.mediaType === "image" && (
-                                    <img src={msg.mediaUrl} className="image" />
+                                    <img
+                                        src={msg.mediaUrl}
+                                        className="image"
+                                        onClick={() =>
+                                            openImageViewer(msg.mediaUrl)
+                                        }
+                                    />
                                 )}
 
                                 {msg.mediaType === "audio" && (
@@ -219,7 +269,9 @@ export default function ChatBox({
                                 )}
 
                                 {!msg.mediaUrl && (
-                                    <span className="text">{msg.content}</span>
+                                    <span className="text">
+                                        {msg.content}
+                                    </span>
                                 )}
                             </div>
 
@@ -233,6 +285,49 @@ export default function ChatBox({
                 })}
                 <div ref={messagesEndRef} />
             </div>
+
+            {imageViewer && (
+                <div
+                    className="imageViewerOverlay"
+                    onClick={() => setImageViewer(null)}
+                    onTouchStart={(e) =>
+                    (touchStartX.current =
+                        e.touches[0].clientX)
+                    }
+                    onTouchEnd={(e) => {
+                        const diff =
+                            e.changedTouches[0].clientX -
+                            touchStartX.current;
+                        if (diff > 50) prevImage();
+                        if (diff < -50) nextImage();
+                    }}
+                >
+                    <button className="imageNav left" onClick={prevImage}>
+                        ‹
+                    </button>
+
+                    <img
+                        src={
+                            imageViewer.images[
+                            imageViewer.index
+                            ]
+                        }
+                        className="imageViewerImage"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+
+                    <button className="imageNav right" onClick={nextImage}>
+                        ›
+                    </button>
+
+                    <span
+                        className="imageViewerClose"
+                        onClick={() => setImageViewer(null)}
+                    >
+                        ✕
+                    </span>
+                </div>
+            )}
 
             {previewUrls.length > 0 && (
                 <div className="previewBox">
@@ -260,8 +355,11 @@ export default function ChatBox({
 
             <div className="inputBox">
                 <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className={`icon ${isRecording ? "recording" : ""}`}
+                    onClick={
+                        isRecording ? stopRecording : startRecording
+                    }
+                    className={`icon ${isRecording ? "recording" : ""
+                        }`}
                 >
                     {isRecording ? "⏹️" : "🎤"}
                 </button>
@@ -269,16 +367,27 @@ export default function ChatBox({
                 {isRecording && (
                     <>
                         <span className="recordingTime">
-                            {String(Math.floor(recordingTime / 60)).padStart(2, "0")}:
-                            {String(recordingTime % 60).padStart(2, "0")}
+                            {String(
+                                Math.floor(recordingTime / 60)
+                            ).padStart(2, "0")}
+                            :
+                            {String(recordingTime % 60).padStart(
+                                2,
+                                "0"
+                            )}
                         </span>
-                        <button onClick={cancelRecording} className="cancelRecord">
+                        <button
+                            onClick={cancelRecording}
+                            className="cancelRecord"
+                        >
                             ❌
                         </button>
                     </>
                 )}
 
-                <label htmlFor="imageInput" className="icon">🖼️</label>
+                <label htmlFor="imageInput" className="icon">
+                    🖼️
+                </label>
                 <input
                     id="imageInput"
                     type="file"
@@ -290,13 +399,17 @@ export default function ChatBox({
                         setPreviewFiles((p) => [...p, ...files]);
                         setPreviewUrls((p) => [
                             ...p,
-                            ...files.map((f) => URL.createObjectURL(f)),
+                            ...files.map((f) =>
+                                URL.createObjectURL(f)
+                            ),
                         ]);
                         e.target.value = "";
                     }}
                 />
 
-                <label htmlFor="fileInput" className="icon">📎</label>
+                <label htmlFor="fileInput" className="icon">
+                    📎
+                </label>
                 <input
                     id="fileInput"
                     type="file"
@@ -312,7 +425,9 @@ export default function ChatBox({
 
                 <textarea
                     value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
+                    onChange={(e) =>
+                        setMessageInput(e.target.value)
+                    }
                     placeholder="Nhập tin nhắn..."
                     className="input"
                     rows={1}
