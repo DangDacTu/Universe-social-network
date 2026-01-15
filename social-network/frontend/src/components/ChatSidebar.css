@@ -1,0 +1,77 @@
+.sidebar {
+    width: 280px;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+}
+
+.title {
+    margin-bottom: 10px;
+}
+
+.search {
+    width: 94%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+/* ================= USER ITEM ================= */
+.userItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.userItem:hover {
+    background-color: #f5f5f5;
+}
+
+.userItem.selected {
+    background-color: #eee;
+}
+
+.username {
+    flex: 1;
+}
+
+/* ================= AVATAR ================= */
+.avatarWrapper {
+    position: relative;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.onlineDot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #00d100;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* ================= UNREAD ================= */
+.unreadBadge {
+    min-width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+}

@@ -1,0 +1,177 @@
+.chatBox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================= HEADER ================= */
+.header {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ================= MESSAGES ================= */
+.messages {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+}
+
+/* Wrapper chỉ giới hạn max-width, không kéo dài */
+.messageWrapper {
+    max-width: 60%;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.messageWrapper.me {
+    align-self: flex-end;
+}
+
+/* Bubble ôm sát nội dung */
+.message {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #eee;
+
+    width: fit-content;
+    max-width: 100%;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.message.me {
+    background: #daf8cb;
+}
+
+/* Ảnh / audio không có bubble */
+.message.noBubble {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* ================= MEDIA ================= */
+.image {
+    max-width: 220px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+}
+
+.audio {
+    width: 220px;
+    display: block;
+}
+
+.file {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.text {
+    white-space: pre-wrap;
+}
+
+/* ================= STATUS ================= */
+.status {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+    text-align: right;
+}
+
+/* ================= PREVIEW ================= */
+.previewBox {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.previewItem {
+    position: relative;
+}
+
+.previewImage {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.previewRemove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    border: none;
+    background: #ff4d4f;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+/* ================= INPUT ================= */
+.inputBox {
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    border-top: 1px solid #ddd;
+    align-items: center;
+}
+
+.input {
+    flex: 1;
+    padding: 8px;
+    resize: none;
+}
+
+/* ================= ICON ================= */
+.icon {
+    cursor: pointer;
+    font-size: 20px;
+    background: none;
+    border: none;
+}
+
+.icon.send {
+    color: #0084ff;
+    font-size: 22px;
+}
+
+.icon.recording {
+    color: red;
+}
+
+/* ================= RECORD ================= */
+.recordingTime {
+    font-size: 12px;
+    color: red;
+    min-width: 42px;
+}
+
+.cancelRecord {
+    font-size: 12px;
+    color: #fff;
+    background: #ff4d4f;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+}
+
+/* ================= EMPTY ================= */
+.empty {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

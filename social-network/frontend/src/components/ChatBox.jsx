@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getSocket } from "../services/socket";
 import uploadApi from "../api/uploadApi";
+import "./ChatBox.css";
 
 export default function ChatBox({
     messages = [],
@@ -161,7 +162,7 @@ export default function ChatBox({
     };
 
     if (!selectedUser) {
-        return <div style={styles.empty}>Chọn một người để bắt đầu chat</div>;
+        return <div className="empty">Chọn một người để bắt đầu chat</div>;
     }
 
     /* ================= MERGE ================= */
@@ -177,42 +178,31 @@ export default function ChatBox({
         .slice(-1)[0]?._id;
 
     return (
-        <div style={styles.chatBox}>
-            <div style={styles.header}>
+        <div className="chatBox">
+            <div className="header">
                 Chat với <b>{selectedUser.username}</b>
             </div>
 
-            <div style={styles.messages}>
+            <div className="messages">
                 {allMessages.map((msg) => {
                     const isMe = msg.senderId === currentUserId;
-                    const noBubble = msg.mediaType === "image" || msg.mediaType === "audio";
+                    const noBubble =
+                        msg.mediaType === "image" || msg.mediaType === "audio";
 
                     return (
                         <div
                             key={msg._id}
-                            style={{
-                                ...styles.messageWrapper,
-                                alignSelf: isMe ? "flex-end" : "flex-start",
-                            }}
+                            className={`messageWrapper ${isMe ? "me" : ""}`}
                         >
                             <div
-                                style={{
-                                    ...styles.message,
-                                    backgroundColor: noBubble
-                                        ? "transparent"
-                                        : isMe
-                                            ? "#daf8cb"
-                                            : "#eee",
-                                    padding: noBubble ? 0 : styles.message.padding,
-                                    borderRadius: noBubble ? 0 : styles.message.borderRadius,
-                                }}
+                                className={`message ${noBubble ? "noBubble" : ""} ${isMe ? "me" : ""}`}
                             >
                                 {msg.mediaType === "image" && (
-                                    <img src={msg.mediaUrl} style={styles.image} />
+                                    <img src={msg.mediaUrl} className="image" />
                                 )}
 
                                 {msg.mediaType === "audio" && (
-                                    <audio controls style={styles.audio}>
+                                    <audio controls className="audio">
                                         <source src={msg.mediaUrl} />
                                     </audio>
                                 )}
@@ -222,21 +212,19 @@ export default function ChatBox({
                                         href={msg.mediaUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        style={styles.file}
+                                        className="file"
                                     >
                                         {msg.mediaName}
                                     </a>
                                 )}
 
                                 {!msg.mediaUrl && (
-                                    <span style={{ whiteSpace: "pre-wrap" }}>
-                                        {msg.content}
-                                    </span>
+                                    <span className="text">{msg.content}</span>
                                 )}
                             </div>
 
                             {isMe && msg._id === lastMyMessageId && (
-                                <div style={styles.status}>
+                                <div className="status">
                                     {msg.isSeen ? "Đã xem" : "Đã gửi"}
                                 </div>
                             )}
@@ -247,16 +235,20 @@ export default function ChatBox({
             </div>
 
             {previewUrls.length > 0 && (
-                <div style={styles.previewBox}>
+                <div className="previewBox">
                     {previewUrls.map((url, idx) => (
-                        <div key={idx} style={styles.previewItem}>
-                            <img src={url} style={styles.previewImage} />
+                        <div key={idx} className="previewItem">
+                            <img src={url} className="previewImage" />
                             <button
-                                style={styles.previewRemove}
+                                className="previewRemove"
                                 onClick={() => {
                                     URL.revokeObjectURL(url);
-                                    setPreviewFiles((f) => f.filter((_, i) => i !== idx));
-                                    setPreviewUrls((u) => u.filter((_, i) => i !== idx));
+                                    setPreviewFiles((f) =>
+                                        f.filter((_, i) => i !== idx)
+                                    );
+                                    setPreviewUrls((u) =>
+                                        u.filter((_, i) => i !== idx)
+                                    );
                                 }}
                             >
                                 ✕
@@ -266,45 +258,27 @@ export default function ChatBox({
                 </div>
             )}
 
-            <div style={styles.inputBox}>
-                {/* VOICE */}
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <button
-                        onClick={isRecording ? stopRecording : startRecording}
-                        style={{
-                            ...styles.icon,
-                            color: isRecording ? "red" : "black",
-                        }}
-                    >
-                        {isRecording ? "⏹️" : "🎤"}
-                    </button>
+            <div className="inputBox">
+                <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`icon ${isRecording ? "recording" : ""}`}
+                >
+                    {isRecording ? "⏹️" : "🎤"}
+                </button>
 
-                    {isRecording && (
-                        <>
-                            <span style={{ fontSize: "12px", color: "red", minWidth: "42px" }}>
-                                {String(Math.floor(recordingTime / 60)).padStart(2, "0")}:
-                                {String(recordingTime % 60).padStart(2, "0")}
-                            </span>
+                {isRecording && (
+                    <>
+                        <span className="recordingTime">
+                            {String(Math.floor(recordingTime / 60)).padStart(2, "0")}:
+                            {String(recordingTime % 60).padStart(2, "0")}
+                        </span>
+                        <button onClick={cancelRecording} className="cancelRecord">
+                            ❌
+                        </button>
+                    </>
+                )}
 
-                            <button
-                                onClick={cancelRecording}
-                                style={{
-                                    fontSize: "12px",
-                                    color: "#fff",
-                                    background: "#ff4d4f",
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    padding: "2px 6px",
-                                    cursor: "pointer",
-                                }}
-                            >
-                                ❌
-                            </button>
-                        </>
-                    )}
-                </div>
-
-                <label htmlFor="imageInput" style={styles.icon}>🖼️</label>
+                <label htmlFor="imageInput" className="icon">🖼️</label>
                 <input
                     id="imageInput"
                     type="file"
@@ -322,7 +296,7 @@ export default function ChatBox({
                     }}
                 />
 
-                <label htmlFor="fileInput" style={styles.icon}>📎</label>
+                <label htmlFor="fileInput" className="icon">📎</label>
                 <input
                     id="fileInput"
                     type="file"
@@ -336,12 +310,11 @@ export default function ChatBox({
                     }}
                 />
 
-                {/* ✅ TEXTAREA – ENTER / SHIFT+ENTER */}
                 <textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     placeholder="Nhập tin nhắn..."
-                    style={{ ...styles.input, resize: "none" }}
+                    className="input"
                     rows={1}
                     onKeyDown={async (e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
@@ -367,7 +340,7 @@ export default function ChatBox({
                             onSendMessage();
                         }
                     }}
-                    style={{ ...styles.icon, color: "#0084ff", fontSize: "22px" }}
+                    className="icon send"
                 >
                     📩
                 </button>
@@ -375,65 +348,3 @@ export default function ChatBox({
         </div>
     );
 }
-
-/* ================= STYLES (GIỮ NGUYÊN) ================= */
-const styles = {
-    chatBox: { flex: 1, display: "flex", flexDirection: "column" },
-    header: { padding: "10px", borderBottom: "1px solid #ddd" },
-    messages: {
-        flex: 1,
-        padding: "10px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "6px",
-        overflowY: "auto",
-    },
-    messageWrapper: { maxWidth: "60%" },
-    message: { padding: "8px 12px", borderRadius: "10px" },
-    status: { fontSize: "11px", color: "#666", marginTop: "2px", textAlign: "right" },
-    inputBox: {
-        display: "flex",
-        padding: "10px",
-        gap: "10px",
-        borderTop: "1px solid #ddd",
-        alignItems: "center",
-    },
-    input: { flex: 1, padding: "8px" },
-    icon: { cursor: "pointer", fontSize: "20px", background: "none", border: "none" },
-    image: { maxWidth: "220px", borderRadius: "8px" },
-    audio: { width: "220px" },
-    file: { color: "#0066cc", textDecoration: "none" },
-    empty: {
-        flex: 1,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    previewBox: {
-        display: "flex",
-        gap: "10px",
-        padding: "10px",
-        borderTop: "1px solid #ddd",
-        flexWrap: "wrap",
-    },
-    previewItem: { position: "relative" },
-    previewImage: {
-        width: "90px",
-        height: "90px",
-        objectFit: "cover",
-        borderRadius: "8px",
-        border: "1px solid #ccc",
-    },
-    previewRemove: {
-        position: "absolute",
-        top: "-6px",
-        right: "-6px",
-        border: "none",
-        background: "#ff4d4f",
-        color: "#fff",
-        borderRadius: "50%",
-        width: "22px",
-        height: "22px",
-        cursor: "pointer",
-    },
-};
