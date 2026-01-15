@@ -185,6 +185,8 @@ export default function ChatBox({
             <div style={styles.messages}>
                 {allMessages.map((msg) => {
                     const isMe = msg.senderId === currentUserId;
+                    const noBubble = msg.mediaType === "image" || msg.mediaType === "audio";
+
                     return (
                         <div
                             key={msg._id}
@@ -196,7 +198,13 @@ export default function ChatBox({
                             <div
                                 style={{
                                     ...styles.message,
-                                    backgroundColor: isMe ? "#daf8cb" : "#eee",
+                                    backgroundColor: noBubble
+                                        ? "transparent"
+                                        : isMe
+                                            ? "#daf8cb"
+                                            : "#eee",
+                                    padding: noBubble ? 0 : styles.message.padding,
+                                    borderRadius: noBubble ? 0 : styles.message.borderRadius,
                                 }}
                             >
                                 {msg.mediaType === "image" && (
