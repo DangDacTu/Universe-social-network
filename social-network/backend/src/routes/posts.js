@@ -4,55 +4,21 @@ const postController = require("../controllers/postController");
 const { protect } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
-// ======================
-// CREATE POST (MULTI MEDIA)
-// ======================
-router.post(
-  "/",
-  protect,
-  upload.array("media", 10),
-  postController.createPost
-);
-
-// ======================
-// GET ALL POSTS
-// ======================
+router.post("/", protect, upload.array("media", 10), postController.createPost);
 router.get("/", protect, postController.getAllPosts);
 
-// ======================
-// 🔥 GET COMMENTS (THREADS)
-// ======================
-router.get(
-  "/:id/comments",
-  protect,
-  postController.getComments
-);
+// COMMENTS
+router.get("/:id/comments", protect, postController.getComments);
+router.post("/:id/comments", protect, postController.addComment);
 
-// ======================
-// 🔥 TOGGLE LIKE
-// ======================
+// LIKE POST
+router.post("/:id/like", protect, postController.toggleLike);
+
+// 🔥 LIKE COMMENT
 router.post(
-  "/:id/like",
+  "/:id/comments/:commentId/like",
   protect,
-  postController.toggleLike
-);
-
-// ======================
-// 💬 ADD COMMENT
-// ======================
-router.post(
-  "/:id/comments",
-  protect,
-  postController.addComment
-);
-
-// ======================
-// 🗑 DELETE COMMENT
-// ======================
-router.delete(
-  "/:id/comments/:commentId",
-  protect,
-  postController.deleteComment
+  postController.toggleLikeComment
 );
 
 module.exports = router;

@@ -1,13 +1,15 @@
+/* ================= OVERLAY ================= */
 .comment-overlay {
   position: fixed;
   inset: 0;
-  background: transparent; /* ❌ bỏ nền đen */
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1000;
 }
 
+/* ================= MODAL ================= */
 .comment-modal {
   width: 520px;
   max-height: 80vh;
@@ -15,12 +17,22 @@
   border-radius: 14px;
   display: flex;
   flex-direction: column;
-
-  /* nổi nhẹ như Threads */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.25s ease;
 }
 
-/* HEADER */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ================= HEADER ================= */
 .comment-header {
   padding: 12px 16px;
   border-bottom: 1px solid #eee;
@@ -28,174 +40,126 @@
   justify-content: space-between;
   align-items: center;
   font-weight: 600;
+  color: #050505;
 }
 
 .comment-header button {
-  background: none;
+  background: #f0f2f5;
   border: none;
-  font-size: 18px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
 }
 
-/* LIST */
+/* ================= LIST ================= */
 .comment-list {
   flex: 1;
   overflow-y: auto;
   padding: 12px 16px;
 }
 
+/* ================= COMMENT ITEM ================= */
 .comment-item {
-  margin-bottom: 12px;
-}
-
-.comment-item b {
-  font-size: 14px;
-}
-
-.comment-item p {
-  margin: 4px 0 0;
-  font-size: 14px;
-}
-
-/* INPUT */
-.comment-input {
-  border-top: 1px solid #eee;
-  padding: 10px;
   display: flex;
+  align-items: flex-start;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
-.comment-input input {
-  flex: 1;
-  padding: 8px 10px;
-  border-radius: 20px;
-  border: 1px solid #ccc;
-  outline: none;
+/* avatar */
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.comment-input button {
-  padding: 0 16px;
-  border-radius: 20px;
-  border: none;
-  background: #000;
-  color: #fff;
-  cursor: pointer;
-}
-
-.comment-input button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* EMPTY */
-.no-comment {
-  color: #777;
-  font-size: 14px;
-  text-align: center;
-  margin-top: 20px;
-}
-.comment-overlay {
-  position: fixed;
-  inset: 0;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.comment-modal {
-  width: 520px;
-  max-height: 80vh;
-  background: #fff;
-  border-radius: 14px;
+/* ================= COMMENT BUBBLE ================= */
+.comment-bubble {
+  background: #f0f2f5;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-
-  /* 🔥 FIX QUAN TRỌNG */
-  color: #000;
+  gap: 2px;
 }
 
-/* HEADER */
-.comment-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+/* username */
+.comment-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #050505;
+}
+
+/* content */
+.comment-content {
+  margin: 0;
+  font-size: 14px;
+  color: #050505;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ================= COMMENT META (NEW) ================= */
+.comment-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-weight: 600;
-
-  /* 🔥 */
-  color: #000;
+  gap: 10px;
+  margin-left: 8px; /* nằm ngay dưới bubble */
+  font-size: 12px;
+  color: #65676b;
 }
 
-.comment-header button {
-  background: none;
-  border: none;
-  font-size: 18px;
+.comment-time {
+  font-size: 12px;
+}
+
+/* ❤️ like icon */
+.comment-like {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
-
-  /* 🔥 */
-  color: #000;
+  user-select: none;
 }
 
-/* LIST */
-.comment-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 16px;
-
-  /* 🔥 */
-  color: #000;
+.comment-like svg {
+  width: 14px;
+  height: 14px;
+  fill: #65676b;
 }
 
-.comment-item {
-  margin-bottom: 12px;
+.comment-like.liked svg {
+  fill: #e41e3f; /* đỏ Facebook */
 }
 
-.comment-item b {
-  font-size: 14px;
-  font-weight: 600;
-
-  /* 🔥 */
-  color: #000;
+.comment-like span {
+  font-size: 12px;
 }
 
-.comment-item p {
-  margin: 4px 0 0;
-  font-size: 14px;
-
-  /* 🔥 */
-  color: #333;
-}
-
-/* INPUT */
+/* ================= INPUT ================= */
 .comment-input {
   border-top: 1px solid #eee;
-  padding: 10px;
+  padding: 10px 12px;
   display: flex;
   gap: 8px;
 }
 
 .comment-input input {
   flex: 1;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 20px;
   border: 1px solid #ccc;
-  outline: none;
-
-  /* 🔥 */
-  color: #000;
-  background: #fff;
-}
-
-.comment-input input::placeholder {
-  color: #888;
+  font-size: 14px;
 }
 
 .comment-input button {
   padding: 0 16px;
+  height: 36px;
   border-radius: 20px;
   border: none;
   background: #000;
@@ -203,15 +167,52 @@
   cursor: pointer;
 }
 
-.comment-input button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* EMPTY */
+/* ================= EMPTY ================= */
 .no-comment {
   color: #777;
   font-size: 14px;
   text-align: center;
   margin-top: 20px;
+}
+
+/* reply icon */
+.comment-reply {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.comment-reply svg {
+  width: 14px;
+  height: 14px;
+  fill: #9fa1a5;
+}
+
+.comment-reply:hover svg {
+  fill: #050505;
+}
+
+.comment-like,
+.comment-reply {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+  color: #9fa1a5; /* xám mặc định */
+}
+
+.comment-like svg,
+.comment-reply svg {
+  width: 14px;
+  height: 14px;
+}
+
+.comment-like.liked {
+  color: #e41e3f; /* đỏ khi liked */
+}
+
+.comment-like span,
+.comment-reply span {
+  font-size: 12px;
 }

@@ -12,6 +12,14 @@ const commentSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
+
+    // 🔥 LIKE COMMENT
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -30,7 +38,6 @@ const postSchema = new mongoose.Schema(
       default: "",
     },
 
-    // 🔥 MULTI MEDIA
     media: [
       {
         url: { type: String, required: true },
@@ -42,7 +49,7 @@ const postSchema = new mongoose.Schema(
       },
     ],
 
-    // 🔥 LIKE
+    // 🔥 LIKE POST
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,7 +57,7 @@ const postSchema = new mongoose.Schema(
       },
     ],
 
-    // 🔥 COMMENTS (Threads style)
+    // 🔥 COMMENTS
     comments: [commentSchema],
   },
   { timestamps: true }
