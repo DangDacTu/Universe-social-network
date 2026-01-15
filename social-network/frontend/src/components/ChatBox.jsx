@@ -216,12 +216,15 @@ export default function ChatBox({
                                         rel="noopener noreferrer"
                                         style={styles.file}
                                     >
-                                        📎 {msg.mediaName}
+                                        {msg.mediaName}
                                     </a>
                                 )}
 
-                                {/* ✅ TEXT MESSAGE */}
-                                {!msg.mediaUrl && msg.content}
+                                {!msg.mediaUrl && (
+                                    <span style={{ whiteSpace: "pre-wrap" }}>
+                                        {msg.content}
+                                    </span>
+                                )}
                             </div>
 
                             {isMe && msg._id === lastMyMessageId && (
@@ -325,28 +328,38 @@ export default function ChatBox({
                     }}
                 />
 
-                <input
+                {/* ✅ TEXTAREA – ENTER / SHIFT+ENTER */}
+                <textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     placeholder="Nhập tin nhắn..."
-                    style={styles.input}
+                    style={{ ...styles.input, resize: "none" }}
+                    rows={1}
+                    onKeyDown={async (e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            if (previewFiles.length) {
+                                await sendPreviewImages();
+                                return;
+                            }
+                            if (messageInput.trim()) {
+                                onSendMessage();
+                            }
+                        }
+                    }}
                 />
 
-                {/* SEND ICON LIKE MESSENGER */}
                 <button
                     onClick={async () => {
                         if (previewFiles.length) {
                             await sendPreviewImages();
                             return;
                         }
-                        onSendMessage();
+                        if (messageInput.trim()) {
+                            onSendMessage();
+                        }
                     }}
-                    style={{
-                        ...styles.icon,
-                        color: "#0084ff",
-                        fontSize: "22px",
-                    }}
-                    title="Gửi tin nhắn"
+                    style={{ ...styles.icon, color: "#0084ff", fontSize: "22px" }}
                 >
                     📩
                 </button>
