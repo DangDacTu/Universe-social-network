@@ -167,9 +167,7 @@ export default function ChatBox({
         setIsRecording(false);
     };
 
-    if (!selectedUser) {
-        return <div className="empty">Chọn một người để bắt đầu chat</div>;
-    }
+
 
     /* ================= MERGE ================= */
     const allMessages = [
@@ -217,11 +215,13 @@ export default function ChatBox({
         window.addEventListener("keydown", handler);
         return () => window.removeEventListener("keydown", handler);
     }, [imageViewer]);
-
+    if (!selectedUser) {
+        return <div className="empty">Chọn một người để bắt đầu chat</div>;
+    }
     return (
         <div className="chatBox">
             <div className="header">
-                Chat với <b>{selectedUser.username}</b>
+                Đang nhắn tin với <b>{selectedUser.username}</b>
             </div>
 
             <div className="messages">

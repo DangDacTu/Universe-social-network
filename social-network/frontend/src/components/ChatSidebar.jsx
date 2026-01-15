@@ -22,12 +22,12 @@ export default function ChatSidebar({
 
     return (
         <div className="sidebar">
-            <h3 className="title">Inbox</h3>
+            <h3 className="title">Tin nhắn</h3>
 
             {/* 🔍 SEARCH INPUT */}
             <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Tìm kiếm..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="search"
