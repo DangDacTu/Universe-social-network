@@ -55,8 +55,11 @@ export default function CommentModal({ postId, onClose }) {
   const [text, setText] = useState("");
   const [replyingId, setReplyingId] = useState(null);
 
+  /* ✅ CHỈ THÊM STATE LOADING */
+  const [submitting, setSubmitting] = useState(false);
+
   /* ======================
-     FETCH COMMENTS (LIKE THẬT)
+     FETCH COMMENTS
   ====================== */
   useEffect(() => {
     axiosClient
@@ -66,7 +69,7 @@ export default function CommentModal({ postId, onClose }) {
   }, [postId]);
 
   /* ======================
-     🔥 TOGGLE LIKE COMMENT (REAL API)
+     TOGGLE LIKE COMMENT
   ====================== */
   const toggleLike = async (commentId) => {
     try {
@@ -91,7 +94,29 @@ export default function CommentModal({ postId, onClose }) {
   };
 
   /* ======================
-     REPLY (UI – giữ nguyên)
+     SUBMIT COMMENT (LOADING)
+  ====================== */
+  const handleSubmitComment = async () => {
+    if (!text.trim() || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        `/posts/${postId}/comments`,
+        { content: text }
+      );
+
+      setComments((prev) => [...prev, res.data]);
+      setText("");
+    } catch (err) {
+      console.error("Create comment error:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  /* ======================
+     REPLY (UI – GIỮ NGUYÊN)
   ====================== */
   const toggleReply = (id) => {
     setReplyingId(replyingId === id ? null : id);
@@ -134,11 +159,9 @@ export default function CommentModal({ postId, onClose }) {
                   </p>
                 </div>
 
-                {/* META */}
                 <div className="comment-meta">
                   <span>{timeAgo(c.createdAt)}</span>
 
-                  {/* LIKE */}
                   <div
                     className={`comment-like ${
                       c.liked ? "liked" : ""
@@ -151,7 +174,6 @@ export default function CommentModal({ postId, onClose }) {
                     )}
                   </div>
 
-                  {/* REPLY */}
                   <div
                     className="comment-reply"
                     onClick={() => toggleReply(c._id)}
@@ -167,13 +189,20 @@ export default function CommentModal({ postId, onClose }) {
           ))}
         </div>
 
+        {/* INPUT – CHỈ THÊM DISABLED + TEXT */}
         <div className="comment-input">
           <input
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Viết bình luận..."
+            disabled={submitting}
           />
-          <button>Đăng</button>
+          <button
+            onClick={handleSubmitComment}
+            disabled={submitting}
+          >
+            {submitting ? "Đang gửi..." : "Đăng"}
+          </button>
         </div>
       </div>
     </div>

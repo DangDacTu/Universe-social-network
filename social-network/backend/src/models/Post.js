@@ -12,8 +12,6 @@ const commentSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-
-    // 🔥 LIKE COMMENT
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,13 +29,11 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     content: {
       type: String,
       trim: true,
       default: "",
     },
-
     media: [
       {
         url: { type: String, required: true },
@@ -48,16 +44,12 @@ const postSchema = new mongoose.Schema(
         },
       },
     ],
-
-    // 🔥 LIKE POST
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
-
-    // 🔥 COMMENTS
     comments: [commentSchema],
   },
   { timestamps: true }

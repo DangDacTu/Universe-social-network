@@ -56,7 +56,7 @@ exports.getAllPosts = async (req, res) => {
 };
 
 /* ======================
-   GET COMMENTS
+   GET COMMENTS (🔥 FIXED)
 ====================== */
 exports.getComments = async (req, res) => {
   try {
@@ -68,10 +68,14 @@ exports.getComments = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
+    const userId = req.user.id.toString();
+
     const comments = post.comments.map((c) => ({
       ...c.toObject(),
       likeCount: c.likes.length,
-      liked: c.likes.includes(req.user.id),
+      liked: c.likes.some(
+        (id) => id.toString() === userId
+      ),
     }));
 
     res.json(comments);
@@ -91,7 +95,11 @@ exports.toggleLike = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
-    const index = post.likes.indexOf(req.user.id);
+    const userId = req.user.id.toString();
+
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId
+    );
 
     if (index > -1) {
       post.likes.splice(index, 1);
@@ -111,7 +119,7 @@ exports.toggleLike = async (req, res) => {
 };
 
 /* ======================
-   🔥 TOGGLE LIKE COMMENT
+   🔥 TOGGLE LIKE COMMENT (FIXED)
 ====================== */
 exports.toggleLikeComment = async (req, res) => {
   try {
@@ -125,7 +133,11 @@ exports.toggleLikeComment = async (req, res) => {
     if (!comment)
       return res.status(404).json({ message: "Comment không tồn tại" });
 
-    const index = comment.likes.indexOf(req.user.id);
+    const userId = req.user.id.toString();
+
+    const index = comment.likes.findIndex(
+      (id) => id.toString() === userId
+    );
 
     if (index > -1) {
       comment.likes.splice(index, 1);
@@ -160,12 +172,19 @@ exports.addComment = async (req, res) => {
     post.comments.push({
       user: req.user.id,
       content,
+      likes: [],
     });
 
     await post.save();
     await post.populate("comments.user", "username avatar");
 
-    res.status(201).json(post.comments.at(-1));
+    const newComment = post.comments.at(-1);
+
+    res.status(201).json({
+      ...newComment.toObject(),
+      likeCount: 0,
+      liked: false,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
