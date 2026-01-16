@@ -10,6 +10,7 @@ import LoginSuccess from './pages/user/LoginSuccess';
 import ForgotPassword from './pages/user/ForgotPassword';
 import ResetPassword from './pages/user/ResetPassword';
 import Chat from './pages/user/Chat';
+import Settings from './pages/user/Setting';
 
 
 // Component bảo vệ Route
@@ -45,6 +46,7 @@ function App() {
                     <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
                     <Route path="/me" element={<PrivateRoute><Profile /></PrivateRoute>} />
                     <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+                    <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
                 </Routes>
             </AuthProvider>
         </Router>
