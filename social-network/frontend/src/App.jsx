@@ -9,6 +9,7 @@ import Home from './pages/user/Home';
 import LoginSuccess from './pages/user/LoginSuccess';
 import ForgotPassword from './pages/user/ForgotPassword';
 import ResetPassword from './pages/user/ResetPassword';
+import Search from './pages/user/Search';
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -25,23 +26,18 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/verify-email" element={<VerifyEmail />} />
-
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/resetpassword/:token" element={<ResetPassword />} />
-                    
                     <Route path="/login-success/:token" element={<LoginSuccess />} />
 
-                    <Route 
-                        path="/" 
-                        element={
-                            <PrivateRoute>
-                                <Home /> 
-                            </PrivateRoute>
-                        } 
-                    />
-                    
+                    {/* Các route cần đăng nhập */}
+                    <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
                     <Route path="/profile/:id" element={<PrivateRoute><Profile /></PrivateRoute>} />
                     <Route path="/me" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                    
+                    {/* Route Search */}
+                    <Route path="/search" element={<PrivateRoute><Search /></PrivateRoute>} />
+
                 </Routes>
             </AuthProvider>
         </Router>

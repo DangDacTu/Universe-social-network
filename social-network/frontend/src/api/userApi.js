@@ -11,6 +11,10 @@ const userApi = {
         return axiosClient.get('/users');
     },
 
+    search: (keyword) => {
+        return axiosClient.get(`/users/search?q=${keyword}`);
+    },
+
     // 3. Cập nhật thông tin
     updateUser(id, data) {
         return axiosClient.put(`/users/${id}`, data);
