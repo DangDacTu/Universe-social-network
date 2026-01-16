@@ -12,14 +12,15 @@ export default function PostList({ reload }) {
   const fetchPosts = async () => {
     try {
       const res = await axiosClient.get("/posts");
-
-      console.log("POST LIST RESPONSE:", res.data);
-
-      // 🔥 API trả về MẢNG
       setPosts(res.data);
     } catch (err) {
       console.error("FETCH POSTS ERROR:", err);
     }
+  };
+
+  // 🔥 HÀM XÓA POST KHÔNG RELOAD
+  const handleRemovePost = (postId) => {
+    setPosts((prev) => prev.filter((p) => p._id !== postId));
   };
 
   return (
@@ -31,7 +32,11 @@ export default function PostList({ reload }) {
       )}
 
       {posts.map((post) => (
-        <PostItem key={post._id} post={post} />
+        <PostItem
+          key={post._id}
+          post={post}
+          onDeleted={handleRemovePost} // 👈 truyền xuống
+        />
       ))}
     </div>
   );

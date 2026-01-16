@@ -40,6 +40,30 @@ exports.createPost = async (req, res) => {
 };
 
 /* ======================
+   DELETE POST
+====================== */
+exports.deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    // 🔒 chỉ chủ post được xóa
+    if (post.author.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Không có quyền xóa post" });
+    }
+
+    await post.deleteOne();
+
+    res.json({ message: "Xóa post thành công" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ======================
    GET ALL POSTS
 ====================== */
 exports.getAllPosts = async (req, res) => {
@@ -62,7 +86,8 @@ exports.getComments = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
       .select("comments")
-      .populate("comments.user", "username avatar");
+      .populate("comments.user", "username avatar")
+      .populate("comments.replies.user", "username avatar");
 
     if (!post) {
       return res.status(404).json({ message: "Post không tồn tại" });
@@ -73,9 +98,8 @@ exports.getComments = async (req, res) => {
     const comments = post.comments.map((c) => ({
       ...c.toObject(),
       likeCount: c.likes.length,
-      liked: c.likes.some(
-        (id) => id.toString() === userId
-      ),
+      liked: c.likes.some((id) => id.toString() === userId),
+      replyCount: c.replies?.length || 0,
     }));
 
     res.json(comments);
@@ -83,6 +107,7 @@ exports.getComments = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 /* ======================
    TOGGLE LIKE POST
@@ -189,3 +214,60 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/* ======================
+   ADD REPLY (MULTI LEVEL)
+====================== */
+exports.addReply = async (req, res) => {
+  try {
+    const { id: postId, commentId } = req.params;
+    const { content, parentReplyId = null, replyTo = null } = req.body;
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: "Nội dung trống" });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post)
+      return res.status(404).json({ message: "Post không tồn tại" });
+
+    const comment = post.comments.id(commentId);
+    if (!comment)
+      return res.status(404).json({ message: "Comment không tồn tại" });
+
+    const newReply = {
+      user: req.user.id,
+      content,
+      replyTo,
+      replies: [],
+    };
+
+    // 🔥 Reply cấp 2 trở lên
+    if (parentReplyId) {
+      const parentReply = comment.replies.id(parentReplyId);
+      if (!parentReply) {
+        return res
+          .status(404)
+          .json({ message: "Reply cha không tồn tại" });
+      }
+
+      parentReply.replies.push(newReply);
+    } else {
+      // Reply cấp 1
+      comment.replies.push(newReply);
+    }
+
+    await post.save();
+
+    await post.populate(
+      "comments.replies.user comments.replies.replyTo comments.replies.replies.user",
+      "username avatar"
+    );
+
+    res.status(201).json(newReply);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+

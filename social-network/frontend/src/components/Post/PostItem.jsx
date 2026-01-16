@@ -1,27 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
-import { FiHeart, FiMessageCircle } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiMoreHorizontal } from "react-icons/fi";
 import { AiFillHeart } from "react-icons/ai";
 import CommentModal from "../CommentModal/CommentModal";
+import { FiTrash2 } from "react-icons/fi";
 
 const BACKEND_URL = "http://localhost:5000";
 const DEFAULT_AVATAR = "/avatar.jpg";
 
-export default function PostItem({ post }) {
+export default function PostItem({ post, onDeleted }) {
+
   const [activeIndex, setActiveIndex] = useState(null);
+
+  /* ======================
+     CURRENT USER (✅ FIX)
+  ====================== */
+  const user = JSON.parse(localStorage.getItem("user"));
+  const currentUserId = user?._id || null;
 
   /* ======================
      LIKE STATE
   ====================== */
-  const currentUserId = localStorage.getItem("userId");
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
-  const [liked, setLiked] = useState(
-    post.likes?.includes(currentUserId)
-  );
-  const [likeCount, setLikeCount] = useState(
-    post.likes?.length || 0
-  );
+  useEffect(() => {
+    const userId = currentUserId?.toString();
+    const isLiked = post.likes?.some(
+      (id) => id.toString() === userId
+    );
+    setLiked(isLiked);
+    setLikeCount(post.likes?.length || 0);
+  }, [post.likes, currentUserId]);
 
   /* ======================
      COMMENT COUNT
@@ -34,6 +45,42 @@ export default function PostItem({ post }) {
      COMMENT MODAL
   ====================== */
   const [openComment, setOpenComment] = useState(false);
+
+  /* ======================
+     DROPDOWN DELETE
+  ====================== */
+  const [openMenu, setOpenMenu] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
+        setOpenMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
+  }, []);
+
+  const handleDeletePost = async () => {
+  if (!window.confirm("Xóa bài viết này?")) return;
+
+  try {
+    await axiosClient.delete(`/posts/${post._id}`);
+    onDeleted(post._id); // ✅ xóa UI ngay
+  } catch (err) {
+    console.error("DELETE POST ERROR:", err);
+    alert("Không thể xóa bài viết");
+  }
+};
+
 
   /* ======================
      MEDIA VIEWER
@@ -63,19 +110,15 @@ export default function PostItem({ post }) {
     try {
       setLiked((prev) => !prev);
       setLikeCount((c) => (liked ? c - 1 : c + 1));
-
       await axiosClient.post(`/posts/${post._id}/like`);
     } catch (err) {
-      // rollback
       setLiked((prev) => !prev);
       setLikeCount((c) => (liked ? c + 1 : c - 1));
-      console.error("LIKE ERROR:", err);
     }
   };
 
   return (
     <>
-      {/* ================= POST ITEM ================= */}
       <div className="post-item">
         <img
           src={post.author?.avatar || DEFAULT_AVATAR}
@@ -84,50 +127,85 @@ export default function PostItem({ post }) {
         />
 
         <div className="post-content">
-          {/* HEADER */}
           <div className="post-header">
-            <span className="post-username">
-              {post.author?.username || "Người dùng"}
-            </span>
-            <span className="post-time">
-              · {new Date(post.createdAt).toLocaleString()}
-            </span>
+            <div className="post-header-left">
+              <span className="post-username">
+                {post.author?.username || "Người dùng"}
+              </span>
+              <span className="post-time">
+                ·{" "}
+                {new Date(post.createdAt).toLocaleString()}
+              </span>
+            </div>
+
+            {/* ✅ ICON ⋯ CHỈ HIỆN KHI LÀ CHỦ POST */}
+            {String(post.author?._id) ===
+              String(currentUserId) && (
+                <div className="post-menu" ref={menuRef}>
+                  <button
+                    className="post-menu-btn"
+                    onClick={() =>
+                      setOpenMenu((p) => !p)
+                    }
+                  >
+                    <FiMoreHorizontal size={18} />
+                  </button>
+
+                  {openMenu && (
+                    <div className="post-menu-dropdown">
+                      <button
+                        className="post-menu-delete"
+                        onClick={handleDeletePost}
+                      >
+                        <FiTrash2 size={14} />
+                        <span>Xóa</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
 
-          {/* TEXT */}
           {post.content && (
-            <div className="post-text">{post.content}</div>
+            <div className="post-text">
+              {post.content}
+            </div>
           )}
 
-          {/* MEDIA */}
           {mediaList.length > 0 && (
             <div
-              className={`post-media-scroll ${
-                mediaList.length === 1 ? "single" : "multiple"
-              }`}
+              className={`post-media-scroll ${mediaList.length === 1
+                  ? "single"
+                  : "multiple"
+                }`}
             >
               {mediaList.map((item, index) => (
                 <div
                   className="post-media-item"
                   key={index}
-                  onClick={() => setActiveIndex(index)}
+                  onClick={() =>
+                    setActiveIndex(index)
+                  }
                 >
                   {item.type === "image" ? (
-                    <img src={`${BACKEND_URL}${item.url}`} />
+                    <img
+                      src={`${BACKEND_URL}${item.url}`}
+                    />
                   ) : (
-                    <video src={`${BACKEND_URL}${item.url}`} />
+                    <video
+                      src={`${BACKEND_URL}${item.url}`}
+                    />
                   )}
                 </div>
               ))}
             </div>
           )}
 
-          {/* ================= ACTION BAR ================= */}
           <div className="post-actions">
-            {/* LIKE */}
             <div className="action-group">
               <button
-                className={`like-btn ${liked ? "liked" : ""}`}
+                className={`like-btn ${liked ? "liked" : ""
+                  }`}
                 onClick={handleLike}
               >
                 {liked ? (
@@ -136,29 +214,28 @@ export default function PostItem({ post }) {
                   <FiHeart size={20} />
                 )}
               </button>
-
               <span
-                className={`like-count ${
-                  likeCount === 0 ? "hidden" : ""
-                }`}
+                className={`like-count ${likeCount === 0 ? "hidden" : ""
+                  }`}
               >
                 {likeCount}
               </span>
             </div>
 
-            {/* COMMENT */}
             <div className="action-group">
               <button
                 className="comment-btn"
-                onClick={() => setOpenComment(true)}
+                onClick={() =>
+                  setOpenComment(true)
+                }
               >
                 <FiMessageCircle size={20} />
               </button>
-
               <span
-                className={`comment-count ${
-                  commentCount === 0 ? "hidden" : ""
-                }`}
+                className={`comment-count ${commentCount === 0
+                    ? "hidden"
+                    : ""
+                  }`}
               >
                 {commentCount}
               </span>
@@ -167,11 +244,12 @@ export default function PostItem({ post }) {
         </div>
       </div>
 
-      {/* ================= COMMENT MODAL ================= */}
       {openComment && (
         <CommentModal
           postId={post._id}
-          onClose={() => setOpenComment(false)}
+          onClose={() =>
+            setOpenComment(false)
+          }
           onCommentAdded={() =>
             setCommentCount((c) => c + 1)
           }

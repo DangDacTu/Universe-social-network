@@ -608,4 +608,73 @@ body {
 .comment-btn:hover {
   transform: scale(1.1);
 }
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.post-header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-menu {
+  position: relative;
+}
+
+.post-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #000;
+}
+
+.post-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.post-menu-delete {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #ff4d4f;
+  text-align: left;
+  cursor: pointer;
+}
+
+.post-menu-delete:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.post-menu-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff4d4f;
+  font-size: 14px;
+}
+
+.post-menu-delete svg {
+  color: #ff4d4f;
+}
+
+.post-menu-delete:hover {
+  background: #f5f5f5;
+}
