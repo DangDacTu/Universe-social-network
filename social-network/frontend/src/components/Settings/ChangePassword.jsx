@@ -58,7 +58,7 @@ export default function ChangePassword() {
 
     return (
         <form className="settings-form" onSubmit={handleSubmit}>
-            <h3>Đổi mật khẩu</h3>
+            <h3 className="change-password-title">Thay đổi mật khẩu của bạn</h3>
 
             <input
                 type="password"

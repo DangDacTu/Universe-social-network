@@ -102,6 +102,32 @@
     font-size: 18px;
 }
 
+
+
+.change-password-title {
+    color: #000;
+    /* Đen */
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.privacy-title {
+    color: #000;
+    /* Đen */
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.setting-title {
+    color: #000;
+    /* Đen */
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
     .settings-menu {

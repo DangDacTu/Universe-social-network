@@ -29,7 +29,7 @@ export default function PrivacySettings() {
 
     return (
         <div className="settings-form">
-            <h3>Quyền riêng tư</h3>
+            <h3 className="privacy-title">Quyền riêng tư(đang phát triển)</h3>
 
             <label>
                 <input

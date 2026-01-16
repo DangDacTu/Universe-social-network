@@ -17,7 +17,7 @@ export default function Settings() {
 
                 {/* Header */}
                 <div className="settings-header">
-                    <h2>⚙️ Cài đặt tài khoản</h2>
+                    <h2 className="setting-title">⚙️ Cài đặt tài khoản</h2>
                     <p>Quản lý bảo mật và quyền riêng tư của bạn</p>
                 </div>
 
