@@ -13,7 +13,7 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 onClick={() => setActiveTab("password")}
                 type="button"
             >
-                <span className="icon">🔐</span>
+                <span className="icon"></span>
                 <span>Đổi mật khẩu</span>
             </button>
 
@@ -23,7 +23,7 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 onClick={() => setActiveTab("privacy")}
                 type="button"
             >
-                <span className="icon">🔒</span>
+                <span className="icon"></span>
                 <span>Quyền riêng tư</span>
             </button>
         </div>
