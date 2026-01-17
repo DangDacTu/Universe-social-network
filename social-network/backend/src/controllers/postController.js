@@ -270,4 +270,48 @@ exports.addReply = async (req, res) => {
   }
 };
 
+/* ======================
+   🔥 DELETE COMMENT
+====================== */
+exports.deleteComment = async (req, res) => {
+  try {
+    const { id: postId, commentId } = req.params;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    const comment = post.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment không tồn tại" });
+    }
+
+    const userId = req.user.id.toString();
+
+    const isCommentOwner =
+      comment.user.toString() === userId;
+
+    const isPostOwner =
+      post.author.toString() === userId;
+
+    // 🔒 CHECK QUYỀN
+    if (!isCommentOwner && !isPostOwner) {
+      return res
+        .status(403)
+        .json({ message: "Không có quyền xóa comment" });
+    }
+
+    // 🔥 XÓA COMMENT
+    comment.deleteOne();
+    await post.save();
+
+    res.json({
+      message: "Xóa comment thành công",
+      commentId,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 

@@ -31,4 +31,11 @@ router.post(
   postController.addReply
 );
 
+// 🔥 DELETE COMMENT
+router.delete(
+  "/:id/comments/:commentId",
+  protect,
+  postController.deleteComment
+);
+
 module.exports = router;

@@ -678,3 +678,17 @@ body {
 .post-menu-delete:hover {
   background: #f5f5f5;
 }
+.post-removing {
+  animation: postRemove 0.3s ease forwards;
+}
+
+@keyframes postRemove {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-10px);
+  }
+}

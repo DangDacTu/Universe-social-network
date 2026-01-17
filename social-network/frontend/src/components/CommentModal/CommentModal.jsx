@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axiosClient from "../../api/axiosClient";
+import { FiMoreHorizontal, FiTrash2 } from "react-icons/fi";
 import "./commentModal.css";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
@@ -12,22 +13,16 @@ function timeAgo(date) {
     (Date.now() - new Date(date)) / 1000
   );
   if (seconds < 60) return "Vừa xong";
-
   const minutes = Math.floor(seconds / 60);
   if (minutes < 60) return `${minutes} phút`;
-
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} giờ`;
-
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} ngày`;
-
   const weeks = Math.floor(days / 7);
   if (weeks < 4) return `${weeks} tuần`;
-
   const months = Math.floor(days / 30);
   if (months < 12) return `${months} tháng`;
-
   const years = Math.floor(days / 365);
   return `${years} năm`;
 }
@@ -54,9 +49,15 @@ export default function CommentModal({ postId, onClose }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [replyingId, setReplyingId] = useState(null);
-
-  /* ✅ CHỈ THÊM STATE LOADING */
   const [submitting, setSubmitting] = useState(false);
+
+  /* ====== STATE CHO XÓA COMMENT ====== */
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [removingId, setRemovingId] = useState(null);
+
+  /* ====== THÊM CHO SCROLL + HIGHLIGHT ====== */
+  const commentListRef = useRef(null);
+  const [newCommentId, setNewCommentId] = useState(null);
 
   /* ======================
      FETCH COMMENTS
@@ -94,7 +95,7 @@ export default function CommentModal({ postId, onClose }) {
   };
 
   /* ======================
-     SUBMIT COMMENT (LOADING)
+     SUBMIT COMMENT (CHỈ THÊM SCROLL + HIGHLIGHT)
   ====================== */
   const handleSubmitComment = async () => {
     if (!text.trim() || submitting) return;
@@ -106,7 +107,25 @@ export default function CommentModal({ postId, onClose }) {
         { content: text }
       );
 
-      setComments((prev) => [...prev, res.data]);
+      setComments((prev) => {
+        const next = [...prev, res.data];
+
+        setTimeout(() => {
+          commentListRef.current?.scrollTo({
+            top: commentListRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }, 50);
+
+        return next;
+      });
+
+      setNewCommentId(res.data._id);
+
+      setTimeout(() => {
+        setNewCommentId(null);
+      }, 1500);
+
       setText("");
     } catch (err) {
       console.error("Create comment error:", err);
@@ -116,7 +135,31 @@ export default function CommentModal({ postId, onClose }) {
   };
 
   /* ======================
-     REPLY (UI – GIỮ NGUYÊN)
+     DELETE COMMENT
+  ====================== */
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Xóa bình luận này?")) return;
+
+    setRemovingId(commentId);
+
+    try {
+      await axiosClient.delete(
+        `/posts/${postId}/comments/${commentId}`
+      );
+
+      setTimeout(() => {
+        setComments((prev) =>
+          prev.filter((c) => c._id !== commentId)
+        );
+      }, 200);
+    } catch (err) {
+      console.error("Delete comment error:", err);
+      setRemovingId(null);
+    }
+  };
+
+  /* ======================
+     REPLY (GIỮ NGUYÊN)
   ====================== */
   const toggleReply = (id) => {
     setReplyingId(replyingId === id ? null : id);
@@ -141,9 +184,15 @@ export default function CommentModal({ postId, onClose }) {
           <button onClick={onClose}>✕</button>
         </div>
 
-        <div className="comment-list">
+        <div className="comment-list" ref={commentListRef}>
           {comments.map((c) => (
-            <div key={c._id} className="comment-item">
+            <div
+              key={c._id}
+              className={`comment-item
+                ${removingId === c._id ? "comment-removing" : ""}
+                ${newCommentId === c._id ? "comment-new" : ""}
+              `}
+            >
               <img
                 src={c.user?.avatar || DEFAULT_AVATAR}
                 className="comment-avatar"
@@ -154,24 +203,18 @@ export default function CommentModal({ postId, onClose }) {
                   <b className="comment-username">
                     {c.user?.username || "Người dùng"}
                   </b>
-                  <p className="comment-content">
-                    {c.content}
-                  </p>
+                  <p className="comment-content">{c.content}</p>
                 </div>
 
                 <div className="comment-meta">
                   <span>{timeAgo(c.createdAt)}</span>
 
                   <div
-                    className={`comment-like ${
-                      c.liked ? "liked" : ""
-                    }`}
+                    className={`comment-like ${c.liked ? "liked" : ""}`}
                     onClick={() => toggleLike(c._id)}
                   >
                     <HeartIcon />
-                    {c.likeCount > 0 && (
-                      <span>{c.likeCount}</span>
-                    )}
+                    {c.likeCount > 0 && <span>{c.likeCount}</span>}
                   </div>
 
                   <div
@@ -179,17 +222,39 @@ export default function CommentModal({ postId, onClose }) {
                     onClick={() => toggleReply(c._id)}
                   >
                     <ReplyIcon />
-                    {c.replyCount > 0 && (
-                      <span>{c.replyCount}</span>
-                    )}
+                    {c.replyCount > 0 && <span>{c.replyCount}</span>}
                   </div>
                 </div>
+              </div>
+
+              {/* ===== MENU XÓA COMMENT ===== */}
+              <div className="comment-menu">
+                <button
+                  className="comment-menu-btn"
+                  onClick={() => {
+                    if (c.canDelete === false) return;
+                    setOpenMenuId(openMenuId === c._id ? null : c._id);
+                  }}
+                >
+                  <FiMoreHorizontal size={16} />
+                </button>
+
+                {openMenuId === c._id && c.canDelete !== false && (
+                  <div className="comment-menu-dropdown">
+                    <button
+                      className="comment-menu-delete"
+                      onClick={() => handleDeleteComment(c._id)}
+                    >
+                      <FiTrash2 />
+                      <span>Xóa</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* INPUT – CHỈ THÊM DISABLED + TEXT */}
         <div className="comment-input">
           <input
             value={text}

@@ -216,3 +216,64 @@
 .comment-reply span {
   font-size: 12px;
 }
+
+/* ===== DELETE COMMENT ===== */
+.comment-menu {
+  margin-left: auto;
+  position: relative;
+}
+
+.comment-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #65676b;
+  padding: 4px;
+}
+
+.comment-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  padding: 6px;
+  z-index: 30;
+}
+
+.comment-menu-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e41e3f;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.comment-menu-delete:hover {
+  background: #f5f5f5;
+}
+
+/* animation xóa */
+.comment-removing {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+}
+.comment-new {
+  animation: commentHighlight 1.5s ease;
+}
+
+@keyframes commentHighlight {
+  0% {
+    background-color: #f0f2f5;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
