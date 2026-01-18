@@ -1,5 +1,62 @@
 const mongoose = require("mongoose");
 
+/* ======================
+   REPLY SCHEMA (MULTI LEVEL)
+====================== */
+const replySchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    // 🔥 replies con (reply của reply)
+    replies: [],
+  },
+  { timestamps: true }
+);
+
+/* ======================
+   COMMENT SCHEMA
+====================== */
+const commentSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    replies: [replySchema],
+  },
+  { timestamps: true }
+);
+
+/* ======================
+   POST SCHEMA
+====================== */
 const postSchema = new mongoose.Schema(
   {
     author: {
@@ -7,20 +64,14 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     content: {
       type: String,
       trim: true,
       default: "",
     },
-
-    // 🔥 MULTI MEDIA (image / video)
     media: [
       {
-        url: {
-          type: String,
-          required: true,
-        },
+        url: { type: String, required: true },
         type: {
           type: String,
           enum: ["image", "video"],
@@ -28,13 +79,13 @@ const postSchema = new mongoose.Schema(
         },
       },
     ],
-
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
     ],
+    comments: [commentSchema],
   },
   { timestamps: true }
 );
