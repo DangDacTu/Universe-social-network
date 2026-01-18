@@ -6,19 +6,29 @@ import { AiFillHeart } from "react-icons/ai";
 import CommentModal from "../CommentModal/CommentModal";
 import { FiTrash2 } from "react-icons/fi";
 
+// 1. SỬA: Xóa dòng BACKEND_URL vì Cloudinary dùng link tuyệt đối
+// const BACKEND_URL = "http://localhost:5000"; 
 const DEFAULT_AVATAR = "/avatar.jpg";
 
 export default function PostItem({ post, onDeleted }) {
+  // 2. THÊM: Dòng này bắt buộc để tránh lỗi màn hình đen khi dữ liệu chưa tải xong
+  if (!post) return null;
+
   const [activeIndex, setActiveIndex] = useState(null);
 
   /* ======================
-     CURRENT USER
+      CURRENT USER (Thêm try-catch để an toàn hơn file gốc)
   ====================== */
-  const user = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = user?._id || null;
+  let currentUserId = null;
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    currentUserId = user?._id || null;
+  } catch (error) {
+    console.error("Lỗi đọc user");
+  }
 
   /* ======================
-     LIKE STATE
+      LIKE STATE
   ====================== */
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -26,26 +36,26 @@ export default function PostItem({ post, onDeleted }) {
   useEffect(() => {
     const userId = currentUserId?.toString();
     const isLiked = post.likes?.some(
-      (id) => id.toString() === userId
+      (id) => id?.toString() === userId
     );
-    setLiked(isLiked);
+    setLiked(!!isLiked);
     setLikeCount(post.likes?.length || 0);
   }, [post.likes, currentUserId]);
 
   /* ======================
-     COMMENT COUNT
+      COMMENT COUNT
   ====================== */
   const [commentCount, setCommentCount] = useState(
     post.comments?.length || 0
   );
 
   /* ======================
-     COMMENT MODAL
+      COMMENT MODAL
   ====================== */
   const [openComment, setOpenComment] = useState(false);
 
   /* ======================
-     DROPDOWN DELETE
+      DROPDOWN DELETE
   ====================== */
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef(null);
@@ -62,7 +72,7 @@ export default function PostItem({ post, onDeleted }) {
   }, []);
 
   /* ======================
-     DELETE POST (ANIMATION)
+      DELETE POST (ANIMATION)
   ====================== */
   const [removing, setRemoving] = useState(false);
 
@@ -74,7 +84,10 @@ export default function PostItem({ post, onDeleted }) {
     try {
       await axiosClient.delete(`/posts/${post._id}`);
       setTimeout(() => {
-        onDeleted(post._id);
+        // Kiểm tra an toàn trước khi gọi
+        if (typeof onDeleted === "function") {
+            onDeleted(post._id);
+        }
       }, 300);
     } catch (err) {
       console.error("DELETE POST ERROR:", err);
@@ -84,9 +97,11 @@ export default function PostItem({ post, onDeleted }) {
   };
 
   /* ======================
-     MEDIA VIEWER
+      MEDIA VIEWER
   ====================== */
-  const mediaList = post.media || [];
+  // 3. SỬA: Lọc bỏ media lỗi để tránh crash
+  const mediaList = (post.media || []).filter(item => item && item.url);
+  
   const activeMedia =
     activeIndex !== null ? mediaList[activeIndex] : null;
 
@@ -105,7 +120,7 @@ export default function PostItem({ post, onDeleted }) {
   };
 
   /* ======================
-     TOGGLE LIKE
+      TOGGLE LIKE
   ====================== */
   const handleLike = async () => {
     try {
@@ -121,7 +136,7 @@ export default function PostItem({ post, onDeleted }) {
   return (
     <>
       <div className={`post-item ${removing ? "post-removing" : ""}`}>
-        {/* AVATAR: Kiểm tra nếu là link Cloudinary thì dùng luôn, không thì dùng default */}
+        {/* 4. SỬA: Thêm profilePicture vào fallback avatar */}
         <img
           src={post.author?.profilePicture || post.author?.avatar || DEFAULT_AVATAR}
           className="post-avatar"
@@ -136,15 +151,19 @@ export default function PostItem({ post, onDeleted }) {
                 {post.author?.username || "Người dùng"}
               </span>
               <span className="post-time">
-                · {new Date(post.createdAt).toLocaleString()}
+                · {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
               </span>
             </div>
 
+            {/* LOGIC HIỆN NÚT XÓA (GIỮ NGUYÊN TỪ FILE GỐC CỦA BẠN) */}
             {String(post.author?._id) === String(currentUserId) && (
               <div className="post-menu" ref={menuRef}>
                 <button
                   className="post-menu-btn"
-                  onClick={() => setOpenMenu((p) => !p)}
+                  onClick={(e) => {
+                      e.stopPropagation(); // Thêm cái này để tránh click nhầm vào post
+                      setOpenMenu((p) => !p)
+                  }}
                 >
                   <FiMoreHorizontal size={18} />
                 </button>
@@ -168,9 +187,7 @@ export default function PostItem({ post, onDeleted }) {
             <div className="post-text">{post.content}</div>
           )}
 
-          {/* 🔥 SỬA LỖI HIỂN THỊ ẢNH Ở ĐÂY:
-              Bỏ BACKEND_URL đi, dùng trực tiếp item.url vì Cloudinary trả về link full
-          */}
+          {/* 5. SỬA: DÙNG TRỰC TIẾP item.url CHO CLOUDINARY (BỎ BACKEND_URL) */}
           {mediaList.length > 0 && (
             <div
               className={`post-media-scroll ${
@@ -183,7 +200,7 @@ export default function PostItem({ post, onDeleted }) {
                   key={index}
                   onClick={() => setActiveIndex(index)}
                 >
-                  {item.type === "image" ? (
+                  {item.type && item.type.startsWith("image") ? (
                     <img src={item.url} loading="lazy" />
                   ) : (
                     <video
@@ -241,7 +258,6 @@ export default function PostItem({ post, onDeleted }) {
         />
       )}
 
-      {/* MEDIA VIEWER MODAL */}
       {activeMedia && (
         <div className="media-viewer" onClick={closeViewer}>
           <button className="viewer-close" onClick={closeViewer}>
@@ -272,7 +288,7 @@ export default function PostItem({ post, onDeleted }) {
             >
               {mediaList.map((item, index) => (
                 <div className="media-slide" key={index}>
-                  {item.type === "image" ? (
+                  {item.type && item.type.startsWith("image") ? (
                     <img src={item.url} />
                   ) : (
                     <video
