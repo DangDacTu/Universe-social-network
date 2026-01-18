@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const { data } = await authApi.login({ email, password });
+        localStorage.setItem("accessToken", data.token); // ✅ LƯU TOKEN ĐỂ SETTINGS API DÙNG
         setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
         return data;

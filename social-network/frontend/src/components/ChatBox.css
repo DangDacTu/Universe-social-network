@@ -1,0 +1,285 @@
+.chatBox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+}
+
+/* ================= HEADER ================= */
+.header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #dbdbdb;
+    font-weight: 600;
+    background: #fff;
+    color: #000;
+}
+
+/* ================= MESSAGES ================= */
+.messages {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    background: #fff;
+}
+
+/* Wrapper chỉ giới hạn max-width, không kéo dài */
+.messageWrapper {
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.messageWrapper.me {
+    align-self: flex-end;
+}
+
+/* ================= BUBBLE ================= */
+.message {
+    padding: 8px 12px;
+    border-radius: 18px;
+    background: #efefef;
+    font-size: 14px;
+    line-height: 1.4;
+
+    width: fit-content;
+    max-width: 100%;
+    word-break: break-word;
+    white-space: pre-wrap;
+    color: #000;
+}
+
+/* Tin nhắn của mình – IG xanh */
+.message.me {
+    background: #3797f0;
+    color: #ffffff;
+    border-bottom-right-radius: 6px;
+}
+
+/* Ảnh / audio không có bubble */
+.message.noBubble {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* ================= MEDIA ================= */
+.image {
+    max-width: 220px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: block;
+}
+
+.audio {
+    width: 220px;
+    display: block;
+}
+
+.file {
+    color: #00376b;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.text {
+    white-space: pre-wrap;
+}
+
+/* ================= STATUS ================= */
+.status {
+    font-size: 11px;
+    color: #8e8e8e;
+    margin-top: 2px;
+    text-align: right;
+}
+
+/* ================= PREVIEW ================= */
+.previewBox {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    border-top: 1px solid #dbdbdb;
+    flex-wrap: wrap;
+    background: #fff;
+}
+
+.previewItem {
+    position: relative;
+}
+
+.previewImage {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #dbdbdb;
+}
+
+.previewRemove {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    border: none;
+    background: #ed4956;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+/* ================= INPUT ================= */
+.inputBox {
+    display: flex;
+    padding: 10px 14px;
+    gap: 10px;
+    border-top: 1px solid #dbdbdb;
+    align-items: center;
+    background: #fff;
+}
+
+.input {
+    flex: 1;
+    padding: 10px 14px;
+    resize: none;
+    border-radius: 22px;
+    border: 1px solid #dbdbdb;
+    font-size: 14px;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #a8a8a8;
+}
+
+/* ================= ICON ================= */
+.icon {
+    cursor: pointer;
+    font-size: 20px;
+    background: none;
+    border: none;
+    color: #262626;
+}
+
+.icon.send {
+    color: #3797f0;
+    font-size: 22px;
+}
+
+.icon.recording {
+    color: #ed4956;
+}
+
+/* ================= RECORD ================= */
+.recordingTime {
+    font-size: 12px;
+    color: #ed4956;
+    min-width: 42px;
+}
+
+.cancelRecord {
+    font-size: 12px;
+    color: #fff;
+    background: #ed4956;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    cursor: pointer;
+}
+
+/* ================= EMPTY ================= */
+.empty {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8e8e8e;
+}
+
+/* ================= IMAGE VIEWER ================= */
+.imageViewerOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.imageViewerImage {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* ❌ Close button */
+.imageViewerClose {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ◀ ▶ Navigation buttons */
+.imageNav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 30px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.imageNav:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.imageNav.left {
+    left: 30px;
+}
+
+.imageNav.right {
+    right: 30px;
+}
+
+/* 📱 Mobile tối ưu */
+@media (max-width: 768px) {
+    .imageNav {
+        width: 40px;
+        height: 40px;
+        font-size: 26px;
+    }
+
+    .imageNav.left {
+        left: 10px;
+    }
+
+    .imageNav.right {
+        right: 10px;
+    }
+
+    .messageWrapper {
+        max-width: 85%;
+    }
+}
