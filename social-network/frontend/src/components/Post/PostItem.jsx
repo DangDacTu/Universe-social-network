@@ -6,7 +6,6 @@ import { AiFillHeart } from "react-icons/ai";
 import CommentModal from "../CommentModal/CommentModal";
 import { FiTrash2 } from "react-icons/fi";
 
-const BACKEND_URL = "http://localhost:5000";
 const DEFAULT_AVATAR = "/avatar.jpg";
 
 export default function PostItem({ post, onDeleted }) {
@@ -122,10 +121,12 @@ export default function PostItem({ post, onDeleted }) {
   return (
     <>
       <div className={`post-item ${removing ? "post-removing" : ""}`}>
+        {/* AVATAR: Kiểm tra nếu là link Cloudinary thì dùng luôn, không thì dùng default */}
         <img
-          src={post.author?.avatar || DEFAULT_AVATAR}
+          src={post.author?.profilePicture || post.author?.avatar || DEFAULT_AVATAR}
           className="post-avatar"
           alt="avatar"
+          onError={(e) => e.target.src = DEFAULT_AVATAR} 
         />
 
         <div className="post-content">
@@ -167,6 +168,9 @@ export default function PostItem({ post, onDeleted }) {
             <div className="post-text">{post.content}</div>
           )}
 
+          {/* 🔥 SỬA LỖI HIỂN THỊ ẢNH Ở ĐÂY:
+              Bỏ BACKEND_URL đi, dùng trực tiếp item.url vì Cloudinary trả về link full
+          */}
           {mediaList.length > 0 && (
             <div
               className={`post-media-scroll ${
@@ -180,11 +184,10 @@ export default function PostItem({ post, onDeleted }) {
                   onClick={() => setActiveIndex(index)}
                 >
                   {item.type === "image" ? (
-                    <img src={`${BACKEND_URL}${item.url}`} />
+                    <img src={item.url} loading="lazy" />
                   ) : (
-                    /* ✅ AUTOPLAY + MUTED (THREADS STYLE) */
                     <video
-                      src={`${BACKEND_URL}${item.url}`}
+                      src={item.url}
                       autoPlay
                       muted
                       loop
@@ -238,6 +241,7 @@ export default function PostItem({ post, onDeleted }) {
         />
       )}
 
+      {/* MEDIA VIEWER MODAL */}
       {activeMedia && (
         <div className="media-viewer" onClick={closeViewer}>
           <button className="viewer-close" onClick={closeViewer}>
@@ -269,10 +273,10 @@ export default function PostItem({ post, onDeleted }) {
               {mediaList.map((item, index) => (
                 <div className="media-slide" key={index}>
                   {item.type === "image" ? (
-                    <img src={`${BACKEND_URL}${item.url}`} />
+                    <img src={item.url} />
                   ) : (
                     <video
-                      src={`${BACKEND_URL}${item.url}`}
+                      src={item.url}
                       controls
                       autoPlay
                     />
