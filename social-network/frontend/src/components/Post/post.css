@@ -75,6 +75,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #000;
+}
+
+.modal-header .cancel-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #000;
+}
+
+.modal-header .cancel-btn:focus {
+  outline: none;
 }
 
 .modal-body textarea {

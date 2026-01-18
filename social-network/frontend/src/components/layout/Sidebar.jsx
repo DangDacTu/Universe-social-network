@@ -7,14 +7,26 @@ import {
   FiUser,
   FiMenu,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ onCreate }) {
+  const navigate = useNavigate();
+
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo"></div>
+      {/* ===== LOGO TOP (CLICK → HOME) ===== */}
+      <div
+        className="sidebar-logo"
+        onClick={() => navigate("/")}
+      >
+        <img src="/logo-universe.png" alt="Logo" />
+      </div>
 
       <nav className="sidebar-nav">
-        <button className="sidebar-item active">
+        <button
+          className="sidebar-item active"
+          onClick={() => navigate("/")}
+        >
           <FiHome />
         </button>
 
@@ -30,7 +42,11 @@ export default function Sidebar({ onCreate }) {
           <FiHeart />
         </button>
 
-        <button className="sidebar-item">
+        {/* ✅ USER → /me */}
+        <button
+          className="sidebar-item"
+          onClick={() => navigate("/me")}
+        >
           <FiUser />
         </button>
       </nav>

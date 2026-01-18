@@ -69,8 +69,10 @@ export default function CreatePostModal({ onClose, onSuccess }) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
         <div className="modal-header">
-          <button onClick={onClose}>Hủy</button>
-          <span>Thread mới</span>
+          <button className="cancel-btn" onClick={onClose}>
+            Hủy
+          </button>
+          <span><b>Post mới</b></span>
           <button
             className="submit"
             disabled={loading || (!content && media.length === 0)}

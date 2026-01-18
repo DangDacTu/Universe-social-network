@@ -31,7 +31,7 @@ export default function Home() {
         `}
       </style>
 
-      <Sidebar />
+      <Sidebar onCreate={() => setOpen(true)} />
 
       <main
         style={{
