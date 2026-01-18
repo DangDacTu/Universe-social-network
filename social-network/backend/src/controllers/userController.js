@@ -146,5 +146,29 @@ const getChatAvailableUsers = async (req, res) => {
     }
 };
 
+// @desc    Tìm kiếm người dùng CHỈ THEO USERNAME
+// @route   GET /api/users/search?q=keyword
+const searchUsers = async (req, res) => {
+    try {
+        const keyword = req.query.q;
+
+        if (!keyword) {
+            return res.status(400).json({ message: "Vui lòng nhập từ khóa" });
+        }
+
+        // --- SỬA Ở ĐÂY ---
+        // Chỉ tìm theo trường username (bỏ dòng email đi)
+        const users = await User.find({
+            username: { $regex: keyword, $options: "i" } 
+        })
+        .select("username email profilePicture _id") 
+        .limit(10);
+
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, };
