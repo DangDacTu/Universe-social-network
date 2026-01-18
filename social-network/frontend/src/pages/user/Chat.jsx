@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-<div>hoang nguu </div>
-=======
 /**
  * @file Chat.jsx
  * @author moi
@@ -303,4 +300,4 @@ export default function Chat() {
         </div>
     );
 }
->>>>>>> mixcode2
+
