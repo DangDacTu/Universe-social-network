@@ -57,3 +57,24 @@
 .sidebar-bottom {
   margin-bottom: 12px;
 }
+
+.sidebar-logo {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+
+  overflow: hidden;        /* giới hạn hitbox */
+  pointer-events: auto;    /* ✅ BẮT BUỘC */
+}
+
+.sidebar-logo img {
+  width: 107px;
+  height: 107px;
+  object-fit: contain;
+
+  pointer-events: none;    /* ❗ CHỈ ẢNH KHÔNG BẮT CLICK */
+}

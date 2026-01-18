@@ -1,22 +1,25 @@
-.sidebar {
+/* 👇 Class chính đã đổi tên */
+.chat-sidebar {
     width: 280px;
     border-right: 1px solid #dbdbdb;
     padding: 10px;
     background: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Đảm bảo nó full chiều cao cha */
 }
 
 /* ================= TITLE ================= */
-.title {
+.chat-title {
     margin-bottom: 10px;
     font-weight: 600;
     font-size: 16px;
     color: #262626;
-    /* IG black */
 }
 
 /* ================= SEARCH ================= */
-.search {
-    width: 94%;
+.chat-search {
+    width: 100%; /* Sửa lại cho đẹp hơn */
     padding: 8px 10px;
     margin-bottom: 10px;
     border-radius: 8px;
@@ -25,14 +28,21 @@
     font-size: 14px;
     background: #fafafa;
     color: #262626;
+    box-sizing: border-box; /* Để padding không làm vỡ layout */
 }
 
-.search::placeholder {
+.chat-search::placeholder {
     color: #8e8e8e;
 }
 
+/* ================= USER LIST SCROLL ================= */
+.chat-user-list {
+    flex: 1;
+    overflow-y: auto; /* Cho phép cuộn danh sách user nếu quá dài */
+}
+
 /* ================= USER ITEM ================= */
-.userItem {
+.chat-user-item {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -42,16 +52,16 @@
     transition: background 0.15s ease;
 }
 
-.userItem:hover {
+.chat-user-item:hover {
     background-color: #fafafa;
 }
 
-.userItem.selected {
+.chat-user-item.selected {
     background-color: #efefef;
 }
 
 /* ================= USERNAME ================= */
-.username {
+.chat-user-item .username {
     flex: 1;
     font-size: 14px;
     color: #262626;
@@ -61,22 +71,23 @@
 /* ================= AVATAR ================= */
 .avatarWrapper {
     position: relative;
+    display: flex; /* Căn chỉnh ảnh tốt hơn */
 }
 
-.avatar {
+.chat-user-item .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
 }
 
-/* Online dot giống IG */
+/* Online dot */
 .onlineDot {
     position: absolute;
     bottom: 1px;
     right: 1px;
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
     background-color: #00c853;
     border-radius: 50%;
     border: 2px solid #fff;
@@ -87,7 +98,6 @@
     min-width: 18px;
     height: 18px;
     background-color: #ed4956;
-    /* IG red */
     color: #fff;
     font-size: 11px;
     font-weight: 600;
