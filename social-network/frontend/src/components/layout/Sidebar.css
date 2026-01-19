@@ -79,4 +79,71 @@
   pointer-events: none;    /* ❗ CHỈ ẢNH KHÔNG BẮT CLICK */
 }
 
+.sidebar-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background 0.25s ease, transform 0.15s ease;
+}
 
+.sidebar-item.active {
+  background: #111;
+}
+
+.sidebar-item:hover {
+  background: #f2f2f2;
+}
+
+/* ===== DROPUP MENU ===== */
+.sidebar-dropup {
+  position: absolute;
+  bottom: 60px;
+
+  /* 👇 neo vào TRONG sidebar */
+  left: 12px;
+
+  background: #fff;
+  border-radius: 12px;
+  min-width: 160px;
+  padding: 6px 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+}
+
+
+.dropup-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #000;
+  cursor: pointer;
+}
+
+.dropup-item:hover {
+  background: #f2f2f2;
+}
+
+.dropup-item.logout {
+  color: #ff5c5c;
+}
+
+.sidebar-dropup {
+  animation: dropUp 0.18s ease-out;
+}
+
+@keyframes dropUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

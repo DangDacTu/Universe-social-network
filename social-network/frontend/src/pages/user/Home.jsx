@@ -1,8 +1,7 @@
 import { useState } from "react";
-import Sidebar from "../../components/layout/Sidebar";
 import PostInput from "../../components/post/PostInput";
 import PostList from "../../components/post/PostList";
-import CreatePostModal from "../../components/post/CreatePostModal";
+import CreatePostModal from "../../components/Post/CreatePostModal";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
@@ -31,22 +30,10 @@ export default function Home() {
         `}
       </style>
 
-      <Sidebar onCreate={() => setOpen(true)} />
-
-      <main
-        style={{
-          marginLeft: "80px",
-          height: "100vh",
-          background: "#000",
-          display: "flex",
-          justifyContent: "center",
-          paddingTop: "24px",
-        }}
-      >
         {/* KHUNG FEED TRẮNG */}
         <div
           style={{
-            width: "600px",
+            width: "650px",
             background: "#fff",
             borderRadius: "16px",
             display: "flex",
@@ -71,8 +58,7 @@ export default function Home() {
             <PostList reload={reload} />
           </div>
         </div>
-      </main>
-
+      
       {open && (
         <CreatePostModal
           onClose={() => setOpen(false)}
