@@ -1,25 +1,15 @@
-/**
- * @file messageApi.js
- * @author moi
- * @description
- * Gọi API liên quan tới message
- */
+import axiosClient from "./axiosClient"; // Giả sử bạn đã cấu hình axiosClient
 
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/messages";
-
-/**
- * Lấy lịch sử chat giữa user hiện tại và user khác
- * @param {string} userId - userId người chat cùng
- * @param {string} token - JWT token
- */
-export const getChatHistory = async (userId, token) => {
-    const response = await axios.get(`${API_URL}/${userId}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return response.data;
+const messageApi = {
+  // Lấy lịch sử chat với 1 user cụ thể
+  getChatHistory: (userId) => {
+    return axiosClient.get(`/messages/${userId}`);
+  },
+  
+  // (Tuỳ chọn) Lấy danh sách những người đã từng chat
+  getConversations: () => {
+    return axiosClient.get("/messages/conversations");
+  }
 };
+
+export default messageApi;

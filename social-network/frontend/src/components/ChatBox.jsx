@@ -1,465 +1,274 @@
-/**
- * @file ChatBox.jsx
- * Hiển thị tin nhắn + input gửi (text / image / file / audio / voice)
- */
-
 import { useEffect, useRef, useState } from "react";
-import { getSocket } from "../services/socket";
-import uploadApi from "../api/uploadApi";
+import uploadApi from "../api/uploadApi"; 
+import { getSocket } from "../services/socket"; // Import socket để xóa/sửa
 import "./ChatBox.css";
 
-export default function ChatBox({
-    messages = [],
-    currentUserId,
-    messageInput,
-    setMessageInput,
-    onSendMessage,
-    selectedUser,
-}) {
-    const messagesEndRef = useRef(null);
+// Icons style Instagram + Icons chức năng
+import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiVideo, FiMoreVertical, FiTrash, FiEdit2, FiX, FiSend } from "react-icons/fi";
+import { HiOutlinePhone, HiOutlineVideoCamera } from "react-icons/hi";
+import { RiMessengerLine } from "react-icons/ri"; 
 
-    const [localMediaMessages, setLocalMediaMessages] = useState([]);
-    const [previewFiles, setPreviewFiles] = useState([]);
-    const [previewUrls, setPreviewUrls] = useState([]);
+/* =========================================================
+   COMPONENT CON: MESSAGE ITEM (Đã thêm menu Sửa/Xóa)
+   ========================================================= */
+const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit }) => {
+    const [showMenu, setShowMenu] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(msg.content);
+    const menuRef = useRef(null);
 
-    /* ================= IMAGE VIEWER ================= */
-    const [imageViewer, setImageViewer] = useState(null);
-    const touchStartX = useRef(0);
-
-    /* ================= VOICE ================= */
-    const mediaRecorderRef = useRef(null);
-    const audioChunksRef = useRef([]);
-    const recordingIntervalRef = useRef(null);
-    const streamRef = useRef(null);
-
-    const [isRecording, setIsRecording] = useState(false);
-    const [recordingTime, setRecordingTime] = useState(0);
-    const [isCancelRecording, setIsCancelRecording] = useState(false);
-
-    /* ================= AUTO SCROLL ================= */
+    // Đóng menu khi click ra ngoài
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages, localMediaMessages]);
-
-    /* ================= OPEN CHAT ================= */
-    useEffect(() => {
-        if (!selectedUser) return;
-        getSocket().emit("open-chat", { otherUserId: selectedUser._id });
-    }, [selectedUser]);
-
-    /* ================= SEEN ================= */
-    useEffect(() => {
-        if (!selectedUser || !messages.length) return;
-
-        const unseen = messages.filter(
-            (m) => m.senderId !== currentUserId && !m.isSeen
-        );
-
-        if (!unseen.length) return;
-
-        getSocket().emit("message-seen", {
-            messageIds: unseen.map((m) => m._id),
-            senderId: selectedUser._id,
-        });
-    }, [messages, selectedUser, currentUserId]);
-
-    /* ================= UPLOAD ================= */
-    const handleUpload = async (file) => {
-        if (!file || !selectedUser) return;
-
-        const res = await uploadApi.uploadFile(file);
-        const socket = getSocket();
-
-        let mediaType = "file";
-        if (file.type.startsWith("image")) mediaType = "image";
-        else if (file.type.startsWith("audio")) mediaType = "audio";
-
-        const tempMessage = {
-            _id: "temp-" + Date.now() + Math.random(),
-            senderId: currentUserId,
-            receiverId: selectedUser._id,
-            content: "",
-            mediaUrl: res.data.url,
-            mediaType,
-            mediaName: file.name,
-            mediaMimeType: file.type,
-            mediaSize: file.size,
-            isDelivered: true,
-            isSeen: false,
-            createdAt: new Date().toISOString(),
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false);
         };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-        setLocalMediaMessages((p) => [...p, tempMessage]);
-
-        socket.emit("send-message", {
-            receiverId: selectedUser._id,
-            content: "",
-            mediaUrl: res.data.url,
-            mediaType,
-            mediaName: file.name,
-            mediaMimeType: file.type,
-            mediaSize: file.size,
-        });
+    const handleSaveEdit = () => {
+        if (editText.trim() !== msg.content) onEdit(msg._id, editText);
+        setIsEditing(false); setShowMenu(false);
     };
 
-    /* ================= PREVIEW SEND ================= */
-    const sendPreviewImages = async () => {
-        for (const file of previewFiles) {
-            await handleUpload(file);
-        }
-        previewUrls.forEach((u) => URL.revokeObjectURL(u));
-        setPreviewFiles([]);
-        setPreviewUrls([]);
-    };
+    const isMedia = ["image", "video", "audio"].includes(msg.mediaType);
 
-    /* ================= VOICE ================= */
-    const startRecording = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-
-        streamRef.current = stream;
-        mediaRecorderRef.current = recorder;
-        audioChunksRef.current = [];
-        setRecordingTime(0);
-        setIsCancelRecording(false);
-
-        recorder.ondataavailable = (e) => {
-            if (e.data.size) audioChunksRef.current.push(e.data);
-        };
-
-        recorder.onstop = async () => {
-            clearInterval(recordingIntervalRef.current);
-
-            if (isCancelRecording) {
-                stream.getTracks().forEach((t) => t.stop());
-                return;
-            }
-
-            const blob = new Blob(audioChunksRef.current, {
-                type: "audio/webm",
-            });
-            const file = new File([blob], `voice-${Date.now()}.webm`, {
-                type: "audio/webm",
-            });
-
-            await handleUpload(file);
-            stream.getTracks().forEach((t) => t.stop());
-        };
-
-        recorder.start();
-        setIsRecording(true);
-
-        recordingIntervalRef.current = setInterval(
-            () => setRecordingTime((t) => t + 1),
-            1000
-        );
-    };
-
-    const stopRecording = () => {
-        mediaRecorderRef.current?.stop();
-        setIsRecording(false);
-    };
-
-    const cancelRecording = () => {
-        setIsCancelRecording(true);
-        mediaRecorderRef.current?.stop();
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        setIsRecording(false);
-    };
-
-
-
-    /* ================= MERGE ================= */
-    const allMessages = [
-        ...messages,
-        ...localMediaMessages.filter(
-            (m) => !messages.some((x) => x._id === m._id)
-        ),
-    ].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-
-    const lastMyMessageId = [...allMessages]
-        .filter((m) => m.senderId === currentUserId)
-        .slice(-1)[0]?._id;
-
-    /* ================= IMAGE VIEWER ================= */
-    const openImageViewer = (url) => {
-        const images = allMessages
-            .filter((m) => m.mediaType === "image")
-            .map((m) => m.mediaUrl);
-
-        setImageViewer({
-            images,
-            index: images.indexOf(url),
-        });
-    };
-
-    const nextImage = () =>
-        setImageViewer((v) => ({
-            ...v,
-            index: (v.index + 1) % v.images.length,
-        }));
-
-    const prevImage = () =>
-        setImageViewer((v) => ({
-            ...v,
-            index: (v.index - 1 + v.images.length) % v.images.length,
-        }));
-
-    useEffect(() => {
-        if (!imageViewer) return;
-        const handler = (e) => {
-            if (e.key === "ArrowRight") nextImage();
-            if (e.key === "ArrowLeft") prevImage();
-            if (e.key === "Escape") setImageViewer(null);
-        };
-        window.addEventListener("keydown", handler);
-        return () => window.removeEventListener("keydown", handler);
-    }, [imageViewer]);
-    if (!selectedUser) {
-        return <div className="empty">Chọn một người để bắt đầu chat</div>;
-    }
     return (
-        <div className="chatBox">
-            <div className="header">
-                Đang nhắn tin với <b>{selectedUser.username}</b>
-            </div>
-
-            <div className="messages">
-                {allMessages.map((msg) => {
-                    const isMe = msg.senderId === currentUserId;
-                    const noBubble =
-                        msg.mediaType === "image" ||
-                        msg.mediaType === "audio";
-
-                    return (
-                        <div
-                            key={msg._id}
-                            className={`messageWrapper ${isMe ? "me" : ""
-                                }`}
-                        >
-                            <div
-                                className={`message ${noBubble ? "noBubble" : ""
-                                    } ${isMe ? "me" : ""}`}
-                            >
-                                {msg.mediaType === "image" && (
-                                    <img
-                                        src={msg.mediaUrl}
-                                        className="image"
-                                        onClick={() =>
-                                            openImageViewer(msg.mediaUrl)
-                                        }
-                                    />
-                                )}
-
-                                {msg.mediaType === "audio" && (
-                                    <audio controls className="audio">
-                                        <source src={msg.mediaUrl} />
-                                    </audio>
-                                )}
-
-                                {msg.mediaType === "file" && (
-                                    <a
-                                        href={msg.mediaUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="file"
-                                    >
-                                        {msg.mediaName}
-                                    </a>
-                                )}
-
-                                {!msg.mediaUrl && (
-                                    <span className="text">
-                                        {msg.content}
-                                    </span>
-                                )}
+        <div className={`ig-message-row ${isMe ? "me" : "other"}`}>
+             {!isMe && <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-small-avatar" />}
+             
+             {/* Group để chứa bong bóng chat và nút 3 chấm */}
+             <div className="ig-message-group">
+                 <div className={`ig-message-bubble ${isMedia ? "media" : ""} ${isMe ? "me" : "other"}`}>
+                    {isEditing ? (
+                        <div className="ig-edit-mode">
+                            <input 
+                                value={editText} 
+                                onChange={(e) => setEditText(e.target.value)}
+                                autoFocus
+                                onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
+                            />
+                            <div className="ig-edit-btns">
+                                <span onClick={handleSaveEdit}>Lưu</span>
+                                <span onClick={() => setIsEditing(false)}>Hủy</span>
                             </div>
-
-                            {isMe && msg._id === lastMyMessageId && (
-                                <div className="status">
-                                    {msg.isSeen ? "Đã xem" : "Đã gửi"}
-                                </div>
-                            )}
                         </div>
-                    );
-                })}
-                <div ref={messagesEndRef} />
-            </div>
+                    ) : (
+                        <>
+                            {msg.mediaType === "text" && <span>{msg.content}</span>}
+                            {msg.mediaType === "image" && <img src={msg.mediaUrl} className="ig-msg-img" onClick={()=>onPreviewImage(msg.mediaUrl)}/>}
+                            {msg.mediaType === "video" && <video controls src={msg.mediaUrl} className="ig-msg-video"/>}
+                            {msg.mediaType === "audio" && <audio controls src={msg.mediaUrl} />}
+                        </>
+                    )}
+                 </div>
 
-            {imageViewer && (
-                <div
-                    className="imageViewerOverlay"
-                    onClick={() => setImageViewer(null)}
-                    onTouchStart={(e) =>
-                    (touchStartX.current =
-                        e.touches[0].clientX)
-                    }
-                    onTouchEnd={(e) => {
-                        const diff =
-                            e.changedTouches[0].clientX -
-                            touchStartX.current;
-                        if (diff > 50) prevImage();
-                        if (diff < -50) nextImage();
-                    }}
-                >
-                    <button className="imageNav left" onClick={prevImage}>
-                        ‹
-                    </button>
-
-                    <img
-                        src={
-                            imageViewer.images[
-                            imageViewer.index
-                            ]
-                        }
-                        className="imageViewerImage"
-                        onClick={(e) => e.stopPropagation()}
-                    />
-
-                    <button className="imageNav right" onClick={nextImage}>
-                        ›
-                    </button>
-
-                    <span
-                        className="imageViewerClose"
-                        onClick={() => setImageViewer(null)}
-                    >
-                        ✕
-                    </span>
-                </div>
-            )}
-
-            {previewUrls.length > 0 && (
-                <div className="previewBox">
-                    {previewUrls.map((url, idx) => (
-                        <div key={idx} className="previewItem">
-                            <img src={url} className="previewImage" />
-                            <button
-                                className="previewRemove"
-                                onClick={() => {
-                                    URL.revokeObjectURL(url);
-                                    setPreviewFiles((f) =>
-                                        f.filter((_, i) => i !== idx)
-                                    );
-                                    setPreviewUrls((u) =>
-                                        u.filter((_, i) => i !== idx)
-                                    );
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            <div className="inputBox">
-                <button
-                    onClick={
-                        isRecording ? stopRecording : startRecording
-                    }
-                    className={`icon ${isRecording ? "recording" : ""
-                        }`}
-                >
-                    {isRecording ? "⏹️" : "🎤"}
-                </button>
-
-                {isRecording && (
-                    <>
-                        <span className="recordingTime">
-                            {String(
-                                Math.floor(recordingTime / 60)
-                            ).padStart(2, "0")}
-                            :
-                            {String(recordingTime % 60).padStart(
-                                2,
-                                "0"
-                            )}
-                        </span>
-                        <button
-                            onClick={cancelRecording}
-                            className="cancelRecord"
-                        >
-                            ❌
+                 {/* MENU MORE (Chỉ hiện cho tin nhắn của mình) */}
+                 {isMe && !isEditing && (
+                    <div className="ig-more-menu" ref={menuRef}>
+                        <button className="ig-more-btn" onClick={() => setShowMenu(!showMenu)}>
+                            <FiMoreVertical size={16} />
                         </button>
-                    </>
-                )}
-
-                <label htmlFor="imageInput" className="icon">
-                    🖼️
-                </label>
-                <input
-                    id="imageInput"
-                    type="file"
-                    hidden
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => {
-                        const files = Array.from(e.target.files);
-                        setPreviewFiles((p) => [...p, ...files]);
-                        setPreviewUrls((p) => [
-                            ...p,
-                            ...files.map((f) =>
-                                URL.createObjectURL(f)
-                            ),
-                        ]);
-                        e.target.value = "";
-                    }}
-                />
-
-                <label htmlFor="fileInput" className="icon">
-                    📎
-                </label>
-                <input
-                    id="fileInput"
-                    type="file"
-                    hidden
-                    accept="audio/*,.pdf,.doc,.docx,.zip"
-                    onChange={(e) => {
-                        if (e.target.files?.[0]) {
-                            handleUpload(e.target.files[0]);
-                        }
-                        e.target.value = "";
-                    }}
-                />
-
-                <textarea
-                    value={messageInput}
-                    onChange={(e) =>
-                        setMessageInput(e.target.value)
-                    }
-                    placeholder="Nhập tin nhắn..."
-                    className="input"
-                    rows={1}
-                    onKeyDown={async (e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            if (previewFiles.length) {
-                                await sendPreviewImages();
-                                return;
-                            }
-                            if (messageInput.trim()) {
-                                onSendMessage();
-                            }
-                        }
-                    }}
-                />
-
-                <button
-                    onClick={async () => {
-                        if (previewFiles.length) {
-                            await sendPreviewImages();
-                            return;
-                        }
-                        if (messageInput.trim()) {
-                            onSendMessage();
-                        }
-                    }}
-                    className="icon send"
-                >
-                    📩
-                </button>
-            </div>
+                        {showMenu && (
+                            <div className="ig-dropdown-menu">
+                                {msg.mediaType === "text" && (
+                                    <div className="ig-menu-item" onClick={() => { setIsEditing(true); setShowMenu(false); }}>
+                                        <FiEdit2 /> Sửa
+                                    </div>
+                                )}
+                                <div className="ig-menu-item delete" onClick={() => onDelete(msg._id)}>
+                                    <FiTrash /> Gỡ
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                 )}
+             </div>
         </div>
     );
+};
+
+/* =========================================================
+   COMPONENT CHÍNH: CHAT BOX
+   ========================================================= */
+export default function ChatBox({ messages, currentUserId, selectedUser, onSendMessage }) {
+  const messagesEndRef = useRef(null);
+  const [text, setText] = useState("");
+  const [previewFile, setPreviewFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [fileType, setFileType] = useState("image");
+  const [fullImage, setFullImage] = useState(null);
+
+  // Recording State
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  // Auto Scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, previewUrl, isRecording]);
+
+  /* --- LOGIC XÓA / SỬA --- */
+  const handleDeleteMessage = (msgId) => {
+      if(window.confirm("Gỡ tin nhắn này?")) {
+          getSocket().emit("delete-message", { messageId: msgId, receiverId: selectedUser._id });
+      }
+  };
+  const handleEditMessage = (msgId, newContent) => {
+      getSocket().emit("edit-message", { messageId: msgId, receiverId: selectedUser._id, newContent });
+  };
+
+  /* --- LOGIC UPLOAD & GỬI --- */
+  const handleSelectFile = (e, type) => {
+      const file = e.target.files[0];
+      if(file){
+          setPreviewFile(file);
+          setPreviewUrl(URL.createObjectURL(file));
+          setFileType(type);
+      }
+      e.target.value = "";
+  }
+
+  const uploadAndSend = async (file, type) => {
+    try {
+      const res = await uploadApi.uploadFile(file);
+      onSendMessage({ content: "", mediaUrl: res.data.url, mediaType: type });
+    } catch (err) { alert("Lỗi gửi file!"); }
+  };
+
+  const handleSendTextOrMedia = async () => {
+       if(text.trim()) { onSendMessage({content: text, mediaType: 'text'}); setText(""); }
+       if(previewFile) { 
+           await uploadAndSend(previewFile, fileType); 
+           setPreviewFile(null); setPreviewUrl(null); 
+       }
+  }
+
+  /* --- LOGIC GHI ÂM --- */
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = async () => {
+        const audioFile = new File([new Blob(audioChunksRef.current, { type: "audio/webm" })], "voice.webm", { type: "audio/webm" });
+        await uploadAndSend(audioFile, "audio");
+        stream.getTracks().forEach(t => t.stop());
+      };
+      recorder.start(); setIsRecording(true);
+    } catch (err) { alert("Lỗi Micro!"); }
+  };
+  
+  const stopRecording = () => { 
+      mediaRecorderRef.current?.stop(); 
+      setIsRecording(false); 
+  };
+
+
+  // --- UI EMPTY STATE ---
+  if (!selectedUser) {
+    return (
+      <div className="ig-empty-state">
+        <div className="ig-empty-icon-circle"><RiMessengerLine size={50} /></div>
+        <h2>Your messages</h2>
+        <p>Send a message to start a chat.</p>
+        <button className="ig-send-msg-btn">Send message</button>
+      </div>
+    );
+  }
+
+  // --- UI MAIN CHAT ---
+  return (
+    <div className="ig-chatbox">
+      {/* HEADER */}
+      <div className="ig-chat-header">
+        <div className="ig-header-user">
+            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-header-avatar" />
+            <div className="ig-header-info">
+                <span className="ig-header-name">{selectedUser.username}</span>
+                <span className="ig-header-status">Active now</span>
+            </div>
+        </div>
+        <div className="ig-header-actions">
+            <HiOutlinePhone size={26} />
+            <HiOutlineVideoCamera size={26} />
+            <FiInfo size={26} />
+        </div>
+      </div>
+
+      {/* MESSAGES */}
+      <div className="ig-messages-list">
+        <div className="ig-profile-intro">
+            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-intro-avatar" />
+            <h3>{selectedUser.username}</h3>
+            <p>{selectedUser.username} • Universe</p>
+            <button className="ig-view-profile-btn">View profile</button>
+        </div>
+
+        {messages.map((msg) => (
+            <MessageItem 
+                key={msg._id} msg={msg} isMe={msg.senderId === currentUserId} selectedUser={selectedUser}
+                onPreviewImage={setFullImage} onDelete={handleDeleteMessage} onEdit={handleEditMessage}
+            />
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      {/* PREVIEW */}
+      {previewUrl && (
+          <div className="ig-preview-area">
+              {fileType === 'video' ? <video src={previewUrl} style={{height:100}}/> : <img src={previewUrl} style={{height: 100}} />}
+              <button onClick={()=>{setPreviewUrl(null); setPreviewFile(null)}}><FiX/></button>
+          </div>
+      )}
+
+      {/* INPUT AREA */}
+      <div className="ig-input-area">
+        {isRecording ? (
+            // Giao diện khi đang ghi âm
+            <div className="ig-recording-ui">
+                <span className="ig-rec-dot">Recording...</span>
+                <button onClick={stopRecording} className="ig-send-text-btn">Send Voice</button>
+            </div>
+        ) : (
+            // Giao diện nhập liệu bình thường (Pill shape)
+            <div className="ig-input-wrapper">
+                <FiSmile size={24} className="ig-input-icon left" />
+                
+                <input 
+                    placeholder="Message..." 
+                    className="ig-input-field"
+                    value={text}
+                    onChange={e => setText(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSendTextOrMedia()}
+                />
+
+                {/* Logic hiển thị nút bấm */}
+                {text.trim() || previewFile ? (
+                     <button className="ig-send-text-btn" onClick={handleSendTextOrMedia}>Send</button>
+                ) : (
+                    <div className="ig-right-icons">
+                        {/* Nút Mic */}
+                        <FiMic size={24} onClick={startRecording} />
+
+                        {/* Nút Ảnh */}
+                        <label><FiImage size={24} /><input type="file" hidden accept="image/*" onChange={e => handleSelectFile(e, 'image')} /></label>
+                        
+                        {/* Nút Video (Mới thêm) */}
+                        <label><FiVideo size={24} /><input type="file" hidden accept="video/*" onChange={e => handleSelectFile(e, 'video')} /></label>
+                        
+                        <FiHeart size={24} />
+                    </div>
+                )}
+            </div>
+        )}
+      </div>
+
+      {/* Fullscreen Image View */}
+      {fullImage && <div className="image-overlay" onClick={()=>setFullImage(null)}><img src={fullImage} onClick={e=>e.stopPropagation()}/></div>}
+    </div>
+  );
 }

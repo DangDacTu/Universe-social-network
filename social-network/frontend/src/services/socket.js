@@ -1,48 +1,53 @@
-/**
- * @file socket.js
- * @author moi
- * @description
- * Quản lý kết nối socket.io phía client
- * - Kết nối tới server
- * - Gửi userId khi online
- */
-
 import { io } from "socket.io-client";
 
-// URL backend socket
-const SOCKET_URL = "http://localhost:5000";
+// Đổi URL này nếu bạn deploy (ví dụ: https://api.your-app.com)
+const SOCKET_URL = "http://localhost:5000"; 
 
-// Biến socket dùng chung
 let socket = null;
 
 /**
- * Kết nối socket với server
- * @param {string} userId - id user hiện tại
+ * Khởi tạo kết nối Socket
+ * @param {string} userId - ID của user đang đăng nhập
  */
 export const connectSocket = (userId) => {
-    if (!socket) {
+    // Chỉ tạo mới nếu chưa có hoặc đã mất kết nối
+    if (!socket || !socket.connected) {
         socket = io(SOCKET_URL, {
-            transports: ["websocket"],
+            transports: ["websocket"], // Bắt buộc dùng websocket để nhanh nhất
+            reconnectionAttempts: 5,   // Thử kết nối lại 5 lần nếu mất mạng
+            
+            // 🔥 QUAN TRỌNG: Gửi userId ngay trong lúc bắt tay
+            // Backend sẽ đọc cái này ở dòng: socket.handshake.query.userId
+            query: {
+                userId: userId
+            }
         });
 
-        // ✅ CHỜ SOCKET CONNECT XONG
+        // Debug log để biết đã kết nối chưa
         socket.on("connect", () => {
-            console.log("Socket connected:", socket.id);
-
-            // 🔥 Gửi userId cho server
-            socket.emit("user-online", userId);
+            console.log("🟢 Socket Connected:", socket.id);
         });
-
-        // (tuỳ chọn) debug lỗi
+        
         socket.on("connect_error", (err) => {
-            console.error("Socket connect error:", err.message);
+            console.error("🔴 Socket Error:", err.message);
         });
     }
-
     return socket;
 };
 
-/**
- * Lấy instance socket hiện tại
- */
-export const getSocket = () => socket;
+// Hàm lấy socket instance để dùng ở các component khác
+export const getSocket = () => {
+    if (!socket) {
+        console.warn("⚠️ Socket chưa được khởi tạo!");
+    }
+    return socket;
+};
+
+// Hàm ngắt kết nối (dùng khi Logout)
+export const disconnectSocket = () => {
+    if (socket) {
+        socket.disconnect();
+        socket = null;
+        console.log("🔴 Socket Disconnected");
+    }
+};

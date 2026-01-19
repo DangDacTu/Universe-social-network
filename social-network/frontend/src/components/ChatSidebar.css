@@ -1,109 +1,88 @@
-/* 👇 Class chính đã đổi tên */
-.chat-sidebar {
-    width: 280px;
-    border-right: 1px solid #dbdbdb;
-    padding: 10px;
-    background: #fff;
+.ig-sidebar {
     display: flex;
     flex-direction: column;
-    height: 100%; /* Đảm bảo nó full chiều cao cha */
+    height: 100%;
+    background-color: #fff;
+    border-right: 1px solid #dbdbdb;
 }
 
-/* ================= TITLE ================= */
-.chat-title {
-    margin-bottom: 10px;
-    font-weight: 600;
+/* Header */
+.ig-sidebar-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0; /* Không bị co lại */
+}
+
+.ig-own-profile {
+    font-weight: 700;
     font-size: 16px;
-    color: #262626;
-}
-
-/* ================= SEARCH ================= */
-.chat-search {
-    width: 100%; /* Sửa lại cho đẹp hơn */
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: 1px solid #dbdbdb;
-    outline: none;
-    font-size: 14px;
-    background: #fafafa;
-    color: #262626;
-    box-sizing: border-box; /* Để padding không làm vỡ layout */
-}
-
-.chat-search::placeholder {
-    color: #8e8e8e;
-}
-
-/* ================= USER LIST SCROLL ================= */
-.chat-user-list {
-    flex: 1;
-    overflow-y: auto; /* Cho phép cuộn danh sách user nếu quá dài */
-}
-
-/* ================= USER ITEM ================= */
-.chat-user-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
+    gap: 5px;
     cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.15s ease;
 }
 
-.chat-user-item:hover {
-    background-color: #fafafa;
+.ig-new-chat-icon { cursor: pointer; }
+
+/* SEARCH BAR STYLE */
+.ig-search-wrapper {
+    padding: 10px 20px;
 }
 
-.chat-user-item.selected {
+.ig-search-input {
+    width: 100%;
     background-color: #efefef;
-}
-
-/* ================= USERNAME ================= */
-.chat-user-item .username {
-    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
     font-size: 14px;
-    color: #262626;
-    font-weight: 500;
+    outline: none;
+    box-sizing: border-box; /* Đảm bảo padding không làm vỡ layout */
 }
 
-/* ================= AVATAR ================= */
-.avatarWrapper {
-    position: relative;
-    display: flex; /* Căn chỉnh ảnh tốt hơn */
+/* USER LIST */
+.ig-user-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 5px;
 }
 
-.chat-user-item .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-/* Online dot */
-.onlineDot {
-    position: absolute;
-    bottom: 1px;
-    right: 1px;
-    width: 10px;
-    height: 10px;
-    background-color: #00c853;
-    border-radius: 50%;
-    border: 2px solid #fff;
-}
-
-/* ================= UNREAD ================= */
-.unreadBadge {
-    min-width: 18px;
-    height: 18px;
-    background-color: #ed4956;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 9px;
+.ig-user-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0 6px;
+    padding: 8px 20px; /* Giảm padding dọc một chút */
+    cursor: pointer;
+    transition: background 0.2s;
 }
+
+.ig-user-item:hover { background-color: #fafafa; }
+.ig-user-item.selected { background-color: #efefef; }
+
+.ig-avatar-wrapper { position: relative; margin-right: 12px; }
+.ig-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+
+.ig-online-dot {
+    width: 14px; height: 14px;
+    background-color: #00d26a;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    position: absolute; bottom: 2px; right: 2px;
+}
+
+.ig-user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Căn giữa tên theo chiều dọc */
+    height: 100%;
+}
+
+.ig-user-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #262626;
+}
+
+/* Xóa các class không dùng nữa (tabs, user-status) để code sạch hơn */

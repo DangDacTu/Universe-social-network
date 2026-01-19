@@ -1,20 +1,18 @@
-import axios from "axios";
+import axiosClient from "./axiosClient";
 
 const uploadApi = {
-    uploadFile: (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
+  // Upload file (ảnh/video/audio)
+  uploadFile: (file) => {
+    const formData = new FormData();
+    formData.append("file", file); 
+    // Lưu ý: Tên trường "file" phải khớp với upload.single('file') bên Backend
 
-        return axios.post(
-            "http://localhost:5000/api/upload",
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            }
-        );
-    },
+    return axiosClient.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };
 
 export default uploadApi;

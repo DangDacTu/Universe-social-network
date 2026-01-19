@@ -1,4 +1,52 @@
-.chat-main-layout { margin-left: 80px; height: 100vh; background: #f1f1f1; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-.chat-container { width: 1000px; max-width: 100%; height: 90vh; background: #ffffff; border-radius: 16px; display: flex; border: 1px solid #dbdbdb; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-.chat-sidebar-wrapper { width: 320px; border-right: 1px solid #dbdbdb; display: flex; flex-direction: column; }
-.chat-box-wrapper { flex: 1; display: flex; flex-direction: column; background-color: #fff; min-width: 0; }
+/* Reset & Font */
+:root {
+  --ig-primary-background: #ffffff;
+  --ig-secondary-background: #fafafa;
+  --ig-border-color: #dbdbdb;
+  --ig-primary-text: #262626;
+  --ig-secondary-text: #8e8e8e;
+  --ig-link: #0095f6;
+  --ig-button-hover: #00376b;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout toàn trang */
+.chatLayout {
+  display: flex;
+  height: 100vh;
+  background-color: var(--ig-primary-background);
+  /* Nếu bạn có Sidebar chính của App bên trái (của toàn trang web), hãy giữ margin-left */
+  margin-left: 80px; 
+}
+
+/* Khung chứa Chat (Sidebar Chat + ChatBox) */
+.chatContainer {
+  display: flex;
+  width: 100%;
+  max-width: 100%; /* Full width */
+  height: 100vh;
+  border: 1px solid var(--ig-border-color); /* Viền mỏng bao quanh */
+  background: var(--ig-primary-background);
+}
+
+/* CỘT TRÁI (Chat Sidebar) */
+.chatSidebarWrapper {
+  width: 350px; /* Instagram sidebar thường rộng khoảng 350px */
+  border-right: 1px solid var(--ig-border-color);
+  display: flex;
+  flex-direction: column;
+  background: var(--ig-primary-background);
+}
+
+/* CỘT PHẢI (Chat Box) */
+.chatBoxWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--ig-primary-background);
+}

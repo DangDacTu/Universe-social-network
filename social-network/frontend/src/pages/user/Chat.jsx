@@ -1,303 +1,135 @@
-/**
- * @file Chat.jsx
- * @author moi
- * @description
- * Trang chat 1-1 (Instagram style)
- */
-
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { connectSocket, getSocket } from "../../services/socket";
-import { getChatHistory } from "../../api/messageApi";
+import messageApi from "../../api/messageApi";
 import userApi from "../../api/userApi";
-
+import Sidebar from "../../components/layout/Sidebar";
 import ChatSidebar from "../../components/ChatSidebar";
 import ChatBox from "../../components/ChatBox";
+import "./Chat.css";
 
 export default function Chat() {
-    const { user } = useAuth();
+  const { user } = useAuth();
+  const [chatUsers, setChatUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [messages, setMessages] = useState({});
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
-    const [chatUsers, setChatUsers] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [messages, setMessages] = useState({});
-    const [messageInput, setMessageInput] = useState("");
-    const [onlineUsers, setOnlineUsers] = useState([]);
-    const [lastMessageMap, setLastMessageMap] = useState({});
+  useEffect(() => {
+    if (!user) return;
+    const socket = connectSocket(user._id);
 
-    const [unreadMap, setUnreadMap] = useState(() => {
-        return JSON.parse(localStorage.getItem("unreadMap")) || {};
+    // 1. Nhận tin nhắn mới
+    socket.on("receive-message", (msg) => {
+      if (msg.senderId === user._id) return;
+      addMessageToState(msg.senderId, msg);
     });
 
-    /* ===============================
-        LOAD USERS
-    =============================== */
-    useEffect(() => {
-        const fetchUsers = async () => {
+    // 2. Xử lý tin nhắn bị XÓA (MỚI)
+    socket.on("message-deleted", ({ messageId }) => {
+      setMessages(prev => {
+        const newState = { ...prev };
+        // Lặp qua tất cả cuộc hội thoại để tìm và xóa tin nhắn đó
+        for (const uid in newState) {
+          newState[uid] = newState[uid].filter(m => m._id !== messageId);
+        }
+        return newState;
+      });
+    });
+
+    // 3. Xử lý tin nhắn bị SỬA (MỚI)
+    socket.on("message-edited", ({ messageId, newContent }) => {
+      setMessages(prev => {
+        const newState = { ...prev };
+        for (const uid in newState) {
+          newState[uid] = newState[uid].map(m => 
+            m._id === messageId ? { ...m, content: newContent } : m
+          );
+        }
+        return newState;
+      });
+    });
+
+    socket.on("chat-error", (data) => alert(data.message));
+    socket.on("online-users", (users) => setOnlineUsers(users));
+    socket.on("user-status", ({ userId, isOnline }) => {
+      setOnlineUsers(prev => isOnline ? [...new Set([...prev, userId])] : prev.filter(id => id !== userId));
+    });
+
+    return () => {
+      socket.off("receive-message");
+      socket.off("message-deleted");
+      socket.off("message-edited");
+      socket.off("chat-error");
+      socket.off("online-users");
+      socket.off("user-status");
+    };
+  }, [user]);
+
+  // Load danh sách user
+  useEffect(() => {
+    const fetchUsers = async () => {
+        try {
             const res = await userApi.getChatAvailableUsers();
             setChatUsers(res.data);
-        };
-        fetchUsers();
-    }, []);
-
-    /* ===============================
-        RESTORE SELECTED USER
-    =============================== */
-    useEffect(() => {
-        if (chatUsers.length === 0) return;
-        const saved = localStorage.getItem("selectedChatUser");
-        setSelectedUser(saved ? JSON.parse(saved) : chatUsers[0]);
-    }, [chatUsers]);
-
-    /* ===============================
-        SOCKET
-    =============================== */
-    useEffect(() => {
-        if (!user) return;
-
-        const socket = connectSocket(user._id);
-
-        // RECEIVE MESSAGE (TEXT + MEDIA)
-        socket.on("receive-message", (msg) => {
-            if (msg.senderId === user._id) return; // Skip adding own messages to prevent duplication
-
-            const otherUserId =
-                msg.senderId === user._id ? msg.receiverId : msg.senderId;
-
-            setMessages((prev) => {
-                const existing = prev[otherUserId] || [];
-                // Check for duplicate message based on createdAt and content
-                if (existing.some(m => m.createdAt === msg.createdAt && m.content === msg.content)) {
-                    return prev; // Message already exists, skip adding
-                }
-
-                const updated = {
-                    ...prev,
-                    [otherUserId]: [...existing, msg],
-                };
-
-                localStorage.setItem(
-                    `chat_messages_${otherUserId}`,
-                    JSON.stringify(updated[otherUserId])
-                );
-
-                return updated;
-            });
-
-            setLastMessageMap((prev) => ({
-                ...prev,
-                [otherUserId]: msg.createdAt,
-            }));
-
-            // unread count
-            if (
-                msg.senderId !== user._id &&
-                selectedUser?._id !== otherUserId
-            ) {
-                setUnreadMap((prev) => {
-                    const updated = {
-                        ...prev,
-                        [otherUserId]: (prev[otherUserId] || 0) + 1,
-                    };
-                    localStorage.setItem(
-                        "unreadMap",
-                        JSON.stringify(updated)
-                    );
-                    return updated;
-                });
-            }
-        });
-
-        // SEEN
-        socket.on("messages-seen", ({ byUserId }) => {
-            setMessages((prev) => {
-                const updated = { ...prev };
-                if (updated[byUserId]) {
-                    updated[byUserId] = updated[byUserId].map((m) =>
-                        m.senderId === user._id
-                            ? { ...m, isSeen: true, isRead: true }
-                            : m
-                    );
-                }
-                return updated;
-            });
-        });
-
-        // ONLINE STATUS
-        socket.on("user-status", ({ userId, isOnline }) => {
-            setOnlineUsers((prev) =>
-                isOnline
-                    ? [...new Set([...prev, userId])]
-                    : prev.filter((id) => id !== userId)
-            );
-        });
-
-        socket.on("online-users", (users) => {
-            setOnlineUsers(users);
-        });
-
-        return () => {
-            socket.off("receive-message");
-            socket.off("messages-seen");
-            socket.off("user-status");
-            socket.off("online-users");
-        };
-    }, [user, selectedUser]);
-
-    /* ===============================
-        LOAD CHAT HISTORY
-    =============================== */
-    useEffect(() => {
-        if (!selectedUser) return;
-
-        localStorage.setItem("selectedChatUser", JSON.stringify(selectedUser));
-
-        const fetchHistory = async () => {
-            const history = await getChatHistory(selectedUser._id);
-
-            setMessages((prev) => ({
-                ...prev,
-                [selectedUser._id]: history,
-            }));
-
-            localStorage.setItem(
-                `chat_messages_${selectedUser._id}`,
-                JSON.stringify(history)
-            );
-
-            if (history.length > 0) {
-                setLastMessageMap((prev) => ({
-                    ...prev,
-                    [selectedUser._id]:
-                        history[history.length - 1].createdAt,
-                }));
-            }
-        };
-
-        fetchHistory();
-    }, [selectedUser]);
-
-    /* ===============================
-        SEND MESSAGE (TEXT + MEDIA)
-    =============================== */
-    const sendMessage = (message = null, isMedia = false) => {
-        const socket = getSocket();
-
-        // ===== MEDIA =====
-        if (isMedia && message && selectedUser) {
-            socket.emit("send-message", message);
-
-            setMessages((prev) => {
-                const updated = {
-                    ...prev,
-                    [selectedUser._id]: [
-                        ...(prev[selectedUser._id] || []),
-                        message,
-                    ],
-                };
-
-                localStorage.setItem(
-                    `chat_messages_${selectedUser._id}`,
-                    JSON.stringify(updated[selectedUser._id])
-                );
-
-                return updated;
-            });
-
-            setLastMessageMap((prev) => ({
-                ...prev,
-                [selectedUser._id]: message.createdAt,
-            }));
-
-            return;
-        }
-
-        // ===== TEXT =====
-        if (!messageInput.trim() || !selectedUser) return;
-
-        const msg = {
-            senderId: user._id,
-            receiverId: selectedUser._id,
-            content: messageInput,
-            mediaType: "text",
-            createdAt: new Date().toISOString(),
-        };
-
-        socket.emit("send-message", msg);
-
-        setMessages((prev) => {
-            const updated = {
-                ...prev,
-                [selectedUser._id]: [...(prev[selectedUser._id] || []), msg],
-            };
-
-            localStorage.setItem(
-                `chat_messages_${selectedUser._id}`,
-                JSON.stringify(updated[selectedUser._id])
-            );
-
-            return updated;
-        });
-
-        setLastMessageMap((prev) => ({
-            ...prev,
-            [selectedUser._id]: msg.createdAt,
-        }));
-
-        setMessageInput("");
+            if (res.data.length > 0 && !selectedUser) setSelectedUser(res.data[0]);
+        } catch (e) {}
     };
+    fetchUsers();
+  }, []);
 
-    /* ===============================
-        SELECT USER
-    =============================== */
-    const handleSelectUser = (u) => {
-        setSelectedUser(u);
-        localStorage.setItem("selectedChatUser", JSON.stringify(u));
-
-        const socket = getSocket();
-        socket.emit("open-chat", { otherUserId: u._id });
-
-        setUnreadMap((prev) => {
-            const updated = { ...prev, [u._id]: 0 };
-            localStorage.setItem("unreadMap", JSON.stringify(updated));
-            return updated;
-        });
-
-        const cached = localStorage.getItem(`chat_messages_${u._id}`);
-        if (cached) {
-            setMessages((prev) => ({
-                ...prev,
-                [u._id]: JSON.parse(cached),
-            }));
-        }
+  // Load lịch sử chat
+  useEffect(() => {
+    if (!selectedUser) return;
+    const fetchHistory = async () => {
+      try {
+        const res = await messageApi.getChatHistory(selectedUser._id);
+        setMessages(prev => ({ ...prev, [selectedUser._id]: res.data || res }));
+      } catch (err) {
+        if (err.response?.status === 403) setMessages(prev => ({ ...prev, [selectedUser._id]: [] }));
+      }
     };
+    fetchHistory();
+  }, [selectedUser]);
 
-    const sortedUsers = [...chatUsers].sort((a, b) => {
-        const timeA = lastMessageMap[a._id] || 0;
-        const timeB = lastMessageMap[b._id] || 0;
-        return new Date(timeB) - new Date(timeA);
+  const addMessageToState = (userId, msg) => {
+    setMessages(prev => {
+      const list = prev[userId] || [];
+      if (list.some(m => m._id === msg._id)) return prev;
+      return { ...prev, [userId]: [...list, msg] };
     });
+  };
 
-    return (
-        <div style={{ display: "flex", height: "100vh" }}>
-            <ChatSidebar
-                users={sortedUsers}
-                onlineUsers={onlineUsers}
-                unreadMap={unreadMap}
-                selectedUser={selectedUser}
-                onSelectUser={handleSelectUser}
-            />
+  const handleSendMessage = (payload) => {
+    if (!selectedUser) return;
+    const socket = getSocket();
+    
+    const tempMsg = {
+      ...payload, _id: `temp_${Date.now()}`,
+      senderId: user._id, receiverId: selectedUser._id,
+      createdAt: new Date().toISOString(), isRead: false
+    };
+    addMessageToState(selectedUser._id, tempMsg);
 
-            <ChatBox
-                messages={
-                    selectedUser ? messages[selectedUser._id] || [] : []
-                }
-                currentUserId={user._id}
-                messageInput={messageInput}
-                setMessageInput={setMessageInput}
-                onSendMessage={sendMessage}
-                selectedUser={selectedUser}
+    socket.emit("send-message", { receiverId: selectedUser._id, ...payload });
+  };
+
+  return (
+    <>
+      <Sidebar />
+      <div className="chatLayout">
+        <div className="chatContainer">
+          <div className="chatSidebarWrapper">
+            <ChatSidebar users={chatUsers} onlineUsers={onlineUsers} selectedUser={selectedUser} onSelectUser={setSelectedUser} />
+          </div>
+          <div className="chatBoxWrapper">
+            <ChatBox 
+              messages={selectedUser ? messages[selectedUser._id] || [] : []}
+              currentUserId={user._id} selectedUser={selectedUser} onSendMessage={handleSendMessage}
             />
+          </div>
         </div>
-    );
+      </div>
+    </>
+  );
 }
-
