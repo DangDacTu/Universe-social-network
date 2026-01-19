@@ -20,7 +20,8 @@ exports.createPost = async (req, res) => {
     if (req.files?.length > 0) {
       media = req.files.map((file) => ({
         // Cloudinary trả về link ảnh online trong thuộc tính 'path'
-        url: file.path, 
+
+        url: file.path,
         // Xác định loại file dựa trên mimetype
         type: file.mimetype.startsWith("image") ? "image" : "video",
       }));
