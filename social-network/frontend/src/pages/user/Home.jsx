@@ -30,30 +30,13 @@ export default function Home() {
         `}
       </style>
 
-<<<<<<< HEAD
-      <Sidebar />
 
-      <main
-        style={{
-          marginLeft: "80px",
-          height: "100vh",
-          background: "#f1f1f1",
-          display: "flex",
-          justifyContent: "center",
-          paddingTop: "24px",
-        }}
-      >
-=======
->>>>>>> mixcode1
         {/* KHUNG FEED TRẮNG */}
         <div
           style={{
             width: "650px",
-<<<<<<< HEAD
-            background: "#ffffff",
-=======
+
             background: "#fff",
->>>>>>> mixcode1
             borderRadius: "16px",
             display: "flex",
             flexDirection: "column",
