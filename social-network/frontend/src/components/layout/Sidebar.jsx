@@ -8,20 +8,6 @@ import {
   FiMenu,
   FiSend,
 } from "react-icons/fi";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-
-export default function Sidebar({ onCreate }) {
-  const navigate = useNavigate();
-
-  return (
-    <aside className="sidebar">
-      {/* ===== LOGO TOP (CLICK → HOME) ===== */}
-      <div
-        className="sidebar-logo"
-        onClick={() => navigate("/")}
-      >
-=======
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { FiSettings, FiLogOut } from "react-icons/fi";
@@ -50,17 +36,13 @@ export default function Sidebar({ onCreate }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo" onClick={() => navigate("/")}>
->>>>>>> mixcode1
         <img src="/logo-universe.png" alt="Logo" />
       </div>
 
       <nav className="sidebar-nav">
         <button
-<<<<<<< HEAD
-          className="sidebar-item active"
-=======
+
           className={`sidebar-item ${isActive("/") ? "active" : ""}`}
->>>>>>> mixcode1
           onClick={() => navigate("/")}
         >
           <FiHome />
@@ -82,18 +64,13 @@ export default function Sidebar({ onCreate }) {
           <FiHeart />
         </button>
 
-<<<<<<< HEAD
-        {/* ✅ USER → /me */}
-        <button
-          className="sidebar-item"
-=======
+
         <button className="sidebar-item">
           <FiSend />
         </button>
 
         <button
           className={`sidebar-item ${isActive("/me") ? "active" : ""}`}
->>>>>>> mixcode1
           onClick={() => navigate("/me")}
         >
           <FiUser />
