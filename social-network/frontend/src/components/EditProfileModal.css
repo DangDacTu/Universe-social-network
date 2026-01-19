@@ -5,24 +5,24 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Màu đen mờ */
+    background: rgba(0, 0, 0, 0.5); /* Đen mờ nhẹ hơn */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px); /* Hiệu ứng làm mờ nền phía sau */
+    z-index: 2000; /* Cao hơn Sidebar */
+    backdrop-filter: blur(2px);
 }
 
 /* Hộp Modal chính */
 .modal-container {
-    background: #181818; /* Màu nền xám đen */
+    background: #ffffff; /* Nền trắng */
     width: 90%;
     max-width: 450px;
     padding: 24px;
     border-radius: 16px;
-    border: 1px solid #333;
-    color: #fff;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 1px solid #dbdbdb; /* Viền xám */
+    color: #000; /* Chữ đen */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -36,7 +36,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid #dbdbdb; /* Viền kẻ ngang xám */
     padding-bottom: 15px;
 }
 
@@ -44,12 +44,13 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
+    color: #000;
 }
 
 .close-btn {
     background: none;
     border: none;
-    color: #fff;
+    color: #000; /* Nút đóng màu đen */
     font-size: 24px;
     cursor: pointer;
     line-height: 1;
@@ -69,17 +70,16 @@
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 12px;
-    border: 2px solid #333;
+    border: 1px solid #dbdbdb; /* Viền ảnh xám */
 }
 
-/* Ẩn input file mặc định xấu xí */
 input[type="file"] {
     display: none;
 }
 
 /* Label giả làm nút bấm */
 .custom-file-upload {
-    color: #0095f6; /* Màu xanh giống Instagram */
+    color: #0095f6; /* Màu xanh Instagram giữ nguyên */
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
@@ -87,7 +87,7 @@ input[type="file"] {
 }
 
 .custom-file-upload:hover {
-    color: #fff;
+    color: #0074cc;
 }
 
 /* Các ô nhập liệu */
@@ -98,33 +98,34 @@ input[type="file"] {
 .form-group label {
     display: block;
     font-size: 14px;
-    color: #a8a8a8;
+    color: #555; /* Màu chữ label xám đậm */
     margin-bottom: 8px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .modal-input {
     width: 100%;
-    background: #262626;
-    border: 1px solid #363636;
-    color: #fff;
+    background: #fff; /* Nền input trắng */
+    border: 1px solid #dbdbdb; /* Viền input xám */
+    color: #000; /* Chữ input đen */
     padding: 12px 16px;
     border-radius: 12px;
     font-size: 15px;
     outline: none;
     box-sizing: border-box;
     font-family: inherit;
+    transition: border 0.2s;
 }
 
 .modal-input:focus {
-    border-color: #fff;
+    border-color: #000; /* Focus vào thì viền đen */
 }
 
 /* Nút Lưu */
 .save-btn {
     width: 100%;
-    background: #fff;
-    color: #000;
+    background: #000; /* Nút màu đen */
+    color: #fff; /* Chữ trắng */
     border: none;
     padding: 14px;
     border-radius: 12px;
@@ -136,7 +137,7 @@ input[type="file"] {
 }
 
 .save-btn:hover {
-    opacity: 0.9;
+    opacity: 0.8;
 }
 
 .save-btn:disabled {
@@ -144,11 +145,13 @@ input[type="file"] {
     cursor: not-allowed;
 }
 
+/* Select arrow icon (cho input select Gender) */
 select.modal-input {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    /* Mũi tên màu đen */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
     background-position: right 15px top 50%;
     background-size: 12px auto;

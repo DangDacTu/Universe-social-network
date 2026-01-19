@@ -171,4 +171,4 @@ const searchUsers = async (req, res) => {
 };
 
 
-module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, };
+module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, searchUsers };

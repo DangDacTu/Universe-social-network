@@ -23,23 +23,15 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
         e.preventDefault();
         setIsLoading(true);
 
-        // LOG ĐỂ DEBUG
-        console.log("Bắt đầu cập nhật...");
-
         try {
             let profilePictureUrl = user.profilePicture;
 
             // 1. Upload ảnh (Nếu có chọn)
             if (imageFile) {
-                console.log(" Đang upload ảnh...");
-                
                 const formData = new FormData();
                 formData.append("file", imageFile);
-                
-                // THÔNG TIN CHÍNH XÁC TỪ ẢNH CỦA BẠN
                 const CLOUD_NAME = "dz5hsjleb"; 
                 const UPLOAD_PRESET = "universe-social-network"; 
-                
                 formData.append("upload_preset", UPLOAD_PRESET);
 
                 try {
@@ -48,11 +40,9 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
                         formData
                     );
                     profilePictureUrl = res.data.secure_url;
-                    console.log("Upload thành công:", profilePictureUrl);
                 } catch (uploadError) {
-                    // IN LỖI CHI TIẾT RA CONSOLE
-                    console.error("Lỗi Cloudinary Chi Tiết:", uploadError.response?.data);
-                    alert(`Lỗi Upload: ${uploadError.response?.data?.error?.message || "Kiểm tra lại Cloud Name/Preset"}`);
+                    console.error("Lỗi Upload Cloudinary:", uploadError);
+                    alert("Lỗi khi upload ảnh!");
                     setIsLoading(false);
                     return; 
                 }
@@ -93,9 +83,16 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
                         <label htmlFor="file-upload" className="custom-file-upload">Change Photo</label>
                         <input id="file-upload" type="file" accept="image/*" onChange={handleImageChange} />
                     </div>
+                    
                     <div className="form-group">
                         <label>Username</label>
-                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="modal-input" required />
+                        <input 
+                            type="text" 
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                            className="modal-input" 
+                            required 
+                        />
                     </div>
 
                     <div className="form-group">
@@ -103,7 +100,7 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
                         <select 
                             value={gender} 
                             onChange={(e) => setGender(e.target.value)}
-                            className="modal-input" // Dùng chung class với input để đẹp
+                            className="modal-input"
                         >
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -113,9 +110,17 @@ const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
 
                     <div className="form-group">
                         <label>Bio</label>
-                        <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="modal-input" rows="3" placeholder="Bio..." />
+                        <textarea 
+                            value={bio} 
+                            onChange={(e) => setBio(e.target.value)} 
+                            className="modal-input" 
+                            rows="3" 
+                            placeholder="Bio..." 
+                        />
                     </div>
-                    <button type="submit" className="save-btn" disabled={isLoading}>{isLoading ? "Saving..." : "Done"}</button>
+                    <button type="submit" className="save-btn" disabled={isLoading}>
+                        {isLoading ? "Saving..." : "Done"}
+                    </button>
                 </form>
             </div>
         </div>

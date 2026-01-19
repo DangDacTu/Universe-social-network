@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import userApi from '../../api/userApi';
 import { useAuth } from '../../context/AuthContext';
+import Sidebar from '../../components/layout/Sidebar';
+
+// 👇 IMPORT ICON
+import { FiSearch, FiArrowLeft, FiChevronRight, FiUser } from "react-icons/fi";
+import "./Search.css";
 
 const Search = () => {
     const { user } = useAuth();
@@ -9,7 +14,6 @@ const Search = () => {
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Xử lý tìm kiếm
     useEffect(() => {
         if (searchTerm.trim() === '') {
             setResults([]);
@@ -33,83 +37,83 @@ const Search = () => {
     }, [searchTerm, user]);
 
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Link to="/" style={{ textDecoration: 'none', color: '#333', fontSize: '20px' }}>
-                    ←
-                </Link>
-                <h2 style={{ margin: 0 }}>Tìm kiếm thành viên</h2>
-            </div>
-
-            {/* Ô nhập liệu */}
-            <div style={{ marginBottom: '20px' }}>
-                <input 
-                    type="text" 
-                    placeholder="Nhập tên người dùng..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    autoFocus
-                    style={{
-                        width: '100%',
-                        padding: '15px 20px',
-                        borderRadius: '30px',
-                        border: '1px solid #ccc',
-                        fontSize: '16px',
-                        outline: 'none',
-                        backgroundColor: '#f5f5f5'
-                    }}
-                />
-            </div>
-
-            {/* Loading */}
-            {isLoading && <div style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Đang tìm kiếm...</div>}
-
-            {/* Danh sách kết quả */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                {results.map((friend) => (
-                    <div key={friend._id} style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between',
-                        padding: '10px', 
-                        borderBottom: '1px solid #eee' 
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <img 
-                                src={friend.profilePicture || "https://via.placeholder.com/150"} 
-                                alt="avatar" 
-                                style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
-                            />
-                            <div>
-                                <h4 style={{ margin: 0, fontSize: '16px' }}>{friend.username}</h4>
-                                {/* Đã ẩn dòng Email đi cho gọn */}
-                            </div>
+        <>
+            <Sidebar />
+            <main className="search-main-layout">
+                <div className="search-container">
+                    
+                    {/* HEADER */}
+                    <div className="search-header">
+                        <div className="search-nav">
+                            <Link to="/" className="search-back-btn">
+                                <FiArrowLeft size={24} />
+                            </Link>
+                            <h2 className="search-title">Tìm kiếm</h2>
                         </div>
-                        
-                        <Link to={`/profile/${friend._id}`}>
-                            <button style={{ 
-                                padding: '6px 15px', 
-                                backgroundColor: '#008CBA', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '15px', 
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
-                            }}>
-                                Xem
-                            </button>
-                        </Link>
-                    </div>
-                ))}
-            </div>
 
-            {!isLoading && searchTerm && results.length === 0 && (
-                <div style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>
-                    Không tìm thấy người dùng tên "{searchTerm}"
+                        <div className="search-input-wrapper">
+                            <FiSearch className="search-icon" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Tìm kiếm" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                                className="search-input"
+                            />
+                        </div>
+                    </div>
+
+                    {/* BODY */}
+                    <div className="search-scroll">
+                        {isLoading && <div className="search-loading">Đang tải...</div>}
+
+                        <div className="search-list">
+                            {results.map((friend) => (
+                                <Link 
+                                    to={`/profile/${friend._id}`} 
+                                    key={friend._id} 
+                                    className="search-item"
+                                >
+                                    <div className="search-user-info">
+                                        <div className="search-avatar-wrapper">
+                                            {friend.profilePicture ? (
+                                                <img 
+                                                    src={friend.profilePicture} 
+                                                    alt="avatar" 
+                                                    className="search-avatar"
+                                                />
+                                            ) : (
+                                                <div className="search-avatar-placeholder">
+                                                    <FiUser size={20} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h4 className="search-username">{friend.username}</h4>
+                                            <span className="search-handle">
+                                                {friend.bio ? friend.bio.substring(0, 30) + (friend.bio.length > 30 ? "..." : "") : "universe user"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Mũi tên chỉ sang phải thay cho nút Xem */}
+                                    <div className="search-action-icon">
+                                        <FiChevronRight size={20} />
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+
+                        {!isLoading && searchTerm && results.length === 0 && (
+                            <div className="search-status-text">
+                                Không tìm thấy kết quả cho "{searchTerm}"
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
-        </div>
+            </main>
+        </>
     );
 };
 

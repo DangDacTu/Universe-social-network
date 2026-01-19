@@ -37,7 +37,7 @@ export default function Home() {
         style={{
           marginLeft: "80px",
           height: "100vh",
-          background: "#000",
+          background: "#f1f1f1",
           display: "flex",
           justifyContent: "center",
           paddingTop: "24px",
@@ -46,8 +46,8 @@ export default function Home() {
         {/* KHUNG FEED TRẮNG */}
         <div
           style={{
-            width: "600px",
-            background: "#fff",
+            width: "650px",
+            background: "#ffffff",
             borderRadius: "16px",
             display: "flex",
             flexDirection: "column",
