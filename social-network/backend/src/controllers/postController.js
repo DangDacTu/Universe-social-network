@@ -1,12 +1,13 @@
 const Post = require("../models/Post");
 
 /* ======================
-   CREATE POST
+   CREATE POST (ĐÃ SỬA CHO CLOUDINARY)
 ====================== */
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
+    // Kiểm tra: Phải có nội dung hoặc có file ảnh/video
     if (!content && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Bài viết phải có nội dung hoặc media",
@@ -15,12 +16,16 @@ exports.createPost = async (req, res) => {
 
     let media = [];
 
+    // --- LOGIC MỚI: DÙNG CLOUDINARY ---
     if (req.files?.length > 0) {
       media = req.files.map((file) => ({
-        url: `/uploads/${file.filename}`,
+        // Cloudinary trả về link ảnh online trong thuộc tính 'path'
+        url: file.path,
+        // Xác định loại file dựa trên mimetype
         type: file.mimetype.startsWith("image") ? "image" : "video",
       }));
     }
+    // ----------------------------------
 
     const post = await Post.create({
       author: req.user.id,
@@ -30,7 +35,7 @@ exports.createPost = async (req, res) => {
 
     const populatedPost = await post.populate(
       "author",
-      "username avatar"
+      "username profilePicture" // Lưu ý: check lại model User của bạn là 'profilePicture' hay 'avatar' nhé
     );
 
     res.status(201).json(populatedPost);
@@ -50,11 +55,13 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
-    // 🔒 chỉ chủ post được xóa
+    // 🔒 Chỉ chủ post được xóa
     if (post.author.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Không có quyền xóa post" });
     }
 
+    // Lưu ý: Code này xóa post trong DB, nhưng ảnh trên Cloudinary vẫn còn.
+    // Nếu muốn xóa sạch cả trên Cloudinary, cần dùng thư viện cloudinary.uploader.destroy() ở đây.
     await post.deleteOne();
 
     res.json({ message: "Xóa post thành công" });
@@ -69,8 +76,8 @@ exports.deletePost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("author", "username avatar")
-      .populate("comments.user", "username avatar")
+      .populate("author", "username profilePicture") // Đổi avatar -> profilePicture cho khớp model User
+      .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
 
     res.json(posts);
@@ -80,14 +87,14 @@ exports.getAllPosts = async (req, res) => {
 };
 
 /* ======================
-   GET COMMENTS (🔥 FIXED)
+   GET COMMENTS
 ====================== */
 exports.getComments = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
       .select("comments")
-      .populate("comments.user", "username avatar")
-      .populate("comments.replies.user", "username avatar");
+      .populate("comments.user", "username profilePicture")
+      .populate("comments.replies.user", "username profilePicture");
 
     if (!post) {
       return res.status(404).json({ message: "Post không tồn tại" });
@@ -144,7 +151,7 @@ exports.toggleLike = async (req, res) => {
 };
 
 /* ======================
-   🔥 TOGGLE LIKE COMMENT (FIXED)
+   TOGGLE LIKE COMMENT
 ====================== */
 exports.toggleLikeComment = async (req, res) => {
   try {
@@ -201,7 +208,8 @@ exports.addComment = async (req, res) => {
     });
 
     await post.save();
-    await post.populate("comments.user", "username avatar");
+    // Populate lại để trả về frontend hiển thị ngay
+    await post.populate("comments.user", "username profilePicture");
 
     const newComment = post.comments.at(-1);
 
@@ -242,7 +250,7 @@ exports.addReply = async (req, res) => {
       replies: [],
     };
 
-    // 🔥 Reply cấp 2 trở lên
+    // Reply cấp 2 trở lên
     if (parentReplyId) {
       const parentReply = comment.replies.id(parentReplyId);
       if (!parentReply) {
@@ -261,7 +269,7 @@ exports.addReply = async (req, res) => {
 
     await post.populate(
       "comments.replies.user comments.replies.replyTo comments.replies.replies.user",
-      "username avatar"
+      "username profilePicture"
     );
 
     res.status(201).json(newReply);
@@ -271,7 +279,7 @@ exports.addReply = async (req, res) => {
 };
 
 /* ======================
-   🔥 DELETE COMMENT
+   DELETE COMMENT
 ====================== */
 exports.deleteComment = async (req, res) => {
   try {
@@ -302,7 +310,7 @@ exports.deleteComment = async (req, res) => {
         .json({ message: "Không có quyền xóa comment" });
     }
 
-    // 🔥 XÓA COMMENT
+    // XÓA COMMENT
     comment.deleteOne();
     await post.save();
 
@@ -314,4 +322,3 @@ exports.deleteComment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
