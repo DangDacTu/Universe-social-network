@@ -37,7 +37,6 @@ function App() {
 
                     <Route path="/login-success/:token" element={<LoginSuccess />} />
 
-<<<<<<< HEAD
                     <Route
                         path="/"
                         element={
@@ -61,20 +60,6 @@ function App() {
                     {/* Route Search */}
                     <Route path="/search" element={<PrivateRoute><Search /></PrivateRoute>} />
 
-=======
-                    {/* ===== PRIVATE ROUTES (CÓ SIDEBAR) ===== */}
-                    <Route
-                        element={
-                            <PrivateRoute>
-                                <MainLayout />
-                            </PrivateRoute>
-                        }
-                    >
-                        <Route path="/" element={<Home />} />
-                        <Route path="/me" element={<Profile />} />
-                        <Route path="/profile/:id" element={<Profile />} />
-                    </Route>
->>>>>>> mixcode1
                 </Routes>
             </AuthProvider>
         </Router>
