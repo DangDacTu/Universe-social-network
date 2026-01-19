@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import MainLayout from "./components/layout/MainLayout";
 
+//pages
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import VerifyEmail from './pages/user/VerifyEmail';
@@ -35,6 +37,7 @@ function App() {
 
                     <Route path="/login-success/:token" element={<LoginSuccess />} />
 
+<<<<<<< HEAD
                     <Route
                         path="/"
                         element={
@@ -58,6 +61,20 @@ function App() {
                     {/* Route Search */}
                     <Route path="/search" element={<PrivateRoute><Search /></PrivateRoute>} />
 
+=======
+                    {/* ===== PRIVATE ROUTES (CÓ SIDEBAR) ===== */}
+                    <Route
+                        element={
+                            <PrivateRoute>
+                                <MainLayout />
+                            </PrivateRoute>
+                        }
+                    >
+                        <Route path="/" element={<Home />} />
+                        <Route path="/me" element={<Profile />} />
+                        <Route path="/profile/:id" element={<Profile />} />
+                    </Route>
+>>>>>>> mixcode1
                 </Routes>
             </AuthProvider>
         </Router>

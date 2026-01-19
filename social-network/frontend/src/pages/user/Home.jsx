@@ -1,8 +1,7 @@
 import { useState } from "react";
-import Sidebar from "../../components/layout/Sidebar";
 import PostInput from "../../components/post/PostInput";
 import PostList from "../../components/post/PostList";
-import CreatePostModal from "../../components/post/CreatePostModal";
+import CreatePostModal from "../../components/Post/CreatePostModal";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
@@ -31,6 +30,7 @@ export default function Home() {
         `}
       </style>
 
+<<<<<<< HEAD
       <Sidebar />
 
       <main
@@ -43,11 +43,17 @@ export default function Home() {
           paddingTop: "24px",
         }}
       >
+=======
+>>>>>>> mixcode1
         {/* KHUNG FEED TRẮNG */}
         <div
           style={{
             width: "650px",
+<<<<<<< HEAD
             background: "#ffffff",
+=======
+            background: "#fff",
+>>>>>>> mixcode1
             borderRadius: "16px",
             display: "flex",
             flexDirection: "column",
@@ -71,8 +77,7 @@ export default function Home() {
             <PostList reload={reload} />
           </div>
         </div>
-      </main>
-
+      
       {open && (
         <CreatePostModal
           onClose={() => setOpen(false)}

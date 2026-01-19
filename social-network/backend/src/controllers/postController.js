@@ -16,7 +16,14 @@ exports.createPost = async (req, res) => {
     let media = [];
     if (req.files?.length > 0) {
       media = req.files.map((file) => ({
+<<<<<<< HEAD
         url: file.path, 
+=======
+        // Cloudinary trả về link ảnh online trong thuộc tính 'path'
+
+        url: file.path,
+        // Xác định loại file dựa trên mimetype
+>>>>>>> mixcode1
         type: file.mimetype.startsWith("image") ? "image" : "video",
       }));
     }
