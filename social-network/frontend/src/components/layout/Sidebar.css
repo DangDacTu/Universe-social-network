@@ -77,9 +77,6 @@
   object-fit: contain;
 
   pointer-events: none;    /* ❗ CHỈ ẢNH KHÔNG BẮT CLICK */
-<<<<<<< HEAD
-}
-=======
 }
 
 .sidebar-item {
@@ -150,4 +147,3 @@
     transform: translateY(0) scale(1);
   }
 }
->>>>>>> mixcode1

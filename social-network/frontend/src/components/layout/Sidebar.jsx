@@ -41,7 +41,6 @@ export default function Sidebar({ onCreate }) {
 
       <nav className="sidebar-nav">
         <button
-
           className={`sidebar-item ${isActive("/") ? "active" : ""}`}
           onClick={() => navigate("/")}
         >
@@ -58,14 +57,13 @@ export default function Sidebar({ onCreate }) {
           <FiPlusSquare />
         </button>
 
-        <button className="sidebar-item"
-          onClick={() => navigate("/chat")}
-          >
+        <button className="sidebar-item">
           <FiHeart />
         </button>
 
-
-        <button className="sidebar-item">
+        <button className="sidebar-item"
+          onClick={() => navigate("/chat")}
+        >
           <FiSend />
         </button>
 

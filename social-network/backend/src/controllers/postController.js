@@ -1,12 +1,13 @@
 const Post = require("../models/Post");
 
 /* ======================
-   CREATE POST
+   CREATE POST (ĐÃ SỬA CHO CLOUDINARY)
 ====================== */
 exports.createPost = async (req, res) => {
   try {
     const { content } = req.body;
 
+    // Kiểm tra: Phải có nội dung hoặc có file ảnh/video
     if (!content && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Bài viết phải có nội dung hoặc media",
@@ -14,12 +15,17 @@ exports.createPost = async (req, res) => {
     }
 
     let media = [];
+
+    // --- LOGIC MỚI: DÙNG CLOUDINARY ---
     if (req.files?.length > 0) {
       media = req.files.map((file) => ({
-        url: file.path, 
+        // Cloudinary trả về link ảnh online trong thuộc tính 'path'
+        url: file.path,
+        // Xác định loại file dựa trên mimetype
         type: file.mimetype.startsWith("image") ? "image" : "video",
       }));
     }
+    // ----------------------------------
 
     const post = await Post.create({
       author: req.user.id,
@@ -29,7 +35,7 @@ exports.createPost = async (req, res) => {
 
     const populatedPost = await post.populate(
       "author",
-      "username profilePicture"
+      "username profilePicture" // Lưu ý: check lại model User của bạn là 'profilePicture' hay 'avatar' nhé
     );
 
     res.status(201).json(populatedPost);
@@ -49,10 +55,13 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
+    // 🔒 Chỉ chủ post được xóa
     if (post.author.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Không có quyền xóa post" });
     }
 
+    // Lưu ý: Code này xóa post trong DB, nhưng ảnh trên Cloudinary vẫn còn.
+    // Nếu muốn xóa sạch cả trên Cloudinary, cần dùng thư viện cloudinary.uploader.destroy() ở đây.
     await post.deleteOne();
 
     res.json({ message: "Xóa post thành công" });
@@ -62,12 +71,12 @@ exports.deletePost = async (req, res) => {
 };
 
 /* ======================
-   GET ALL POSTS
+   GET ALL POSTS (TIMELINE)
 ====================== */
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("author", "username profilePicture")
+      .populate("author", "username profilePicture") // Đổi avatar -> profilePicture cho khớp model User
       .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
 
@@ -78,19 +87,24 @@ exports.getAllPosts = async (req, res) => {
 };
 
 /* ======================
-   GET USER POSTS (MỚI)
+   GET USER POSTS (PROFILE) - MỚI THÊM
 ====================== */
 exports.getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-
+    
     const posts = await Post.find({ author: userId })
-      .populate("author", "username profilePicture") 
-      .populate("comments.user", "username profilePicture") 
-      .sort({ createdAt: -1 }); 
+      .populate("author", "username profilePicture")
+      .populate("comments.user", "username profilePicture")
+      .sort({ createdAt: -1 });
+
+    if (!posts) {
+        return res.status(404).json({ message: "Không tìm thấy bài viết nào" });
+    }
 
     res.json(posts);
   } catch (error) {
+    console.error("Lỗi lấy bài viết của user:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -124,6 +138,7 @@ exports.getComments = async (req, res) => {
   }
 };
 
+
 /* ======================
    TOGGLE LIKE POST
 ====================== */
@@ -136,7 +151,10 @@ exports.toggleLike = async (req, res) => {
     }
 
     const userId = req.user.id.toString();
-    const index = post.likes.findIndex((id) => id.toString() === userId);
+
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId
+    );
 
     if (index > -1) {
       post.likes.splice(index, 1);
@@ -163,13 +181,18 @@ exports.toggleLikeComment = async (req, res) => {
     const { id: postId, commentId } = req.params;
 
     const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post không tồn tại" });
+    if (!post)
+      return res.status(404).json({ message: "Post không tồn tại" });
 
     const comment = post.comments.id(commentId);
-    if (!comment) return res.status(404).json({ message: "Comment không tồn tại" });
+    if (!comment)
+      return res.status(404).json({ message: "Comment không tồn tại" });
 
     const userId = req.user.id.toString();
-    const index = comment.likes.findIndex((id) => id.toString() === userId);
+
+    const index = comment.likes.findIndex(
+      (id) => id.toString() === userId
+    );
 
     if (index > -1) {
       comment.likes.splice(index, 1);
@@ -194,9 +217,13 @@ exports.toggleLikeComment = async (req, res) => {
 exports.addComment = async (req, res) => {
   try {
     const { content } = req.body;
-    if (!content.trim()) return res.status(400).json({ message: "Nội dung trống" });
+
+    if (!content.trim()) {
+      return res.status(400).json({ message: "Nội dung trống" });
+    }
 
     const post = await Post.findById(req.params.id);
+
     post.comments.push({
       user: req.user.id,
       content,
@@ -204,6 +231,7 @@ exports.addComment = async (req, res) => {
     });
 
     await post.save();
+    // Populate lại để trả về frontend hiển thị ngay
     await post.populate("comments.user", "username profilePicture");
 
     const newComment = post.comments.at(-1);
@@ -219,20 +247,24 @@ exports.addComment = async (req, res) => {
 };
 
 /* ======================
-   ADD REPLY
+   ADD REPLY (MULTI LEVEL)
 ====================== */
 exports.addReply = async (req, res) => {
   try {
     const { id: postId, commentId } = req.params;
     const { content, parentReplyId = null, replyTo = null } = req.body;
 
-    if (!content || !content.trim()) return res.status(400).json({ message: "Nội dung trống" });
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: "Nội dung trống" });
+    }
 
     const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post không tồn tại" });
+    if (!post)
+      return res.status(404).json({ message: "Post không tồn tại" });
 
     const comment = post.comments.id(commentId);
-    if (!comment) return res.status(404).json({ message: "Comment không tồn tại" });
+    if (!comment)
+      return res.status(404).json({ message: "Comment không tồn tại" });
 
     const newReply = {
       user: req.user.id,
@@ -241,15 +273,23 @@ exports.addReply = async (req, res) => {
       replies: [],
     };
 
+    // Reply cấp 2 trở lên
     if (parentReplyId) {
       const parentReply = comment.replies.id(parentReplyId);
-      if (!parentReply) return res.status(404).json({ message: "Reply cha không tồn tại" });
+      if (!parentReply) {
+        return res
+          .status(404)
+          .json({ message: "Reply cha không tồn tại" });
+      }
+
       parentReply.replies.push(newReply);
     } else {
+      // Reply cấp 1
       comment.replies.push(newReply);
     }
 
     await post.save();
+
     await post.populate(
       "comments.replies.user comments.replies.replyTo comments.replies.replies.user",
       "username profilePicture"
@@ -269,23 +309,38 @@ exports.deleteComment = async (req, res) => {
     const { id: postId, commentId } = req.params;
 
     const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ message: "Post không tồn tại" });
-
-    const comment = post.comments.id(commentId);
-    if (!comment) return res.status(404).json({ message: "Comment không tồn tại" });
-
-    const userId = req.user.id.toString();
-    const isCommentOwner = comment.user.toString() === userId;
-    const isPostOwner = post.author.toString() === userId;
-
-    if (!isCommentOwner && !isPostOwner) {
-      return res.status(403).json({ message: "Không có quyền xóa comment" });
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
     }
 
+    const comment = post.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment không tồn tại" });
+    }
+
+    const userId = req.user.id.toString();
+
+    const isCommentOwner =
+      comment.user.toString() === userId;
+
+    const isPostOwner =
+      post.author.toString() === userId;
+
+    // 🔒 CHECK QUYỀN
+    if (!isCommentOwner && !isPostOwner) {
+      return res
+        .status(403)
+        .json({ message: "Không có quyền xóa comment" });
+    }
+
+    // XÓA COMMENT
     comment.deleteOne();
     await post.save();
 
-    res.json({ message: "Xóa comment thành công", commentId });
+    res.json({
+      message: "Xóa comment thành công",
+      commentId,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

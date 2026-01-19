@@ -1,31 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import "./post.css";
 import axiosClient from "../../api/axiosClient";
-import { FiImage, FiX } from "react-icons/fi"; // Import icon đóng và ảnh
-import "./post.css"; // Đảm bảo bạn đã có file css
+import { FiImage } from "react-icons/fi";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
-const MAX_MEDIA = 10; // Giới hạn số lượng ảnh/video
+const MAX_MEDIA = 10; // 🔥 giới hạn media
 
 export default function CreatePostModal({ onClose, onSuccess }) {
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // Lấy thông tin user hiện tại để hiển thị avatar
-  useEffect(() => {
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        setCurrentUser(JSON.parse(userStr));
-      }
-    } catch (error) {
-      console.error("Lỗi đọc user từ local storage");
-    }
-  }, []);
 
   // =========================
-  // XỬ LÝ CHỌN ẢNH/VIDEO
+  // HANDLE UPLOAD
   // =========================
   const handleSelectMedia = (e) => {
     const files = Array.from(e.target.files);
@@ -35,62 +22,43 @@ export default function CreatePostModal({ onClose, onSuccess }) {
       return;
     }
 
-    // Nối thêm file mới vào danh sách cũ
     setMedia((prev) => [...prev, ...files]);
-    
-    // Reset input để chọn lại được file cũ nếu muốn
-    e.target.value = ""; 
+    e.target.value = ""; // reset input
   };
 
   // =========================
-  // XÓA ẢNH/VIDEO ĐÃ CHỌN
+  // REMOVE MEDIA
   // =========================
   const handleRemoveMedia = (index) => {
     setMedia((prev) => prev.filter((_, i) => i !== index));
   };
 
   // =========================
-  // GỬI DỮ LIỆU (QUAN TRỌNG)
+  // SUBMIT
   // =========================
   const handleSubmit = async () => {
-    // 1. Kiểm tra phải có nội dung hoặc ảnh
-    if (!content.trim() && media.length === 0) {
-      return alert("Bạn chưa nhập nội dung!");
-    }
+    if (!content && media.length === 0) return;
 
     try {
       setLoading(true);
-
-      // 2. Tạo FormData
       const formData = new FormData();
-      
-      // Thêm text
-      if (content.trim()) {
-        formData.append("content", content);
-      }
 
-      // Thêm từng file media với tên trường là "media"
-      // Tên này phải khớp với upload.array("media") ở Backend
+      if (content) formData.append("content", content);
+
       media.forEach((file) => {
         formData.append("media", file);
       });
 
-      // 3. Gọi API với Header multipart/form-data
-      await axiosClient.post("/posts", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axiosClient.post("/posts", formData);
 
-      // 4. Thành công
       setContent("");
       setMedia([]);
-      if (onSuccess) onSuccess(); // Load lại danh sách bài viết
-      onClose(); // Đóng modal
 
+      onSuccess && onSuccess();
+      onClose();
     } catch (err) {
       console.error("CREATE POST ERROR:", err);
-      alert(`Đăng bài thất bại: ${err.response?.data?.message || "Lỗi server"}`);
+      alert("Đăng bài thất bại");
     } finally {
       setLoading(false);
     }
@@ -99,17 +67,15 @@ export default function CreatePostModal({ onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        
         {/* HEADER */}
         <div className="modal-header">
-
           <button className="cancel-btn" onClick={onClose}>
             Hủy
           </button>
           <span><b>Post mới</b></span>
           <button
-            className="submit-btn"
-            disabled={loading || (!content.trim() && media.length === 0)}
+            className="submit"
+            disabled={loading || (!content && media.length === 0)}
             onClick={handleSubmit}
           >
             {loading ? "Đang đăng..." : "Đăng"}
@@ -118,43 +84,33 @@ export default function CreatePostModal({ onClose, onSuccess }) {
 
         {/* BODY */}
         <div className="modal-body">
-          <div className="post-input-area">
-            <div className="avatar-wrapper">
-               <img 
-                 src={currentUser?.profilePicture || currentUser?.avatar || DEFAULT_AVATAR} 
-                 className="avatar" 
-                 alt="User Avatar"
-                 onError={(e) => e.target.src = DEFAULT_AVATAR}
-               />
-            </div>
-            
-            <div className="input-wrapper">
-                <span className="username-label">{currentUser?.username}</span>
-                <textarea
-                  placeholder="Có gì mới?"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  autoFocus
-                />
-            </div>
+          <div className="user-row">
+            <img src={DEFAULT_AVATAR} className="avatar" />
+            <textarea
+              placeholder="Có gì mới?"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
           </div>
 
-          {/* MEDIA PREVIEW */}
+          {/* 🔥 THREADS STYLE PREVIEW */}
           {media.length > 0 && (
-            <div className={`preview-scroll ${media.length === 1 ? "single" : "multiple"}`}>
+            <div
+              className={`preview-scroll ${media.length === 1 ? "single" : "multiple"
+                }`}
+            >
               {media.map((file, index) => (
                 <div className="preview-item" key={index}>
-                  {/* Nút xóa ảnh */}
+                  {/* ❌ REMOVE */}
                   <button
                     className="preview-remove"
                     onClick={() => handleRemoveMedia(index)}
                   >
-                    <FiX />
+                    ✕
                   </button>
 
-                  {/* Hiển thị ảnh hoặc video */}
                   {file.type.startsWith("image") ? (
-                    <img src={URL.createObjectURL(file)} alt="preview" />
+                    <img src={URL.createObjectURL(file)} />
                   ) : (
                     <video controls src={URL.createObjectURL(file)} />
                   )}
@@ -163,25 +119,33 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             </div>
           )}
 
-          {/* FOOTER ACTIONS */}
-          <div className="modal-footer-actions">
-             <label className="media-btn">
-               <FiImage size={22} />
-               <input
-                 type="file"
-                 hidden
-                 multiple
-                 accept="image/*,video/*"
-                 onChange={handleSelectMedia}
-               />
-             </label>
-             
-             {media.length > 0 && (
-               <span className="media-count">
-                 {media.length}/{MAX_MEDIA}
-               </span>
-             )}
-          </div>
+          {/* UPLOAD */}
+          <label className="media-btn">
+            <FiImage size={22} />
+            <input
+              type="file"
+              hidden
+              multiple
+              accept="image/*,video/*"
+              onChange={handleSelectMedia}
+            />
+          </label>
+
+          {/* COUNT */}
+          {media.length > 0 && (
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                marginTop: 0,
+                lineHeight: "12px",
+                marginLeft: 5
+              }}
+            >
+              {media.length}/{MAX_MEDIA}
+            </div>
+          )}
+
 
         </div>
       </div>
