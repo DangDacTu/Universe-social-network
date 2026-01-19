@@ -102,15 +102,11 @@ export default function CreatePostModal({ onClose, onSuccess }) {
         
         {/* HEADER */}
         <div className="modal-header">
-<<<<<<< HEAD
-          <button onClick={onClose} className="cancel-btn">Hủy</button>
-          <span className="modal-title">Thread mới</span>
-=======
+
           <button className="cancel-btn" onClick={onClose}>
             Hủy
           </button>
           <span><b>Post mới</b></span>
->>>>>>> mixcode1
           <button
             className="submit-btn"
             disabled={loading || (!content.trim() && media.length === 0)}
