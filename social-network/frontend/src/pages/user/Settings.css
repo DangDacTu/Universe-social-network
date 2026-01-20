@@ -1,138 +1,204 @@
-/* Toàn trang */
+/* =======================
+   TOÀN TRANG
+======================= */
 .settings-wrapper {
-    min-height: 100vh;
-    background: #f0f2f5;
+    height: 100vh;
+    width: 100%;
+    background: #fafafa;
     display: flex;
     justify-content: center;
-    padding: 40px 16px;
+    padding: 12px 24px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Khung chính */
+/* =======================
+   CONTAINER
+======================= */
 .settings-container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-/* Header */
+/* =======================
+   HEADER
+======================= */
 .settings-header {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
-.settings-header h2 {
+.setting-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #000;
     margin: 0;
-    font-size: 24px;
 }
 
 .settings-header p {
-    margin-top: 6px;
-    color: #65676b;
+    margin-top: 4px;
+    font-size: 14px;
+    color: #737373;
 }
 
-/* Body */
+/* =======================
+   KHUNG TRẮNG LỚN (Threads)
+======================= */
+.settings-frame {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #ededed;
+
+    overflow: hidden;
+
+    flex: 1;
+    display: flex;
+}
+
+/* =======================
+   BODY
+======================= */
 .settings-body {
     display: flex;
-    gap: 20px;
+    width: 100%;
+    height: 100%;
 }
 
-/* Nội dung */
-.settings-content {
-    flex: 1;
-}
-
-/* Card */
-.settings-card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .settings-body {
-        flex-direction: column;
-    }
-}
-
+/* =======================
+   MENU TRÁI
+======================= */
 .settings-menu {
-    width: 240px;
+    width: 220px;
     background: #fff;
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    border-right: 1px solid #ededed;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .settings-menu-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #65676b;
-    margin: 8px 10px 12px;
+    color: #8e8e8e;
+    margin: 8px 12px 10px;
 }
 
-/* Item */
+/* ITEM */
 .settings-menu-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 14px;
-    border-radius: 8px;
-    background: none;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
-    color: #050505;
+    color: #262626;
     text-align: left;
-    transition: background 0.2s;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
 .settings-menu-item:hover {
-    background: #f0f2f5;
+    background: #f2f2f2;
 }
 
 .settings-menu-item.active {
-    background: #e7f3ff;
-    color: #1877f2;
+    background: #000;
+    color: #fff;
 }
 
 .settings-menu-item .icon {
-    font-size: 18px;
+    font-size: 17px;
 }
 
-
-
-.change-password-title {
-    color: #000;
-    /* Đen */
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 12px;
+/* =======================
+   CONTENT PHẢI
+======================= */
+.settings-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
 }
 
+/* =======================
+   CARD
+======================= */
+.settings-card {
+    background: #fff;
+    border-radius: 16px;
+}
+
+/* =======================
+   TITLE TRONG CARD
+======================= */
+.change-password-title,
 .privacy-title {
-    color: #000;
-    /* Đen */
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 12px;
-}
-
-.setting-title {
     color: #000;
-    /* Đen */
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
-/* Mobile */
+/* =======================
+   FORM
+======================= */
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.settings-form label {
+    font-size: 13px;
+    color: #737373;
+}
+
+.settings-form input {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid #dbdbdb;
+    font-size: 14px;
+    outline: none;
+}
+
+.settings-form input:focus {
+    border-color: #000;
+}
+
+.settings-form button {
+    margin-top: 8px;
+    height: 44px;
+    border-radius: 999px;
+    border: none;
+    background: #000;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.settings-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
 @media (max-width: 768px) {
+    .settings-body {
+        flex-direction: column;
+    }
+
     .settings-menu {
         width: 100%;
         flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid #ededed;
     }
 
     .settings-menu-title {
@@ -140,7 +206,7 @@
     }
 
     .settings-menu-item {
-        justify-content: center;
         flex: 1;
+        justify-content: center;
     }
 }

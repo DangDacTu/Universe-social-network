@@ -1,6 +1,6 @@
 /**
- * @file Setting.jsx
- * Trang cài đặt người dùng
+ * @file Settings.jsx
+ * Trang cài đặt người dùng (Threads style)
  */
 import { useState } from "react";
 import SettingsMenu from "../../components/Settings/SettingsMenu";
@@ -17,30 +17,35 @@ export default function Settings() {
 
                 {/* Header */}
                 <div className="settings-header">
-                    <h2 className="setting-title">Cài đặt tài khoản</h2>
-                    <p>Quản lý bảo mật và quyền riêng tư của bạn</p>
+                    <h2 className="setting-title">Cài đặt</h2>
+                    <p>Quản lý tài khoản, quyền riêng tư và bảo mật</p>
                 </div>
 
-                <div className="settings-body">
-                    {/* Menu bên trái */}
-                    <SettingsMenu
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                    />
+                {/* Khung chính */}
+                <div className="settings-frame">
+                    <div className="settings-body">
 
-                    {/* Nội dung bên phải */}
-                    <div className="settings-content">
-                        {activeTab === "password" && (
-                            <div className="settings-card">
-                                <ChangePassword />
-                            </div>
-                        )}
+                        {/* Menu trái */}
+                        <SettingsMenu
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                        />
 
-                        {activeTab === "privacy" && (
-                            <div className="settings-card">
-                                <PrivacySettings />
-                            </div>
-                        )}
+                        {/* Nội dung phải */}
+                        <div className="settings-content">
+                            {activeTab === "password" && (
+                                <div className="settings-card">
+                                    <ChangePassword />
+                                </div>
+                            )}
+
+                            {activeTab === "privacy" && (
+                                <div className="settings-card">
+                                    <PrivacySettings />
+                                </div>
+                            )}
+                        </div>
+
                     </div>
                 </div>
 
