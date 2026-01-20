@@ -7,6 +7,16 @@ import { useEffect, useRef, useState } from "react";
 import { getSocket } from "../services/socket";
 import uploadApi from "../api/uploadApi";
 import "./ChatBox.css";
+import {
+    FaMicrophone,
+    FaStop,
+    FaTimes,
+    FaImage,
+    FaPaperclip,
+    FaPaperPlane,
+    FaChevronLeft,
+    FaChevronRight,
+} from "react-icons/fa";
 
 export default function ChatBox({
     messages = [],
@@ -303,7 +313,7 @@ export default function ChatBox({
                     }}
                 >
                     <button className="imageNav left" onClick={prevImage}>
-                        ‹
+                        <FaChevronLeft />
                     </button>
 
                     <img
@@ -317,7 +327,7 @@ export default function ChatBox({
                     />
 
                     <button className="imageNav right" onClick={nextImage}>
-                        ›
+                        <FaChevronRight />
                     </button>
 
                     <span
@@ -361,7 +371,7 @@ export default function ChatBox({
                     className={`icon ${isRecording ? "recording" : ""
                         }`}
                 >
-                    {isRecording ? "⏹️" : "🎤"}
+                    {isRecording ? <FaStop /> : <FaMicrophone />}
                 </button>
 
                 {isRecording && (
@@ -380,13 +390,13 @@ export default function ChatBox({
                             onClick={cancelRecording}
                             className="cancelRecord"
                         >
-                            ❌
+                            <FaTimes />
                         </button>
                     </>
                 )}
 
                 <label htmlFor="imageInput" className="icon">
-                    🖼️
+                    <FaImage />
                 </label>
                 <input
                     id="imageInput"
@@ -408,7 +418,7 @@ export default function ChatBox({
                 />
 
                 <label htmlFor="fileInput" className="icon">
-                    📎
+                    <FaPaperclip />
                 </label>
                 <input
                     id="fileInput"
@@ -457,7 +467,7 @@ export default function ChatBox({
                     }}
                     className="icon send"
                 >
-                    📩
+                    <FaPaperPlane />
                 </button>
             </div>
         </div>
