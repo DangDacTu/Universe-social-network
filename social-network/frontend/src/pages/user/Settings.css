@@ -53,7 +53,7 @@
 .settings-frame {
     background: #fff;
     border-radius: 20px;
-    border: 1px solid #ededed;
+    border: 1px solid #cdcdcd;
 
     overflow: hidden;
 
@@ -77,7 +77,7 @@
     width: 220px;
     background: #fff;
     padding: 8px;
-    border-right: 1px solid #ededed;
+    border-right: 1px solid #cdcdcd;
     display: flex;
     flex-direction: column;
     gap: 4px;
