@@ -7,6 +7,7 @@ import SettingsMenu from "../../components/Settings/SettingsMenu";
 import ChangePassword from "../../components/Settings/ChangePassword";
 import PrivacySettings from "../../components/Settings/PrivacySettings";
 import "./Settings.css";
+import { FaCog } from "react-icons/fa";
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState("password");
@@ -17,7 +18,10 @@ export default function Settings() {
 
                 {/* Header */}
                 <div className="settings-header">
-                    <h2 className="setting-title">Cài đặt</h2>
+                    <h2 className="setting-title">
+                        <FaCog className="settings-title-icon" />
+                        Cài đặt
+                    </h2>
                     <p>Quản lý tài khoản, quyền riêng tư và bảo mật</p>
                 </div>
 

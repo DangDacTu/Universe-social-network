@@ -2,6 +2,7 @@
  * @file SettingsMenu.jsx
  * @description Menu cài đặt bên trái
  */
+import { FaLock, FaUserShield } from "react-icons/fa";
 export default function SettingsMenu({ activeTab, setActiveTab }) {
     return (
         <div className="settings-menu">
@@ -13,7 +14,7 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 onClick={() => setActiveTab("password")}
                 type="button"
             >
-                <span className="icon"></span>
+                <FaLock className="settings-menu-icon" />
                 <span>Đổi mật khẩu</span>
             </button>
 
@@ -23,7 +24,7 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 onClick={() => setActiveTab("privacy")}
                 type="button"
             >
-                <span className="icon"></span>
+                <FaUserShield className="settings-menu-icon" />
                 <span>Quyền riêng tư</span>
             </button>
         </div>

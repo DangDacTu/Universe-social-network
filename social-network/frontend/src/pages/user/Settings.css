@@ -36,6 +36,11 @@
     margin: 0;
 }
 
+.settings-title-icon {
+    font-size: 17px;
+    margin-right: 8px;
+}
+
 .settings-header p {
     margin-top: 4px;
     font-size: 14px;
