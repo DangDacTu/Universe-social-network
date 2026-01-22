@@ -189,26 +189,45 @@ exports.toggleLikeComment = async (req, res) => {
 };
 
 /* ======================
-   ADD COMMENT
+   ADD COMMENT (TEXT + IMAGE + VIDEO - CLOUDINARY)
 ====================== */
 exports.addComment = async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content = "" } = req.body;
 
-    if (!content.trim()) {
-      return res.status(400).json({ message: "Nội dung trống" });
+    // ❗ Phải có text hoặc có media
+    if (!content.trim() && (!req.files || req.files.length === 0)) {
+      return res.status(400).json({
+        message: "Comment phải có nội dung hoặc media",
+      });
     }
 
     const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: "Post không tồn tại" });
+    }
+
+    // 🟢 XỬ LÝ MEDIA TỪ CLOUDINARY
+    let media = [];
+    if (req.files?.length > 0) {
+      media = req.files.map((file) => ({
+        url: file.path, // Cloudinary URL
+        type: file.mimetype.startsWith("image")
+          ? "image"
+          : "video",
+      }));
+    }
 
     post.comments.push({
       user: req.user.id,
       content,
+      media,
       likes: [],
     });
 
     await post.save();
-    // Populate lại để trả về frontend hiển thị ngay
+
+    // Populate để frontend render ngay
     await post.populate("comments.user", "username profilePicture");
 
     const newComment = post.comments.at(-1);
@@ -222,6 +241,7 @@ exports.addComment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 /* ======================
    ADD REPLY (MULTI LEVEL)

@@ -1,6 +1,21 @@
 const mongoose = require("mongoose");
 
 /* ======================
+   MEDIA SCHEMA (COMMENT ONLY)
+====================== */
+const mediaSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true },
+    type: {
+      type: String,
+      enum: ["image", "video"],
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
+/* ======================
    REPLY SCHEMA (MULTI LEVEL)
 ====================== */
 const replySchema = new mongoose.Schema(
@@ -41,8 +56,9 @@ const commentSchema = new mongoose.Schema(
     content: {
       type: String,
       trim: true,
-      required: true,
+      default: "",
     },
+    media: [mediaSchema],
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,

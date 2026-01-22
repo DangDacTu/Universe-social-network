@@ -12,7 +12,12 @@ router.delete("/:id", protect, postController.deletePost);
 
 // COMMENTS
 router.get("/:id/comments", protect, postController.getComments);
-router.post("/:id/comments", protect, postController.addComment);
+router.post(
+  "/:id/comments",
+  protect,
+  upload.array("media", 5),
+  postController.addComment
+);
 
 // LIKE POST
 router.post("/:id/like", protect, postController.toggleLike);

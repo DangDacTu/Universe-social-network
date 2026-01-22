@@ -11,6 +11,7 @@ import Home from './pages/user/Home';
 import LoginSuccess from './pages/user/LoginSuccess';
 import ForgotPassword from './pages/user/ForgotPassword';
 import ResetPassword from './pages/user/ResetPassword';
+import Intro from "./pages/user/Intro";
 
 // Component bảo vệ Route
 const PrivateRoute = ({ children }) => {
@@ -26,6 +27,7 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/intro" element={<Intro />} />
                     <Route path="/verify-email" element={<VerifyEmail />} />
 
                     <Route path="/forgot-password" element={<ForgotPassword />} />

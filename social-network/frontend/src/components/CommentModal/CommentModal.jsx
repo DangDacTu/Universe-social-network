@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import axiosClient from "../../api/axiosClient";
-import { FiMoreHorizontal, FiTrash2 } from "react-icons/fi";
+import { FiMoreHorizontal, FiTrash2, FiImage } from "react-icons/fi";
 import "./commentModal.css";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
@@ -48,6 +48,8 @@ const ReplyIcon = () => (
 export default function CommentModal({ postId, onClose }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
+  const [files, setFiles] = useState([]); // ✅ THÊM
+  const [previews, setPreviews] = useState([]);
   const [replyingId, setReplyingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -57,6 +59,7 @@ export default function CommentModal({ postId, onClose }) {
 
   /* ====== THÊM CHO SCROLL + HIGHLIGHT ====== */
   const commentListRef = useRef(null);
+  const fileInputRef = useRef(null); // ✅ THÊM
   const [newCommentId, setNewCommentId] = useState(null);
 
   /* ======================
@@ -82,10 +85,10 @@ export default function CommentModal({ postId, onClose }) {
         prev.map((c) =>
           c._id === commentId
             ? {
-                ...c,
-                liked: res.data.liked,
-                likeCount: res.data.likeCount,
-              }
+              ...c,
+              liked: res.data.liked,
+              likeCount: res.data.likeCount,
+            }
             : c
         )
       );
@@ -95,43 +98,52 @@ export default function CommentModal({ postId, onClose }) {
   };
 
   /* ======================
-     SUBMIT COMMENT (CHỈ THÊM SCROLL + HIGHLIGHT)
+     SUBMIT COMMENT (TEXT + IMAGE/VIDEO)
   ====================== */
   const handleSubmitComment = async () => {
-    if (!text.trim() || submitting) return;
+    if ((!text.trim() && files.length === 0) || submitting) return;
 
     setSubmitting(true);
     try {
+      const formData = new FormData();
+      if (text.trim()) formData.append("content", text);
+      files.forEach((f) => formData.append("media", f));
+
       const res = await axiosClient.post(
         `/posts/${postId}/comments`,
-        { content: text }
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
-      setComments((prev) => {
-        const next = [...prev, res.data];
-
-        setTimeout(() => {
-          commentListRef.current?.scrollTo({
-            top: commentListRef.current.scrollHeight,
-            behavior: "smooth",
-          });
-        }, 50);
-
-        return next;
-      });
-
-      setNewCommentId(res.data._id);
+      setComments((prev) => [...prev, res.data]);
 
       setTimeout(() => {
-        setNewCommentId(null);
-      }, 1500);
+        commentListRef.current?.scrollTo({
+          top: commentListRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 50);
+
+      setNewCommentId(res.data._id);
+      setTimeout(() => setNewCommentId(null), 1500);
 
       setText("");
+      setFiles([]);
+      setPreviews([]);
     } catch (err) {
       console.error("Create comment error:", err);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const removePreview = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+
+    setPreviews((prev) => {
+      URL.revokeObjectURL(prev[index].url);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   /* ======================
@@ -175,10 +187,7 @@ export default function CommentModal({ postId, onClose }) {
 
   return (
     <div className="comment-overlay" onClick={onClose}>
-      <div
-        className="comment-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="comment-modal" onClick={(e) => e.stopPropagation()}>
         <div className="comment-header">
           <span>Bình luận</span>
           <button onClick={onClose}>✕</button>
@@ -190,8 +199,7 @@ export default function CommentModal({ postId, onClose }) {
               key={c._id}
               className={`comment-item
                 ${removingId === c._id ? "comment-removing" : ""}
-                ${newCommentId === c._id ? "comment-new" : ""}
-              `}
+                ${newCommentId === c._id ? "comment-new" : ""}`}
             >
               <img
                 src={c.user?.avatar || DEFAULT_AVATAR}
@@ -203,7 +211,30 @@ export default function CommentModal({ postId, onClose }) {
                   <b className="comment-username">
                     {c.user?.username || "Người dùng"}
                   </b>
-                  <p className="comment-content">{c.content}</p>
+
+                  {c.content && (
+                    <p className="comment-content">{c.content}</p>
+                  )}
+
+                  {/* ✅ CHỈ THÊM MEDIA – KHÔNG ĐỔI LAYOUT */}
+                  {c.media?.length > 0 &&
+                    c.media.map((m, i) =>
+                      m.type === "image" ? (
+                        <img
+                          key={i}
+                          src={m.url}
+                          className="comment-media-img"
+                        />
+                      ) : (
+                        <video
+                          key={i}
+                          src={m.url}
+                          controls
+                          className="comment-media-video"
+                        />
+
+                      )
+                    )}
                 </div>
 
                 <div className="comment-meta">
@@ -227,19 +258,17 @@ export default function CommentModal({ postId, onClose }) {
                 </div>
               </div>
 
-              {/* ===== MENU XÓA COMMENT ===== */}
               <div className="comment-menu">
                 <button
                   className="comment-menu-btn"
-                  onClick={() => {
-                    if (c.canDelete === false) return;
-                    setOpenMenuId(openMenuId === c._id ? null : c._id);
-                  }}
+                  onClick={() =>
+                    setOpenMenuId(openMenuId === c._id ? null : c._id)
+                  }
                 >
                   <FiMoreHorizontal size={16} />
                 </button>
 
-                {openMenuId === c._id && c.canDelete !== false && (
+                {openMenuId === c._id && (
                   <div className="comment-menu-dropdown">
                     <button
                       className="comment-menu-delete"
@@ -255,6 +284,29 @@ export default function CommentModal({ postId, onClose }) {
           ))}
         </div>
 
+        {previews.length > 0 && (
+          <div className="comment-preview-row">
+            {previews.map((p, index) => (
+              <div key={index} className="comment-preview-item">
+                {p.type === "image" ? (
+                  <img src={p.url} />
+                ) : (
+                  <video src={p.url} />
+                )}
+
+                <button
+                  className="comment-preview-remove"
+                  onClick={() => removePreview(index)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+
+        {/* INPUT – chỉ thêm nút chọn file */}
         <div className="comment-input">
           <input
             value={text}
@@ -262,10 +314,45 @@ export default function CommentModal({ postId, onClose }) {
             placeholder="Viết bình luận..."
             disabled={submitting}
           />
+
+          <input
+            type="file"
+            hidden
+            multiple
+            accept="image/*,video/*"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              // chỉ cho 1 file
+              setFiles([file]);
+
+              setPreviews([
+                {
+                  file,
+                  url: URL.createObjectURL(file),
+                  type: file.type.startsWith("image") ? "image" : "video",
+                },
+              ]);
+
+              // reset input
+              e.target.value = null;
+
+            }}
+
+          />
+
           <button
-            onClick={handleSubmitComment}
-            disabled={submitting}
+            className={`comment-image-btn ${files.length >= 1 ? "disabled" : ""}`}
+            onClick={() => fileInputRef.current.click()}
+            disabled={files.length >= 1}
           >
+            <FiImage size={20} />
+          </button>
+
+
+          <button onClick={handleSubmitComment} disabled={submitting}>
             {submitting ? "Đang gửi..." : "Đăng"}
           </button>
         </div>
