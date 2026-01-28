@@ -19,6 +19,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    justify-content: space-between;
 }
 
 /* INFO */
@@ -50,6 +51,33 @@
     color: #22c55e;
 }
 
+.chatHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chatHeaderActions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.headerIcon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #555;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+}
+
+.headerIcon:hover {
+    background: #f0f2f5;
+    color: #1877f2;
+}
 
 /* ================= MESSAGES ================= */
 .messages {

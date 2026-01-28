@@ -16,6 +16,9 @@ import {
     FaPaperPlane,
     FaChevronLeft,
     FaChevronRight,
+    FaPhone,
+    FaVideo,
+    FaInfoCircle,
 } from "react-icons/fa";
 
 export default function ChatBox({
@@ -235,36 +238,78 @@ export default function ChatBox({
         <div className="chatBox">
             <div className="header">
                 <div className="chatHeader">
-                    <div className="avatarWrapper">
-                        <img
-                            src={
-                                selectedUser.profilePicture ||
-                                "https://via.placeholder.com/40"
+                    {/* LEFT: avatar + info */}
+                    <div className="chatHeaderLeft">
+                        <div className="avatarWrapper">
+                            <img
+                                src={
+                                    selectedUser.profilePicture ||
+                                    "https://via.placeholder.com/40"
+                                }
+                                alt=""
+                                className="avatar"
+                            />
+                            {isOnline && <span className="onlineDot" />}
+                        </div>
+
+                        <div className="chatHeaderInfo">
+                            <div className="chatUsername">
+                                {selectedUser.username}
+                            </div>
+                            <div className="chatSubStatus">
+                                {isOnline ? (
+                                    <>
+                                        <span className="statusActive">
+                                            Đang hoạt động
+                                        </span>
+                                        <span className="statusOnline">
+                                            • Trực tuyến
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="statusOffline">
+                                        Ngoại tuyến
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT: actions giống Messenger */}
+                    <div className="chatHeaderActions">
+                        <button
+                            className="headerIcon"
+                            title="Gọi thoại"
+                            onClick={() =>
+                                console.log("Call voice:", selectedUser._id)
                             }
-                            alt=""
-                            className="avatar"
-                        />
-                        {isOnline && <span className="onlineDot" />}
-                    </div>
+                        >
+                            <FaPhone />
+                        </button>
 
-                    <div className="chatHeaderInfo">
-                        <div className="chatUsername">
-                            {selectedUser.username}
-                        </div>
-                        <div className="chatSubStatus">
-                            {isOnline ? (
-                                <>
-                                    <span className="statusActive">Đang hoạt động</span>
-                                    <span className="statusOnline">• Trực tuyến</span>
-                                </>
-                            ) : (
-                                <span className="statusOffline">Ngoại tuyến</span>
-                            )}
-                        </div>
-                    </div>
+                        <button
+                            className="headerIcon"
+                            title="Gọi video"
+                            onClick={() =>
+                                console.log("Call video:", selectedUser._id)
+                            }
+                        >
+                            <FaVideo />
+                        </button>
 
+                        <button
+                            className="headerIcon"
+                            title="Thông tin cuộc trò chuyện"
+                            onClick={() =>
+                                console.log("Open chat info")
+                            }
+                        >
+                            <FaInfoCircle />
+                        </button>
+                    </div>
                 </div>
             </div>
+
 
 
             <div className="messages">
