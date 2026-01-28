@@ -296,6 +296,7 @@ export default function Chat() {
                 setMessageInput={setMessageInput}
                 onSendMessage={sendMessage}
                 selectedUser={selectedUser}
+                onlineUsers={onlineUsers}
             />
         </div>
     );

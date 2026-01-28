@@ -14,6 +14,43 @@
     color: #000;
 }
 
+/* HEADER */
+.chatHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* INFO */
+.chatHeaderInfo {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.chatUsername {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* STATUS LINE */
+.chatSubStatus {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.statusActive {
+    color: #6b7280;
+}
+
+.statusOnline {
+    color: #22c55e;
+}
+
+
 /* ================= MESSAGES ================= */
 .messages {
     flex: 1;

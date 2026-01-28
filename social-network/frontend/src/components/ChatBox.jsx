@@ -25,6 +25,7 @@ export default function ChatBox({
     setMessageInput,
     onSendMessage,
     selectedUser,
+    onlineUsers = [],
 }) {
     const messagesEndRef = useRef(null);
 
@@ -228,11 +229,43 @@ export default function ChatBox({
     if (!selectedUser) {
         return <div className="empty">Chọn một người để bắt đầu chat</div>;
     }
+    const isOnline = onlineUsers.includes(selectedUser?._id);
+
     return (
         <div className="chatBox">
             <div className="header">
-                Đang nhắn tin với <b>{selectedUser.username}</b>
+                <div className="chatHeader">
+                    <div className="avatarWrapper">
+                        <img
+                            src={
+                                selectedUser.profilePicture ||
+                                "https://via.placeholder.com/40"
+                            }
+                            alt=""
+                            className="avatar"
+                        />
+                        {isOnline && <span className="onlineDot" />}
+                    </div>
+
+                    <div className="chatHeaderInfo">
+                        <div className="chatUsername">
+                            {selectedUser.username}
+                        </div>
+                        <div className="chatSubStatus">
+                            {isOnline ? (
+                                <>
+                                    <span className="statusActive">Đang hoạt động</span>
+                                    <span className="statusOnline">• Trực tuyến</span>
+                                </>
+                            ) : (
+                                <span className="statusOffline">Ngoại tuyến</span>
+                            )}
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
 
             <div className="messages">
                 {allMessages.map((msg) => {
