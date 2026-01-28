@@ -139,6 +139,12 @@
     display: block;
 }
 
+.video {
+    max-width: 260px;
+    border-radius: 12px;
+}
+
+
 .audio {
     width: 220px;
     display: block;

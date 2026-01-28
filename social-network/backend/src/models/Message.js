@@ -30,7 +30,7 @@ const messageSchema = new mongoose.Schema(
         },
 
         // =========================
-        // MEDIA (IMAGE / FILE / VOICE)
+        // MEDIA (IMAGE/ VIDEO / FILE / VOICE)
         // =========================
         mediaUrl: {
             type: String, // link Cloudinary
@@ -44,7 +44,7 @@ const messageSchema = new mongoose.Schema(
 
         mediaType: {
             type: String,
-            enum: ["text", "image", "file", "audio"],
+            enum: ["text", "image", "video", "file", "audio"],
             default: "text",
         },
 

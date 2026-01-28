@@ -86,6 +86,7 @@ export default function ChatBox({
 
         let mediaType = "file";
         if (file.type.startsWith("image")) mediaType = "image";
+        else if (file.type.startsWith("video")) mediaType = "video";
         else if (file.type.startsWith("audio")) mediaType = "audio";
 
         const tempMessage = {
@@ -317,6 +318,7 @@ export default function ChatBox({
                     const isMe = msg.senderId === currentUserId;
                     const noBubble =
                         msg.mediaType === "image" ||
+                        msg.mediaType === "video" ||
                         msg.mediaType === "audio";
 
                     return (
@@ -336,6 +338,14 @@ export default function ChatBox({
                                         onClick={() =>
                                             openImageViewer(msg.mediaUrl)
                                         }
+                                    />
+                                )}
+
+                                {msg.mediaType === "video" && (
+                                    <video
+                                        src={msg.mediaUrl}
+                                        className="video"
+                                        controls
                                     />
                                 )}
 
@@ -421,7 +431,19 @@ export default function ChatBox({
                 <div className="previewBox">
                     {previewUrls.map((url, idx) => (
                         <div key={idx} className="previewItem">
-                            <img src={url} className="previewImage" />
+                            {previewFiles[idx]?.type.startsWith("video") ? (
+                                <video
+                                    src={url}
+                                    className="previewImage"
+                                    controls
+                                />
+                            ) : (
+                                <img
+                                    src={url}
+                                    className="previewImage"
+                                />
+                            )}
+
                             <button
                                 className="previewRemove"
                                 onClick={() => {
@@ -481,7 +503,7 @@ export default function ChatBox({
                     type="file"
                     hidden
                     multiple
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={(e) => {
                         const files = Array.from(e.target.files);
                         setPreviewFiles((p) => [...p, ...files]);
