@@ -1,0 +1,88 @@
+.ig-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #fff;
+    border-right: 1px solid #dbdbdb;
+}
+
+/* Header */
+.ig-sidebar-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0; /* Không bị co lại */
+}
+
+.ig-own-profile {
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.ig-new-chat-icon { cursor: pointer; }
+
+/* SEARCH BAR STYLE */
+.ig-search-wrapper {
+    padding: 10px 20px;
+}
+
+.ig-search-input {
+    width: 100%;
+    background-color: #efefef;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box; /* Đảm bảo padding không làm vỡ layout */
+}
+
+/* USER LIST */
+.ig-user-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 5px;
+}
+
+.ig-user-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px; /* Giảm padding dọc một chút */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ig-user-item:hover { background-color: #fafafa; }
+.ig-user-item.selected { background-color: #efefef; }
+
+.ig-avatar-wrapper { position: relative; margin-right: 12px; }
+.ig-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+
+.ig-online-dot {
+    width: 14px; height: 14px;
+    background-color: #00d26a;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    position: absolute; bottom: 2px; right: 2px;
+}
+
+.ig-user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Căn giữa tên theo chiều dọc */
+    height: 100%;
+}
+
+.ig-user-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #262626;
+}
+
+/* Xóa các class không dùng nữa (tabs, user-status) để code sạch hơn */

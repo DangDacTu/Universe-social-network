@@ -1,0 +1,146 @@
+/* Toàn trang */
+.settings-wrapper {
+    min-height: 100vh;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+/* Khung chính */
+.settings-container {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* Header */
+.settings-header {
+    margin-bottom: 24px;
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.settings-header p {
+    margin-top: 6px;
+    color: #65676b;
+}
+
+/* Body */
+.settings-body {
+    display: flex;
+    gap: 20px;
+}
+
+/* Nội dung */
+.settings-content {
+    flex: 1;
+}
+
+/* Card */
+.settings-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .settings-body {
+        flex-direction: column;
+    }
+}
+
+.settings-menu {
+    width: 240px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-menu-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #65676b;
+    margin: 8px 10px 12px;
+}
+
+/* Item */
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #050505;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.settings-menu-item:hover {
+    background: #f0f2f5;
+}
+
+.settings-menu-item.active {
+    background: #e7f3ff;
+    color: #1877f2;
+}
+
+.settings-menu-item .icon {
+    font-size: 18px;
+}
+
+
+
+.change-password-title {
+    color: #000;
+    /* Đen */
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.privacy-title {
+    color: #000;
+    /* Đen */
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.setting-title {
+    color: #000;
+    /* Đen */
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .settings-menu {
+        width: 100%;
+        flex-direction: row;
+    }
+
+    .settings-menu-title {
+        display: none;
+    }
+
+    .settings-menu-item {
+        justify-content: center;
+        flex: 1;
+    }
+}
