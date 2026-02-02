@@ -28,7 +28,13 @@ const userApi = {
     // 5. Unfollow
     unfollow(id) {
         return axiosClient.put(`/users/${id}/unfollow`);
-    }
+    },
+
+    // 6. LẤY DANH SÁCH USER CÓ THỂ CHAT (FOLLOW LẪN NHAU)
+    getChatAvailableUsers() {
+        return axiosClient.get('/users/chat-available');
+    },
+
 };
 
 export default userApi;

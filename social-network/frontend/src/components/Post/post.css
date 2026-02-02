@@ -1,0 +1,710 @@
+/* ======================
+   GLOBAL FIX
+====================== */
+
+/* ❗ Chặn scroll ngang toàn trang */
+body {
+  overflow-x: hidden;
+}
+
+/* ======================
+   POST INPUT
+====================== */
+
+.post-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 12px;
+}
+
+.post-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.post-input button {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* ======================
+   AVATAR
+====================== */
+
+.avatar,
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* ======================
+   MODAL
+====================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 500px;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #000;
+}
+
+.modal-header .cancel-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #000;
+}
+
+.modal-header .cancel-btn:focus {
+  outline: none;
+}
+
+.modal-body textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 16px;
+}
+
+.user-row {
+  display: flex;
+  gap: 12px;
+}
+
+.preview img,
+.preview video {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.media-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.media-btn:hover {
+  background: #f2f2f2;
+}
+
+.media-btn svg {
+  pointer-events: none;
+}
+
+
+.submit {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+/* ======================
+   POST ITEM (THREAD STYLE)
+====================== */
+
+.post-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.post-content {
+  flex: 1;
+}
+
+/* Header */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.post-username {
+  font-weight: 600;
+  color: #000;
+}
+
+.post-time {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Text */
+.post-text {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #000;
+}
+
+/* ==========================
+   MULTI MEDIA – THREAD STYLE
+========================== */
+
+/* ===== MEDIA SCROLL ===== */
+.post-media-scroll {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: 6px;
+
+  /* 🔥 QUAN TRỌNG: chỉ scroll trong ảnh */
+  overscroll-behavior-x: contain;
+}
+
+/* Ẩn scrollbar */
+.post-media-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== MEDIA ITEM ===== */
+.post-media-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ===== IMAGE / VIDEO ===== */
+.post-media-item img,
+.post-media-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== SINGLE MEDIA ===== */
+.post-media-scroll.single .post-media-item {
+  width: 100%;
+  max-height: 480px;
+}
+
+.post-media-scroll.single img,
+.post-media-scroll.single video {
+  height: auto;
+  max-height: 480px;
+}
+
+/* ===== MULTIPLE MEDIA (THREADS STYLE) ===== */
+.post-media-scroll.multiple .post-media-item {
+  width: 240px;
+  height: 320px;
+}
+
+/* ======================
+   SCROLL FIX – THREADS
+====================== */
+
+/* Khóa scroll ngang toàn feed */
+.feed {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Nội dung post không được scroll ngang */
+.post-content {
+  overflow-x: hidden;
+}
+
+/* Chỉ cho kéo ngang trong media */
+.post-media-scroll {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+}
+
+/* ==========================
+   CREATE POST – PREVIEW THREAD STYLE
+========================== */
+
+.preview-scroll {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 6px;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  overscroll-behavior-x: contain;
+}
+
+/* Ẩn scrollbar */
+.preview-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ITEM */
+.preview-item {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* IMAGE / VIDEO */
+.preview-item img,
+.preview-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== SINGLE MEDIA ===== */
+.preview-scroll.single .preview-item {
+  width: 100%;
+  max-height: 420px;
+}
+
+.preview-scroll.single img,
+.preview-scroll.single video {
+  height: auto;
+  max-height: 420px;
+}
+
+/* ===== MULTIPLE MEDIA (THREADS STYLE) ===== */
+.preview-scroll.multiple .preview-item {
+  width: 180px;
+  height: 240px;
+}
+
+/* ==========================
+   CREATE POST – PREVIEW REMOVE
+========================== */
+
+.preview-item {
+  position: relative;
+}
+
+/* ❌ BUTTON */
+.preview-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.preview-remove:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+/* ======================
+   MEDIA VIEWER (THREADS)
+====================== */
+
+.media-viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  /* 🔥 khoảng thở giống Threads */
+}
+
+.media-viewer-content {
+  max-width: 100%;
+  max-height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* IMAGE + VIDEO */
+.media-viewer-content img,
+.media-viewer-content video {
+  max-width: 100%;
+  max-height: 85vh;
+  /* 🔥 quan trọng: KHÔNG chiếm full màn hình */
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+  /* giữ nguyên tỉ lệ */
+  border-radius: 12px;
+}
+
+/* ======================
+   MEDIA VIEWER (THREADS)
+====================== */
+
+.media-viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* MEDIA */
+.media-viewer-content img,
+.media-viewer-content video {
+  max-width: 100%;
+  max-height: 85vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* ❌ FIXED CLOSE */
+.viewer-close {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10001;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+
+  font-size: 26px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+/* ◀ ▶ FIXED NAV */
+.viewer-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10001;
+
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+
+  font-size: 48px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.viewer-nav.left {
+  left: 12px;
+}
+
+.viewer-nav.right {
+  right: 12px;
+}
+
+/* SLIDER WRAPPER */
+.media-viewer-content {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SLIDER */
+.media-slider {
+  display: flex;
+  transition: transform 0.35s ease;
+  /* 🔥 animation trượt */
+  width: 100%;
+}
+
+/* EACH SLIDE */
+.media-slide {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* IMAGE + VIDEO */
+.media-slide img,
+.media-slide video {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* ===== FIX ROOT ===== */
+.post-content {
+  overflow: hidden;
+}
+
+/* ===== MEDIA ===== */
+.post-media-scroll {
+  display: flex;
+  gap: 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.post-media-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== ACTIONS ===== */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 8px;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #555;
+  transition: transform 0.15s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.1);
+}
+
+.like-btn.liked {
+  color: #e0245e;
+}
+
+.like-count {
+  font-size: 13px;
+  color: #555;
+}
+
+.comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #555;
+  transition: transform 0.15s ease;
+}
+
+.comment-btn:hover {
+  transform: scale(1.1);
+}
+
+.comment-count {
+  font-size: 13px;
+  color: #555;
+  margin-right: 6px;
+}
+
+
+/* ===== ACTION BAR (THREADS STYLE) ===== */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* mỗi cụm icon + số */
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  min-width: 50px; /* 🔥 CỐ ĐỊNH → KHÔNG BỊ ĐẨY */
+}
+
+/* count chung */
+.like-count,
+.comment-count {
+  font-size: 13px;
+  color: #555;
+  min-width: 14px; /* giữ chỗ cho 1–2 chữ số */
+}
+
+/* khi = 0 thì ẩn nhưng vẫn giữ layout */
+.hidden {
+  visibility: hidden;
+}
+
+/* comment button giống like */
+.comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #555;
+  transition: transform 0.15s ease;
+}
+
+.comment-btn:hover {
+  transform: scale(1.1);
+}
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-menu {
+  position: relative;
+}
+
+.post-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #000;
+}
+
+.post-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 24px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.post-menu-delete {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #ff4d4f;
+  text-align: left;
+  cursor: pointer;
+}
+
+.post-menu-delete:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.post-menu-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff4d4f;
+  font-size: 14px;
+}
+
+.post-menu-delete svg {
+  color: #ff4d4f;
+}
+
+.post-menu-delete:hover {
+  background: #f5f5f5;
+}
+.post-removing {
+  animation: postRemove 0.3s ease forwards;
+}
+
+@keyframes postRemove {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(-10px);
+  }
+}
