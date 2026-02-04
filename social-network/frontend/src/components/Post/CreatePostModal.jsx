@@ -2,13 +2,13 @@ import { useState } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
 import { FiImage } from "react-icons/fi";
-import { useAuth } from "../../context/AuthContext"; // 🔥 1. Import AuthContext
+import { useAuth } from "../../context/AuthContext";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
 const MAX_MEDIA = 10; 
 
 export default function CreatePostModal({ onClose, onSuccess }) {
-  const { user } = useAuth(); // 🔥 2. Lấy thông tin user hiện tại
+  const { user } = useAuth(); 
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -87,7 +87,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
         {/* BODY */}
         <div className="modal-body">
           <div className="user-row">
-            {/* 🔥 3. Sử dụng avatar user hoặc default nếu không có */}
+            {/*3. Sử dụng avatar user hoặc default nếu không có */}
             <img 
                 src={user?.profilePicture || DEFAULT_AVATAR} 
                 className="avatar" 
@@ -108,7 +108,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             >
               {media.map((file, index) => (
                 <div className="preview-item" key={index}>
-                  {/* ❌ REMOVE */}
+                  {/* REMOVE */}
                   <button
                     className="preview-remove"
                     onClick={() => handleRemoveMedia(index)}
