@@ -2,11 +2,13 @@ import { useState } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
 import { FiImage } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
-const MAX_MEDIA = 10; // 🔥 giới hạn media
+const MAX_MEDIA = 10; 
 
 export default function CreatePostModal({ onClose, onSuccess }) {
+  const { user } = useAuth(); 
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,7 +87,12 @@ export default function CreatePostModal({ onClose, onSuccess }) {
         {/* BODY */}
         <div className="modal-body">
           <div className="user-row">
-            <img src={DEFAULT_AVATAR} className="avatar" />
+            {/*3. Sử dụng avatar user hoặc default nếu không có */}
+            <img 
+                src={user?.profilePicture || DEFAULT_AVATAR} 
+                className="avatar" 
+                alt="user avatar"
+            />
             <textarea
               placeholder="Có gì mới?"
               value={content}
@@ -93,7 +100,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             />
           </div>
 
-          {/* 🔥 THREADS STYLE PREVIEW */}
+          {/* THREADS STYLE PREVIEW */}
           {media.length > 0 && (
             <div
               className={`preview-scroll ${media.length === 1 ? "single" : "multiple"
@@ -101,7 +108,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             >
               {media.map((file, index) => (
                 <div className="preview-item" key={index}>
-                  {/* ❌ REMOVE */}
+                  {/* REMOVE */}
                   <button
                     className="preview-remove"
                     onClick={() => handleRemoveMedia(index)}
@@ -110,7 +117,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
                   </button>
 
                   {file.type.startsWith("image") ? (
-                    <img src={URL.createObjectURL(file)} />
+                    <img src={URL.createObjectURL(file)} alt="preview" />
                   ) : (
                     <video controls src={URL.createObjectURL(file)} />
                   )}
@@ -145,7 +152,6 @@ export default function CreatePostModal({ onClose, onSuccess }) {
               {media.length}/{MAX_MEDIA}
             </div>
           )}
-
 
         </div>
       </div>

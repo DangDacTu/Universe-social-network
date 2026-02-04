@@ -1,100 +1,143 @@
-.search-main-layout {
-    margin-left: 80px;
-    height: 100vh;
-    background: #f1f1f1;
+/* Container bao ngoài để căn giữa trong MainLayout */
+.search-wrapper-center {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
-    padding-top: 24px;
+    /* MainLayout đã có padding-top, ở đây không cần thêm quá nhiều */
 }
 
+/* Khung chính của Search (giống khung Feed 650px) */
 .search-container {
     width: 650px;
+    max-width: 100%;
     background: #ffffff;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    max-height: 100%;
+    /* Chiều cao fix để scroll bên trong - đồng bộ với Profile */
+    max-height: calc(100vh - 48px); /* Trừ padding-top từ MainLayout (24px * 2) */
     border: 1px solid #dbdbdb;
     overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+/* --- HEADER --- */
 .search-header {
-    padding: 12px 24px 20px 24px;
-    border-bottom: 1px solid #eee;
+    padding: 20px 24px; /* Đồng bộ với padding của profile-scroll */
+    border-bottom: 1px solid #efefef;
     background: #fff;
+    z-index: 10;
 }
 
 .search-nav {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 15px;
 }
 
 .search-back-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    color: #000;
     transition: background 0.2s;
-    margin-left: -10px;
+    color: #262626;
 }
-.search-back-btn:hover { background-color: #f0f0f0; }
+.search-back-btn:hover {
+    background-color: #f0f2f5;
+}
 
 .search-title {
     font-size: 20px;
-    font-weight: 650;
+    font-weight: 700;
     margin: 0;
+    color: #000;
 }
 
-.search-input-wrapper { position: relative; }
+/* --- INPUT --- */
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
 
 .search-icon {
     position: absolute;
-    left: 15px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #999;
+    color: #8e8e8e;
+    pointer-events: none;
 }
 
 .search-input {
     width: 100%;
-    padding: 12px 20px 12px 42px;
-    border-radius: 12px;
-    border: 1px solid #dbdbdb;
-    background-color: #fafafa;
-    font-size: 15px;
+    padding: 10px 40px 10px 44px; /* Chừa chỗ cho icon trái và nút X phải */
+    border-radius: 8px; /* Bo góc nhẹ kiểu Instagram */
+    border: none;
+    background-color: #efefef;
+    font-size: 16px;
     outline: none;
     box-sizing: border-box;
+    color: #262626;
     transition: all 0.2s;
 }
+
 .search-input:focus {
     background-color: #fff;
-    border-color: #000;
+    box-shadow: 0 0 0 1px #dbdbdb; /* Viền mỏng khi focus */
 }
 
+.search-clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #c7c7c7;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 12px;
+}
+.search-clear-btn:hover {
+    background: #a0a0a0;
+}
+
+/* --- LIST KẾT QUẢ --- */
 .search-scroll {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 0;
+    background: #fff;
 }
+/* Ẩn scrollbar nhưng vẫn scroll được */
 .search-scroll::-webkit-scrollbar { display: none; }
-.search-scroll { scrollbar-width: none; }
+.search-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* SEARCH ITEM */
 .search-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 24px;
+    padding: 12px 20px;
     text-decoration: none;
-    transition: background 0.1s;
-    border-bottom: 1px solid #f9f9f9;
+    transition: background 0.2s;
+    cursor: pointer;
 }
-.search-item:hover { background-color: #fafafa; }
+
+.search-item:hover {
+    background-color: #fafafa;
+}
 
 .search-user-info {
     display: flex;
@@ -107,41 +150,92 @@
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid #eee;
+    border: 1px solid #efefef;
 }
 
 .search-avatar-placeholder {
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: #f0f0f0;
+    background: #f0f2f5;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: #8e8e8e;
 }
 
 .search-username {
     margin: 0;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    color: #000;
+    color: #262626;
 }
 
 .search-handle {
-    font-size: 14px;
-    color: #777;
+    font-size: 13px;
+    color: #8e8e8e;
+    margin-top: 2px;
     display: block;
 }
 
 .search-action-icon {
-    color: #ccc;
+    color: #c7c7c7;
 }
-.search-item:hover .search-action-icon { color: #000; }
 
-.search-loading, .search-status-text {
+/* --- TRẠNG THÁI (Loading, Empty) --- */
+.search-status-text {
     text-align: center;
-    color: #999;
+    color: #8e8e8e;
     margin-top: 40px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0095f6; /* Màu xanh Universe/Insta */
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.search-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    color: #262626;
+    text-align: center;
+}
+
+.empty-icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.search-empty-state h3 {
+    margin: 0 0 5px 0;
+    font-weight: 300;
+    font-size: 22px;
+}
+.search-empty-state p {
+    color: #8e8e8e;
     font-size: 14px;
 }

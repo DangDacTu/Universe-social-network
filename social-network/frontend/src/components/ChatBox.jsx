@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import uploadApi from "../api/uploadApi"; 
-import { getSocket } from "../services/socket"; // Import socket để xóa/sửa
+import { getSocket } from "../services/socket"; 
 import "./ChatBox.css";
 
-// Icons style Instagram + Icons chức năng
-import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiVideo, FiMoreVertical, FiTrash, FiEdit2, FiX, FiSend } from "react-icons/fi";
+// Icons
+import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiVideo, FiMoreVertical, FiTrash, FiEdit2, FiX } from "react-icons/fi";
 import { HiOutlinePhone, HiOutlineVideoCamera } from "react-icons/hi";
 import { RiMessengerLine } from "react-icons/ri"; 
 
 /* =========================================================
-   COMPONENT CON: MESSAGE ITEM (Đã thêm menu Sửa/Xóa)
+   COMPONENT CON: MESSAGE ITEM (Đã sửa lỗi thu hồi media)
    ========================================================= */
 const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -31,14 +32,22 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
         setIsEditing(false); setShowMenu(false);
     };
 
+    // Toggle Menu (quan trọng: dùng stopPropagation để ko kích hoạt xem ảnh)
+    const toggleMenu = (e) => {
+        e.stopPropagation(); 
+        setShowMenu(!showMenu);
+    }
+
     const isMedia = ["image", "video", "audio"].includes(msg.mediaType);
 
     return (
         <div className={`ig-message-row ${isMe ? "me" : "other"}`}>
-             {!isMe && <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-small-avatar" />}
+             {!isMe && <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-small-avatar" alt="avatar" />}
              
-             {/* Group để chứa bong bóng chat và nút 3 chấm */}
+             {/* Group chứa nội dung + nút 3 chấm */}
              <div className="ig-message-group">
+                 
+                 {/* Khối hiển thị nội dung */}
                  <div className={`ig-message-bubble ${isMedia ? "media" : ""} ${isMe ? "me" : "other"}`}>
                     {isEditing ? (
                         <div className="ig-edit-mode">
@@ -47,36 +56,57 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
                                 onChange={(e) => setEditText(e.target.value)}
                                 autoFocus
                                 onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
+                                onClick={(e) => e.stopPropagation()} // Chặn click lan ra ngoài
                             />
                             <div className="ig-edit-btns">
-                                <span onClick={handleSaveEdit}>Lưu</span>
-                                <span onClick={() => setIsEditing(false)}>Hủy</span>
+                                <span onClick={(e) => { e.stopPropagation(); handleSaveEdit(); }}>Lưu</span>
+                                <span onClick={(e) => { e.stopPropagation(); setIsEditing(false); }}>Hủy</span>
                             </div>
                         </div>
                     ) : (
                         <>
                             {msg.mediaType === "text" && <span>{msg.content}</span>}
-                            {msg.mediaType === "image" && <img src={msg.mediaUrl} className="ig-msg-img" onClick={()=>onPreviewImage(msg.mediaUrl)}/>}
-                            {msg.mediaType === "video" && <video controls src={msg.mediaUrl} className="ig-msg-video"/>}
-                            {msg.mediaType === "audio" && <audio controls src={msg.mediaUrl} />}
+                            
+                            {/* ẢNH: Click vào thì xem full */}
+                            {msg.mediaType === "image" && (
+                                <img 
+                                    src={msg.mediaUrl} 
+                                    className="ig-msg-img" 
+                                    alt="content" 
+                                    onClick={(e) => { e.stopPropagation(); onPreviewImage(msg.mediaUrl); }}
+                                />
+                            )}
+                            
+                            {/* VIDEO */}
+                            {msg.mediaType === "video" && (
+                                <video controls src={msg.mediaUrl} className="ig-msg-video" onClick={(e) => e.stopPropagation()} />
+                            )}
+                            
+                            {/* AUDIO */}
+                            {msg.mediaType === "audio" && (
+                                <audio controls src={msg.mediaUrl} onClick={(e) => e.stopPropagation()} />
+                            )}
                         </>
                     )}
                  </div>
 
-                 {/* MENU MORE (Chỉ hiện cho tin nhắn của mình) */}
+                 {/* NÚT 3 CHẤM (Hiện cho TẤT CẢ loại tin nhắn của mình) */}
                  {isMe && !isEditing && (
-                    <div className="ig-more-menu" ref={menuRef}>
-                        <button className="ig-more-btn" onClick={() => setShowMenu(!showMenu)}>
+                    <div className="ig-more-menu-wrapper" ref={menuRef}>
+                        <button className="ig-more-btn" onClick={toggleMenu}>
                             <FiMoreVertical size={16} />
                         </button>
+
                         {showMenu && (
                             <div className="ig-dropdown-menu">
+                                {/* Chỉ hiện nút Sửa nếu là Text */}
                                 {msg.mediaType === "text" && (
-                                    <div className="ig-menu-item" onClick={() => { setIsEditing(true); setShowMenu(false); }}>
+                                    <div className="ig-menu-item" onClick={(e) => { e.stopPropagation(); setIsEditing(true); setShowMenu(false); }}>
                                         <FiEdit2 /> Sửa
                                     </div>
                                 )}
-                                <div className="ig-menu-item delete" onClick={() => onDelete(msg._id)}>
+                                {/* Luôn hiện nút Gỡ */}
+                                <div className="ig-menu-item delete" onClick={(e) => { e.stopPropagation(); onDelete(msg._id); }}>
                                     <FiTrash /> Gỡ
                                 </div>
                             </div>
@@ -92,6 +122,7 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
    COMPONENT CHÍNH: CHAT BOX
    ========================================================= */
 export default function ChatBox({ messages, currentUserId, selectedUser, onSendMessage }) {
+  const navigate = useNavigate();
   const messagesEndRef = useRef(null);
   const [text, setText] = useState("");
   const [previewFile, setPreviewFile] = useState(null);
@@ -99,27 +130,27 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
   const [fileType, setFileType] = useState("image");
   const [fullImage, setFullImage] = useState(null);
 
-  // Recording State
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  // Auto Scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, previewUrl, isRecording]);
 
-  /* --- LOGIC XÓA / SỬA --- */
+  /* LOGIC XÓA TIN NHẮN */
   const handleDeleteMessage = (msgId) => {
-      if(window.confirm("Gỡ tin nhắn này?")) {
+      if(window.confirm("Bạn muốn thu hồi tin nhắn này?")) {
+          // Gửi sự kiện xóa lên server
           getSocket().emit("delete-message", { messageId: msgId, receiverId: selectedUser._id });
       }
   };
+
   const handleEditMessage = (msgId, newContent) => {
       getSocket().emit("edit-message", { messageId: msgId, receiverId: selectedUser._id, newContent });
   };
 
-  /* --- LOGIC UPLOAD & GỬI --- */
+  /* UPLOAD & SEND */
   const handleSelectFile = (e, type) => {
       const file = e.target.files[0];
       if(file){
@@ -145,7 +176,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
        }
   }
 
-  /* --- LOGIC GHI ÂM --- */
+  /* RECORDING */
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -159,34 +190,27 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         stream.getTracks().forEach(t => t.stop());
       };
       recorder.start(); setIsRecording(true);
-    } catch (err) { alert("Lỗi Micro!"); }
+    } catch (err) { alert("Lỗi Micro! Hãy cấp quyền."); }
   };
   
-  const stopRecording = () => { 
-      mediaRecorderRef.current?.stop(); 
-      setIsRecording(false); 
-  };
+  const stopRecording = () => { mediaRecorderRef.current?.stop(); setIsRecording(false); };
 
-
-  // --- UI EMPTY STATE ---
   if (!selectedUser) {
     return (
       <div className="ig-empty-state">
         <div className="ig-empty-icon-circle"><RiMessengerLine size={50} /></div>
         <h2>Your messages</h2>
         <p>Send a message to start a chat.</p>
-        <button className="ig-send-msg-btn">Send message</button>
       </div>
     );
   }
 
-  // --- UI MAIN CHAT ---
   return (
     <div className="ig-chatbox">
       {/* HEADER */}
       <div className="ig-chat-header">
         <div className="ig-header-user">
-            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-header-avatar" />
+            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-header-avatar" alt="header avatar"/>
             <div className="ig-header-info">
                 <span className="ig-header-name">{selectedUser.username}</span>
                 <span className="ig-header-status">Active now</span>
@@ -199,13 +223,15 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         </div>
       </div>
 
-      {/* MESSAGES */}
+      {/* MESSAGE LIST */}
       <div className="ig-messages-list">
         <div className="ig-profile-intro">
-            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-intro-avatar" />
+            <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-intro-avatar" alt="intro"/>
             <h3>{selectedUser.username}</h3>
             <p>{selectedUser.username} • Universe</p>
-            <button className="ig-view-profile-btn">View profile</button>
+            <button className="ig-view-profile-btn" onClick={() => navigate(`/profile/${selectedUser._id}`)}>
+                View profile
+            </button>
         </div>
 
         {messages.map((msg) => (
@@ -217,49 +243,36 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         <div ref={messagesEndRef} />
       </div>
       
-      {/* PREVIEW */}
+      {/* PREVIEW UPLOAD */}
       {previewUrl && (
           <div className="ig-preview-area">
-              {fileType === 'video' ? <video src={previewUrl} style={{height:100}}/> : <img src={previewUrl} style={{height: 100}} />}
+              {fileType === 'video' ? <video src={previewUrl} style={{height:100}}/> : <img src={previewUrl} style={{height: 100}} alt="preview"/>}
               <button onClick={()=>{setPreviewUrl(null); setPreviewFile(null)}}><FiX/></button>
           </div>
       )}
 
-      {/* INPUT AREA */}
+      {/* INPUT */}
       <div className="ig-input-area">
         {isRecording ? (
-            // Giao diện khi đang ghi âm
             <div className="ig-recording-ui">
                 <span className="ig-rec-dot">Recording...</span>
                 <button onClick={stopRecording} className="ig-send-text-btn">Send Voice</button>
             </div>
         ) : (
-            // Giao diện nhập liệu bình thường (Pill shape)
             <div className="ig-input-wrapper">
                 <FiSmile size={24} className="ig-input-icon left" />
-                
                 <input 
-                    placeholder="Message..." 
-                    className="ig-input-field"
-                    value={text}
+                    placeholder="Message..." className="ig-input-field" value={text}
                     onChange={e => setText(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSendTextOrMedia()}
                 />
-
-                {/* Logic hiển thị nút bấm */}
                 {text.trim() || previewFile ? (
                      <button className="ig-send-text-btn" onClick={handleSendTextOrMedia}>Send</button>
                 ) : (
                     <div className="ig-right-icons">
-                        {/* Nút Mic */}
                         <FiMic size={24} onClick={startRecording} />
-
-                        {/* Nút Ảnh */}
                         <label><FiImage size={24} /><input type="file" hidden accept="image/*" onChange={e => handleSelectFile(e, 'image')} /></label>
-                        
-                        {/* Nút Video (Mới thêm) */}
                         <label><FiVideo size={24} /><input type="file" hidden accept="video/*" onChange={e => handleSelectFile(e, 'video')} /></label>
-                        
                         <FiHeart size={24} />
                     </div>
                 )}
@@ -267,8 +280,8 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         )}
       </div>
 
-      {/* Fullscreen Image View */}
-      {fullImage && <div className="image-overlay" onClick={()=>setFullImage(null)}><img src={fullImage} onClick={e=>e.stopPropagation()}/></div>}
+      {/* FULLSCREEN IMAGE */}
+      {fullImage && <div className="image-overlay" onClick={()=>setFullImage(null)}><img src={fullImage} onClick={e=>e.stopPropagation()} alt="full"/></div>}
     </div>
   );
 }
