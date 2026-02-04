@@ -1,49 +1,130 @@
+/* Sidebar Container */
 .ig-sidebar {
+    width: 350px;
+    height: 100%;
+    border-right: 1px solid #dbdbdb;
     display: flex;
     flex-direction: column;
-    height: 100%;
     background-color: #fff;
-    border-right: 1px solid #dbdbdb;
+    position: relative; /* Để dropdown có chỗ bám */
 }
 
-/* Header */
+/* HEADER STYLE */
 .ig-sidebar-header {
     height: 60px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    flex-shrink: 0; /* Không bị co lại */
+    position: relative; /* Quan trọng cho dropdown */
+    z-index: 100;
 }
 
 .ig-own-profile {
-    font-weight: 700;
-    font-size: 16px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     cursor: pointer;
+    padding: 5px 0;
 }
 
-.ig-new-chat-icon { cursor: pointer; }
+.ig-username {
+    font-weight: 700;
+    font-size: 20px;
+    color: #000;
+}
 
-/* SEARCH BAR STYLE */
-.ig-search-wrapper {
-    padding: 10px 20px;
+.ig-new-chat-icon {
+    cursor: pointer;
+    color: #000;
+}
+
+/* --- DROPDOWN MENU STYLE (Giống ảnh 2) --- */
+.ig-header-dropdown {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    right: 10px; /* Căn rộng gần hết sidebar */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #dbdbdb;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px 0;
+    z-index: 999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar cho dropdown */
+.ig-header-dropdown::-webkit-scrollbar { width: 6px; }
+.ig-header-dropdown::-webkit-scrollbar-thumb { background: #dbdbdb; border-radius: 3px; }
+
+.ig-menu-section-title {
+    padding: 12px 16px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8e8e8e; /* Màu xám cho tiêu đề section */
+}
+
+.ig-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #000;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.ig-menu-item:hover {
+    background: #fafafa;
+}
+
+.ig-menu-item svg {
+    color: #000;
+}
+
+
+/* --- SEARCH BAR STYLE (Giống ảnh 3) --- */
+.ig-search-container {
+    padding: 0 20px 10px 20px;
+}
+
+.ig-search-box {
+    background-color: #efefef; /* Màu xám nhạt */
+    border-radius: 10px; /* Bo góc */
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ig-search-icon {
+    color: #8e8e8e;
 }
 
 .ig-search-input {
-    width: 100%;
-    background-color: #efefef;
+    background: transparent;
     border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
     outline: none;
-    box-sizing: border-box; /* Đảm bảo padding không làm vỡ layout */
+    width: 100%;
+    font-size: 15px;
+    color: #000;
 }
 
-/* USER LIST */
+.ig-search-input::placeholder {
+    color: #8e8e8e;
+}
+
+
+/* --- USER LIST STYLE --- */
 .ig-user-list {
     flex: 1;
     overflow-y: auto;
@@ -53,36 +134,56 @@
 .ig-user-item {
     display: flex;
     align-items: center;
-    padding: 8px 20px; /* Giảm padding dọc một chút */
+    padding: 10px 20px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.1s;
 }
 
-.ig-user-item:hover { background-color: #fafafa; }
-.ig-user-item.selected { background-color: #efefef; }
+.ig-user-item:hover {
+    background-color: #fafafa;
+}
 
-.ig-avatar-wrapper { position: relative; margin-right: 12px; }
-.ig-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.ig-user-item.selected {
+    background-color: #efefef;
+}
+
+.ig-avatar-wrapper {
+    position: relative;
+    margin-right: 12px;
+}
+
+.ig-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+}
 
 .ig-online-dot {
-    width: 14px; height: 14px;
-    background-color: #00d26a;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background-color: #1ed760;
     border: 2px solid #fff;
     border-radius: 50%;
-    position: absolute; bottom: 2px; right: 2px;
 }
 
 .ig-user-info {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Căn giữa tên theo chiều dọc */
-    height: 100%;
+    justify-content: center;
 }
 
 .ig-user-name {
-    font-size: 14px;
     font-weight: 400;
-    color: #262626;
+    color: #000;
+    font-size: 14px;
 }
 
-/* Xóa các class không dùng nữa (tabs, user-status) để code sạch hơn */
+.ig-user-preview {
+    font-size: 13px;
+    color: #8e8e8e;
+    margin-top: 2px;
+}

@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import userApi from '../../api/userApi';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import userApi from "../../api/userApi";
+import { useAuth } from "../../context/AuthContext";
+import "./Search.css"; // Import file CSS mới
+import { FiArrowLeft, FiSearch, FiX, FiChevronRight, FiUser } from "react-icons/fi";
 
 const Search = () => {
     const { user } = useAuth();
-    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Xử lý tìm kiếm
     useEffect(() => {
-        if (searchTerm.trim() === '') {
+        if (searchTerm.trim() === "") {
             setResults([]);
             return;
         }
@@ -20,7 +23,7 @@ const Search = () => {
             setIsLoading(true);
             try {
                 const res = await userApi.search(searchTerm);
-                const filtered = res.data.filter(u => u._id !== user._id);
+                const filtered = res.data.filter((u) => u._id !== user._id);
                 setResults(filtered);
             } catch (error) {
                 console.error("Lỗi tìm kiếm:", error);
@@ -32,83 +35,103 @@ const Search = () => {
         return () => clearTimeout(delayDebounce);
     }, [searchTerm, user]);
 
+    const handleClear = () => {
+        setSearchTerm("");
+        setResults([]);
+    };
+
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Link to="/" style={{ textDecoration: 'none', color: '#333', fontSize: '20px' }}>
-                    ←
-                </Link>
-                <h2 style={{ margin: 0 }}>Tìm kiếm thành viên</h2>
-            </div>
-
-            {/* Ô nhập liệu */}
-            <div style={{ marginBottom: '20px' }}>
-                <input 
-                    type="text" 
-                    placeholder="Nhập tên người dùng..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    autoFocus
-                    style={{
-                        width: '100%',
-                        padding: '15px 20px',
-                        borderRadius: '30px',
-                        border: '1px solid #ccc',
-                        fontSize: '16px',
-                        outline: 'none',
-                        backgroundColor: '#f5f5f5'
-                    }}
-                />
-            </div>
-
-            {/* Loading */}
-            {isLoading && <div style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Đang tìm kiếm...</div>}
-
-            {/* Danh sách kết quả */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                {results.map((friend) => (
-                    <div key={friend._id} style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between',
-                        padding: '10px', 
-                        borderBottom: '1px solid #eee' 
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <img 
-                                src={friend.profilePicture || "https://via.placeholder.com/150"} 
-                                alt="avatar" 
-                                style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
-                            />
-                            <div>
-                                <h4 style={{ margin: 0, fontSize: '16px' }}>{friend.username}</h4>
-                                {/* Đã ẩn dòng Email đi cho gọn */}
-                            </div>
-                        </div>
-                        
-                        <Link to={`/profile/${friend._id}`}>
-                            <button style={{ 
-                                padding: '6px 15px', 
-                                backgroundColor: '#008CBA', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '15px', 
-                                cursor: 'pointer',
-                                fontWeight: 'bold'
-                            }}>
-                                Xem
-                            </button>
-                        </Link>
+        <div className="search-wrapper-center">
+            {/* Khung Search giống khung Feed */}
+            <div className="search-container">
+                
+                {/* Header cố định */}
+                <div className="search-header">
+                    <div className="search-nav">
+                        <button className="search-back-btn" onClick={() => navigate(-1)}>
+                            <FiArrowLeft size={24} />
+                        </button>
+                        <h2 className="search-title">Tìm kiếm</h2>
                     </div>
-                ))}
-            </div>
 
-            {!isLoading && searchTerm && results.length === 0 && (
-                <div style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>
-                    Không tìm thấy người dùng tên "{searchTerm}"
+                    <div className="search-input-wrapper">
+                        <FiSearch className="search-icon" size={20} />
+                        <input
+                            type="text"
+                            className="search-input"
+                            placeholder="Tìm kiếm mọi người..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                        />
+                        {searchTerm && (
+                            <button className="search-clear-btn" onClick={handleClear}>
+                                <FiX size={16} />
+                            </button>
+                        )}
+                    </div>
                 </div>
-            )}
+
+                {/* Danh sách kết quả (Scrollable) */}
+                <div className="search-scroll">
+                    {/* Loading State */}
+                    {isLoading && (
+                        <div className="search-status-text">
+                            <div className="spinner"></div>
+                            <p>Đang tìm kiếm...</p>
+                        </div>
+                    )}
+
+                    {/* Empty State khi mới vào */}
+                    {!isLoading && !searchTerm && (
+                        <div className="search-empty-state">
+                            <div className="empty-icon-circle">
+                                <FiSearch size={40} />
+                            </div>
+                            <h3>Tìm kiếm bạn bè</h3>
+                            <p>Nhập tên để tìm kiếm người dùng.</p>
+                        </div>
+                    )}
+
+                    {/* No Results */}
+                    {!isLoading && searchTerm && results.length === 0 && (
+                        <div className="search-status-text">
+                            Không tìm thấy kết quả cho "<b>{searchTerm}</b>"
+                        </div>
+                    )}
+
+                    {/* Results List */}
+                    {results.map((friend) => (
+                        <Link 
+                            to={`/profile/${friend._id}`} 
+                            key={friend._id} 
+                            className="search-item"
+                        >
+                            <div className="search-user-info">
+                                {friend.profilePicture ? (
+                                    <img
+                                        src={friend.profilePicture}
+                                        alt={friend.username}
+                                        className="search-avatar"
+                                    />
+                                ) : (
+                                    <div className="search-avatar-placeholder">
+                                        <FiUser size={20} />
+                                    </div>
+                                )}
+                                <div>
+                                    <h4 className="search-username">{friend.username}</h4>
+                                    <span className="search-handle">@{friend.username} • Universe</span>
+                                </div>
+                            </div>
+                            
+                            <div className="search-action-icon">
+                                <FiChevronRight size={20} />
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

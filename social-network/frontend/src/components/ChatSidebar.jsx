@@ -1,40 +1,87 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./ChatSidebar.css";
-import { FiEdit } from "react-icons/fi";
-import { IoIosArrowDown } from "react-icons/io";
+// Import các icon cần thiết
+import { FiEdit, FiSearch, FiLock, FiStar, FiSlash, FiClock, FiMessageCircle, FiAtSign, FiMessageSquare, FiRepeat, FiAlertCircle, FiType, FiBellOff, FiPlayCircle, FiHeart, FiShoppingBag, FiHelpCircle, FiShield, FiUser } from "react-icons/fi";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { BiBlock } from "react-icons/bi";
+import { MdOutlinePrivacyTip } from "react-icons/md";
 
-export default function ChatSidebar({ users, onlineUsers, selectedUser, onSelectUser }) {
-  // State cho thanh tìm kiếm
+export default function ChatSidebar({ users, onlineUsers, selectedUser, onSelectUser, currentUser }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  // Lọc danh sách user theo tên
+  // Đóng menu khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="ig-sidebar">
-      {/* HEADER: Tên User của mình + Nút soạn tin */}
-      <div className="ig-sidebar-header">
-        <div className="ig-own-profile">
-            <span className="ig-username">dagd.tu</span> {/* Thay bằng user hiện tại */}
-            <IoIosArrowDown />
+      {/* --- HEADER: Tên User + Dropdown Menu --- */}
+      <div className="ig-sidebar-header" ref={menuRef}>
+        <div 
+            className="ig-own-profile" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+            <span className="ig-username">Chat</span> {/* Thay bằng currentUser?.username nếu có */}
+            {isMenuOpen ? <IoIosArrowUp size={16} /> : <IoIosArrowDown size={16} />}
         </div>
+        
         <FiEdit size={24} className="ig-new-chat-icon" />
+
+        {/* MENU DROPDOWN (Giống ảnh 2) */}
+        {isMenuOpen && (
+            <div className="ig-header-dropdown">
+                {/* Section 1 */}
+                <div className="ig-menu-section-title">Who can see your content</div>
+                <div className="ig-menu-item"><FiLock size={20} /> Account privacy</div>
+                <div className="ig-menu-item"><FiStar size={20} /> Close Friends</div>
+                <div className="ig-menu-item"><BiBlock size={20} /> Blocked</div>
+                <div className="ig-menu-item"><FiClock size={20} /> Story and location</div>
+
+                {/* Section 2 */}
+                <div className="ig-menu-section-title">How others can interact with you</div>
+                <div className="ig-menu-item"><FiMessageCircle size={20} /> Messages and story replies</div>
+                <div className="ig-menu-item"><FiAtSign size={20} /> Tags and mentions</div>
+                <div className="ig-menu-item"><FiMessageSquare size={20} /> Comments</div>
+                <div className="ig-menu-item"><FiRepeat size={20} /> Sharing and reuse</div>
+                <div className="ig-menu-item"><FiAlertCircle size={20} /> Restricted accounts</div>
+                <div className="ig-menu-item"><FiType size={20} /> Hidden Words</div>
+                
+                {/* Các mục khác mô phỏng theo ảnh */}
+                <div className="ig-menu-section-title">What you see</div>
+                <div className="ig-menu-item"><FiBellOff size={20} /> Muted accounts</div>
+                <div className="ig-menu-item"><FiPlayCircle size={20} /> Content preferences</div>
+            </div>
+        )}
       </div>
 
-      {/* SEARCH BAR (MỚI) */}
-      <div className="ig-search-wrapper">
-        <input 
-            type="text" 
-            placeholder="Search..." 
-            className="ig-search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      {/* --- SEARCH BAR (Giống ảnh 3) --- */}
+      <div className="ig-search-container">
+        <div className="ig-search-box">
+             <FiSearch className="ig-search-icon" size={18} />
+             <input 
+                type="text" 
+                placeholder="Search" 
+                className="ig-search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+             />
+        </div>
       </div>
 
-      {/* USER LIST (Đã bỏ Requests và Status text) */}
+      {/* --- USER LIST --- */}
       <div className="ig-user-list">
         {filteredUsers.map((user) => {
            const isOnline = onlineUsers.includes(user._id);
@@ -53,13 +100,12 @@ export default function ChatSidebar({ users, onlineUsers, selectedUser, onSelect
 
               <div className="ig-user-info">
                 <span className="ig-user-name">{user.username}</span>
-                {/* Đã xóa dòng Active status ở đây */}
+                <span className="ig-user-preview">Active now</span>
               </div>
             </div>
            );
         })}
 
-        {/* Thông báo nếu không tìm thấy user */}
         {filteredUsers.length === 0 && (
             <div style={{textAlign: 'center', color: '#8e8e8e', marginTop: 20}}>
                 No account found.
