@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { createNotification } = require('./notificationController');
 
 // @desc    Get user profile by ID
 // @route   GET /api/users/:id
@@ -66,6 +67,11 @@ const followUser = async (req, res) => {
             if (!userToFollow.followers.includes(req.user._id)) {
                 await userToFollow.updateOne({ $push: { followers: req.user._id } });
                 await currentUser.updateOne({ $push: { following: req.params.id } });
+                await createNotification({
+                    from: req.user._id,
+                    to: userToFollow._id,
+                    type: 'follow',
+                });
                 res.status(200).json({ message: 'User has been followed' });
             } else {
                 res.status(403).json({ message: 'You already follow this user' });

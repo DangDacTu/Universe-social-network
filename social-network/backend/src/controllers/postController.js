@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const { createNotification } = require("./notificationController");
 
 /* ======================
    CREATE POST (ĐÃ SỬA CHO CLOUDINARY)
@@ -160,6 +161,12 @@ exports.toggleLike = async (req, res) => {
       post.likes.splice(index, 1);
     } else {
       post.likes.push(req.user.id);
+      await createNotification({
+        from: req.user.id,
+        to: post.author,
+        type: "like",
+        post: post._id,
+      });
     }
 
     await post.save();
@@ -231,7 +238,13 @@ exports.addComment = async (req, res) => {
     });
 
     await post.save();
-    // Populate lại để trả về frontend hiển thị ngay
+    await createNotification({
+      from: req.user.id,
+      to: post.author,
+      type: "comment",
+      post: post._id,
+      commentId: post.comments.at(-1)._id.toString(),
+    });
     await post.populate("comments.user", "username profilePicture");
 
     const newComment = post.comments.at(-1);

@@ -122,7 +122,8 @@
    3. NỘI DUNG BÊN PHẢI (CONTENT AREA)
    ========================================= */
 .settings-content {
-    flex: 1;
+    flex: 1 1 0%;
+    min-width: 0;
     overflow-y: auto;
     padding: 40px 50px;
     display: flex;
@@ -130,9 +131,10 @@
     background: #fff;
 }
 
-/* Settings Card: Khung chứa nội dung từng tab */
+/* Settings Card: Khung chứa nội dung từng tab — luôn cùng kích thước mọi tab */
 .settings-card {
     width: 100%;
+    min-height: 100%;
     margin: 0 auto;
     /* Nếu bạn muốn đóng khung viền cho nội dung thì uncomment dòng dưới */
     /* border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; */

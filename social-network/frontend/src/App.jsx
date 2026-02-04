@@ -15,6 +15,7 @@ import ResetPassword from './pages/user/ResetPassword';
 import Chat from './pages/user/Chat';
 import Settings from './pages/user/Setting';
 import Search from './pages/user/Search';
+import Notifications from './pages/user/Notifications';
 
 // Component bảo vệ Route (Yêu cầu đăng nhập)
 const PrivateRoute = ({ children }) => {
@@ -70,6 +71,7 @@ function AppContent() {
             <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/notifications" element={<Notifications />} />
                 <Route path="/me" element={<Profile />} />
                 <Route path="/profile/:id" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
