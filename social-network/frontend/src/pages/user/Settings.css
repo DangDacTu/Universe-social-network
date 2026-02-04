@@ -3,7 +3,7 @@
    ========================================= */
 .settings-wrapper {
     min-height: 100vh;
-    background-color: #f8f9fa; /* Nền xám nhạt hiện đại */
+    background: transparent; /* Không lớp nền riêng, dùng nền từ MainLayout */
     display: flex;
     justify-content: center;
     padding: 30px 20px;
@@ -419,7 +419,7 @@ input:checked + .slider:before {
    6. MOBILE RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
-    .settings-wrapper { padding: 10px; background: #fff; }
+    .settings-wrapper { padding: 10px; background: transparent; }
     
     .settings-container {
         flex-direction: column;
@@ -467,3 +467,132 @@ input:checked + .slider:before {
     /* Responsive Form đổi pass */
     .cp-container { width: 100%; max-width: 100%; }
 }
+/* =========================================
+   6. APPEARANCE SETTINGS (GIAO DIỆN)
+   ========================================= */
+
+.appearance-section {
+    margin-bottom: 40px;
+}
+
+.appearance-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #262626;
+}
+
+/* Grid Màu */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 15px;
+}
+
+.color-item {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.color-item.active {
+    border-color: #0095f6; /* Viền xanh khi được chọn */
+    transform: scale(1.05);
+}
+
+.check-icon {
+    color: #262626; /* Màu icon check */
+    font-size: 24px;
+    filter: drop-shadow(0 1px 2px rgba(255,255,255,0.5));
+}
+/* Nếu nền tối thì icon check màu trắng */
+.color-item[style*="#18191a"] .check-icon { color: #fff; }
+
+
+/* Upload Ảnh Custom */
+.custom-bg-upload {
+    display: block;
+    width: 100%;
+    height: 220px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 2px dashed #dbdbdb;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+
+.custom-bg-upload:hover {
+    border-color: #0095f6;
+    background: #f0f2f5;
+}
+
+.upload-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #8e8e8e;
+    font-weight: 500;
+}
+
+.preview-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.custom-bg-upload:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Loader */
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0095f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

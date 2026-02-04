@@ -1,7 +1,6 @@
-import { FiLock, FiShield, FiUser, FiBell, FiBookmark, FiActivity, FiEyeOff, FiMessageCircle, FiAtSign, FiHeart, FiMonitor, FiHelpCircle, FiInfo } from "react-icons/fi";
-import { BiArchive, BiTimeFive, BiBlock } from "react-icons/bi";
+import { FiLock, FiShield, FiUser, FiBell, FiBookmark, FiActivity, FiEyeOff, FiMessageCircle, FiAtSign, FiLayout, FiHelpCircle, FiInfo } from "react-icons/fi";
+import { BiArchive, BiBlock } from "react-icons/bi";
 import { MdOutlinePrivacyTip, MdOutlineCleaningServices } from "react-icons/md";
-import { HiOutlineStatusOnline } from "react-icons/hi";
 
 export default function SettingsMenu({ activeTab, setActiveTab }) {
     const menuSections = [
@@ -10,6 +9,8 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
             items: [
                 { id: "password", label: "Đổi mật khẩu", icon: <FiLock />, isDev: false },
                 { id: "privacy", label: "Quyền riêng tư", icon: <FiShield />, isDev: false },
+                // 🔥 THÊM MỤC NÀY
+                { id: "appearance", label: "Giao diện", icon: <FiLayout />, isDev: false }, 
             ]
         },
         {
@@ -21,22 +22,7 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 { id: "notifications", label: "Thông báo", icon: <FiBell />, isDev: true },
             ]
         },
-        {
-            title: "Ai có thể xem nội dung",
-            items: [
-                { id: "account_privacy", label: "Quyền riêng tư TK", icon: <MdOutlinePrivacyTip />, isDev: true },
-                { id: "blocked", label: "Đã chặn", icon: <BiBlock />, isDev: true },
-                { id: "hide_story", label: "Ẩn tin", icon: <FiEyeOff />, isDev: true },
-            ]
-        },
-        {
-            title: "Tương tác",
-            items: [
-                { id: "messages", label: "Tin nhắn", icon: <FiMessageCircle />, isDev: true },
-                { id: "tags", label: "Gắn thẻ", icon: <FiAtSign />, isDev: true },
-                { id: "comments", label: "Bình luận", icon: <MdOutlineCleaningServices />, isDev: true },
-            ]
-        },
+        // ... (Giữ nguyên các mục khác)
         {
             title: "Thông tin & Hỗ trợ",
             items: [

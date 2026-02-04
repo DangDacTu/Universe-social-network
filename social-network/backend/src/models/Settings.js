@@ -17,6 +17,9 @@ const SettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    // Giao diện: màu nền / ảnh nền
+    background: { type: String, default: "" },
+    backgroundType: { type: String, default: "color" },
 },
     {
         timestamps: true,//createdAt, updatedAt

@@ -39,6 +39,13 @@ const settingsApi = {
 
     changePassword: (data) =>
         axiosInstance.put("/change-password", data),
+
+    /** Cập nhật giao diện (màu/ảnh nền) - gửi lên backend và lưu vào Settings */
+    updateAppearance: (data) =>
+        axiosInstance.put("/", {
+            background: data.background,
+            backgroundType: data.type,
+        }),
 };
 
 export default settingsApi;
