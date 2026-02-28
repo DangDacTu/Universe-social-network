@@ -43,4 +43,7 @@ router.delete(
   postController.deleteComment
 );
 
+//  ROUTE LẤY BÀI VIẾT CỦA 1 USER
+router.get("/user/:userId", protect, postController.getUserPosts);
+
 module.exports = router;

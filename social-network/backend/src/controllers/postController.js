@@ -1,5 +1,5 @@
 const Post = require("../models/Post");
-
+const { createNotification } = require("./notificationController");
 /* ======================
    CREATE POST (ĐÃ SỬA CHO CLOUDINARY)
 ====================== */
@@ -85,6 +85,30 @@ exports.getAllPosts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+/* ======================
+   GET USER POSTS (PROFILE) - MỚI THÊM
+====================== */
+exports.getUserPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const posts = await Post.find({ author: userId })
+      .populate("author", "username profilePicture")
+      .populate("comments.user", "username profilePicture")
+      .sort({ createdAt: -1 });
+
+    if (!posts) {
+        return res.status(404).json({ message: "Không tìm thấy bài viết nào" });
+    }
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Lỗi lấy bài viết của user:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 /* ======================
    GET COMMENTS
