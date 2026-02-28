@@ -4,13 +4,23 @@ const User = require('../models/User');
 module.exports = function (passport) {
 
     console.log("Check Client ID:", process.env.GOOGLE_CLIENT_ID);
-    
+
+    // XỬ LÝ URL CALLBACK THÔNG MINH
+    // Nếu đang chạy trên server (Production) thì dùng link Render
+    // Nếu đang chạy ở máy nhà (Development) thì dùng localhost
+    const BASE_URL = process.env.NODE_ENV === 'production'
+        ? "https://universe-social-network.onrender.com"
+        : "http://localhost:5000";
+
     passport.use(
         new GoogleStrategy(
             {
                 clientID: process.env.GOOGLE_CLIENT_ID,
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                callbackURL: "/api/auth/google/callback",
+                // Ghép thành đường dẫn tuyệt đối (VD: https://.../api/...)
+                callbackURL: `${BASE_URL}/api/auth/google/callback`,
+                // QUAN TRỌNG: Dòng này bắt buộc phải có khi deploy lên Render/Heroku/Vercel
+                proxy: true, 
             },
             async (accessToken, refreshToken, profile, done) => {
                 // Lấy thông tin từ Google

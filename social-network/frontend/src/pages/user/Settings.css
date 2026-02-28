@@ -1,0 +1,600 @@
+/* =========================================
+   1. LAYOUT TỔNG THỂ (MAIN WRAPPER)
+   ========================================= */
+.settings-wrapper {
+    min-height: 100vh;
+    background: transparent; /* Không lớp nền riêng, dùng nền từ MainLayout */
+    display: flex;
+    justify-content: center;
+    padding: 30px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Khung chứa chính: Bo tròn mạnh + Bóng đổ mềm */
+.settings-container {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    background: #fff;
+    border: none; 
+    border-radius: 20px; /* Bo góc lớn */
+    height: 85vh; /* Chiều cao cố định để scroll bên trong */
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================
+   2. MENU BÊN TRÁI (SIDEBAR)
+   ========================================= */
+.settings-menu {
+    width: 280px;
+    background: #fff;
+    border-right: 1px solid #f0f0f0; 
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-shrink: 0;
+    padding: 10px;
+}
+
+.settings-menu-main-title {
+    font-size: 22px;
+    font-weight: 700;
+    padding: 20px 20px;
+    margin: 0;
+    color: #1a1a1a;
+    letter-spacing: -0.5px;
+}
+
+/* Container cuộn cho menu */
+.menu-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 10px;
+}
+
+/* Custom Scrollbar */
+.menu-scroll-container::-webkit-scrollbar { width: 5px; }
+.menu-scroll-container::-webkit-scrollbar-thumb { background-color: #e0e0e0; border-radius: 10px; }
+.menu-scroll-container::-webkit-scrollbar-track { background: transparent; }
+
+/* Nhóm (Section) trong menu */
+.menu-section {
+    margin-bottom: 24px;
+}
+
+.menu-section-title {
+    font-size: 11px;
+    color: #999;
+    font-weight: 700;
+    margin: 0 14px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* MENU ITEM: Style "Viên thuốc" */
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    color: #4a4a4a;
+    font-size: 15px;
+    font-weight: 500;
+    width: 100%;
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.settings-menu-item:hover {
+    background-color: #f5f7f9;
+    color: #1a1a1a;
+}
+
+.settings-menu-item.active {
+    background-color: #f0f2f5;
+    color: #000;
+    font-weight: 600;
+}
+
+.menu-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    color: #666;
+}
+.settings-menu-item.active .menu-icon {
+    color: #000;
+}
+
+/* =========================================
+   3. NỘI DUNG BÊN PHẢI (CONTENT AREA)
+   ========================================= */
+.settings-content {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+/* Settings Card: Khung chứa nội dung từng tab — luôn cùng kích thước mọi tab */
+.settings-card {
+    width: 100%;
+    min-height: 100%;
+    margin: 0 auto;
+    /* Nếu bạn muốn đóng khung viền cho nội dung thì uncomment dòng dưới */
+    /* border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; */
+}
+
+/* Header chung cho các section bên phải */
+.section-heading {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #262626;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+/* =========================================
+   4. FORM ĐỔI MẬT KHẨU (FULL WIDTH)
+   Class prefix: .cp-
+   ========================================= */
+
+/* Container: Rộng 100% để lấp đầy settings-content */
+.cp-container {
+    width: 100%;
+    max-width: 100%; 
+    margin: 0;
+    padding: 0;
+}
+
+/* Header: Avatar + Tên nằm ngang */
+.cp-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+    text-align: left;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cp-avatar-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.cp-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    object-fit: cover;
+}
+
+/* Wrapper chứa text info trong header */
+.cp-header-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cp-username {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: #262626;
+}
+
+.cp-subtitle {
+    font-size: 14px;
+    color: #8e8e8e;
+    margin: 0;
+}
+
+/* Form Layout */
+.cp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.cp-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.cp-input-group label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #262626;
+    margin-left: 0;
+}
+
+/* Wrapper chứa Input và Icon */
+.cp-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.cp-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 18px;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.cp-input {
+    width: 100%;
+    padding: 14px 14px 14px 44px; /* Padding trái lớn chừa chỗ cho icon */
+    border: 1px solid #dbdbdb;
+    border-radius: 12px;
+    font-size: 15px;
+    background: #fafafa;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    box-sizing: border-box;
+    color: #1a1a1a;
+}
+
+.cp-input:focus {
+    background: #fff;
+    border-color: #888;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.cp-input:focus + .cp-icon {
+    color: #1a1a1a;
+}
+
+/* Link Quên mật khẩu */
+.cp-forgot {
+    text-align: right;
+    margin-top: -5px;
+}
+.cp-forgot span {
+    color: #0095f6;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.cp-forgot span:hover {
+    color: #00376b;
+    text-decoration: underline;
+}
+
+/* Nút Submit Chính */
+.cp-btn-submit {
+    margin-top: 15px;
+    width: 100%;
+    padding: 14px;
+    background-color: #0095f6;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 149, 246, 0.25);
+}
+
+.cp-btn-submit:hover {
+    background-color: #1877f2;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0, 149, 246, 0.35);
+}
+
+.cp-btn-submit:active {
+    transform: translateY(0);
+}
+
+.cp-btn-submit:disabled {
+    background-color: #b2dffc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* =========================================
+   5. QUYỀN RIÊNG TƯ (TOGGLE SWITCH & LIST)
+   ========================================= */
+.settings-form-container {
+    width: 100%;
+    max-width: 100%;
+}
+
+.toggle-list-wrapper {
+    width: 100%;
+}
+
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.toggle-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.toggle-info h4 {
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.toggle-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #777;
+    max-width: 90%;
+    line-height: 1.5;
+}
+
+/* Nút gạt (Switch) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #e4e6eb;
+    transition: .3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* Checked State */
+input:checked + .slider {
+    background-color: #0095f6;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* Round Slider */
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* Loading Text */
+.loading-text {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    margin-top: 60px;
+}
+
+/* =========================================
+   6. MOBILE RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .settings-wrapper { padding: 10px; background: transparent; }
+    
+    .settings-container {
+        flex-direction: column;
+        height: auto;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Menu ngang trên mobile */
+    .settings-menu {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+    
+    .menu-scroll-container {
+        max-height: 250px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+    .menu-list { flex-direction: row; }
+    .menu-section { margin-bottom: 0; }
+    .menu-section-title { display: none; }
+    
+    .settings-menu-item { 
+        white-space: nowrap; 
+        padding: 8px 16px; 
+        background: #f5f5f5;
+        width: auto;
+    }
+    .settings-menu-item.active {
+        background: #000;
+        color: #fff;
+    }
+    .settings-menu-item.active .menu-icon { color: #fff; }
+
+    /* Content Area */
+    .settings-content { padding: 20px; }
+    
+    /* Responsive Form đổi pass */
+    .cp-container { width: 100%; max-width: 100%; }
+}
+/* =========================================
+   6. APPEARANCE SETTINGS (GIAO DIỆN)
+   ========================================= */
+
+.appearance-section {
+    margin-bottom: 40px;
+}
+
+.appearance-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #262626;
+}
+
+/* Grid Màu */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 15px;
+}
+
+.color-item {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 3px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.color-item.active {
+    border-color: #0095f6; /* Viền xanh khi được chọn */
+    transform: scale(1.05);
+}
+
+.check-icon {
+    color: #262626; /* Màu icon check */
+    font-size: 24px;
+    filter: drop-shadow(0 1px 2px rgba(255,255,255,0.5));
+}
+/* Nếu nền tối thì icon check màu trắng */
+.color-item[style*="#18191a"] .check-icon { color: #fff; }
+
+
+/* Upload Ảnh Custom */
+.custom-bg-upload {
+    display: block;
+    width: 100%;
+    height: 220px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 2px dashed #dbdbdb;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+
+.custom-bg-upload:hover {
+    border-color: #0095f6;
+    background: #f0f2f5;
+}
+
+.upload-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #8e8e8e;
+    font-weight: 500;
+}
+
+.preview-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.custom-bg-upload:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Loader */
+.loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0095f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }

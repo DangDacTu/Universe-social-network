@@ -1,0 +1,241 @@
+/* Container bao ngoài để căn giữa trong MainLayout */
+.search-wrapper-center {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    /* MainLayout đã có padding-top, ở đây không cần thêm quá nhiều */
+}
+
+/* Khung chính của Search — kéo dài hết màn hình như Home */
+.search-container {
+    width: 650px;
+    max-width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    border: 1px solid #dbdbdb;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- HEADER --- */
+.search-header {
+    padding: 20px 24px; /* Đồng bộ với padding của profile-scroll */
+    border-bottom: 1px solid #efefef;
+    background: #fff;
+    z-index: 10;
+}
+
+.search-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-back-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background 0.2s;
+    color: #262626;
+}
+.search-back-btn:hover {
+    background-color: #f0f2f5;
+}
+
+.search-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #000;
+}
+
+/* --- INPUT --- */
+.search-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8e8e8e;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 40px 10px 44px; /* Chừa chỗ cho icon trái và nút X phải */
+    border-radius: 8px; /* Bo góc nhẹ kiểu Instagram */
+    border: none;
+    background-color: #efefef;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    color: #262626;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #dbdbdb; /* Viền mỏng khi focus */
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #c7c7c7;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 12px;
+}
+.search-clear-btn:hover {
+    background: #a0a0a0;
+}
+
+/* --- LIST KẾT QUẢ --- */
+.search-scroll {
+    flex: 1;
+    overflow-y: auto;
+    background: #fff;
+}
+/* Ẩn scrollbar nhưng vẫn scroll được */
+.search-scroll::-webkit-scrollbar { display: none; }
+.search-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+.search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    text-decoration: none;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.search-item:hover {
+    background-color: #fafafa;
+}
+
+.search-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #efefef;
+}
+
+.search-avatar-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8e8e8e;
+}
+
+.search-username {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.search-handle {
+    font-size: 13px;
+    color: #8e8e8e;
+    margin-top: 2px;
+    display: block;
+}
+
+.search-action-icon {
+    color: #c7c7c7;
+}
+
+/* --- TRẠNG THÁI (Loading, Empty) --- */
+.search-status-text {
+    text-align: center;
+    color: #8e8e8e;
+    margin-top: 40px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0095f6; /* Màu xanh Universe/Insta */
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.search-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60%;
+    color: #262626;
+    text-align: center;
+}
+
+.empty-icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.search-empty-state h3 {
+    margin: 0 0 5px 0;
+    font-weight: 300;
+    font-size: 22px;
+}
+.search-empty-state p {
+    color: #8e8e8e;
+    font-size: 14px;
+}

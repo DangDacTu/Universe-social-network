@@ -47,7 +47,9 @@ export default function Sidebar({ onCreate }) {
           <FiHome />
         </button>
 
-        <button className="sidebar-item">
+        <button className="sidebar-item"
+          onClick={() => navigate("/search")}
+        >
           <FiSearch />
         </button>
 
@@ -55,11 +57,16 @@ export default function Sidebar({ onCreate }) {
           <FiPlusSquare />
         </button>
 
-        <button className="sidebar-item">
+        <button
+          className={`sidebar-item ${location.pathname === "/notifications" ? "active" : ""}`}
+          onClick={() => navigate("/notifications")}
+        >
           <FiHeart />
         </button>
 
-        <button className="sidebar-item">
+        <button className="sidebar-item"
+          onClick={() => navigate("/chat")}
+        >
           <FiSend />
         </button>
 

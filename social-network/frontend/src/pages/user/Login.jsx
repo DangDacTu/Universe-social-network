@@ -29,7 +29,7 @@ const Login = () => {
                 }
             }
 
-            navigate('/intro', { replace: true });
+            navigate('/', { replace: true });
         } catch (error) {
             console.error("Lỗi đăng nhập:", error);
             alert('Login failed!');

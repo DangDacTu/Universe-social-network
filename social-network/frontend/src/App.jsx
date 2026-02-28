@@ -1,8 +1,9 @@
+import { useEffect } from "react"; // 🔥 Import useEffect
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from "./components/layout/MainLayout";
 
-//pages
+// Pages
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import VerifyEmail from './pages/user/VerifyEmail';
@@ -11,43 +12,80 @@ import Home from './pages/user/Home';
 import LoginSuccess from './pages/user/LoginSuccess';
 import ForgotPassword from './pages/user/ForgotPassword';
 import ResetPassword from './pages/user/ResetPassword';
-import Intro from "./pages/user/Intro";
+import Chat from './pages/user/Chat';
+import Settings from './pages/user/Setting';
+import Search from './pages/user/Search';
+import Notifications from './pages/user/Notifications';
 
-// Component bảo vệ Route
+// Component bảo vệ Route (Yêu cầu đăng nhập)
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useAuth();
     if (loading) return <div>Loading...</div>;
     return user ? children : <Navigate to="/login" />;
 };
 
+// 🔥 COMPONENT CON: Chứa logic đổi nền và Routes
+function AppContent() {
+    const { user } = useAuth(); // Lấy user để check cài đặt background
+
+    // 🔥 EFFECT: Tự động đổi nền khi user thay đổi cài đặt
+    useEffect(() => {
+        if (user?.background) {
+            if (user.backgroundType === 'image') {
+                // Nếu là ảnh nền
+                document.body.style.backgroundImage = `url(${user.background})`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundColor = 'transparent';
+            } else {
+                // Nếu là màu hoặc gradient
+                document.body.style.backgroundImage = 'none';
+                document.body.style.background = user.background;
+            }
+        } else {
+            // Mặc định (nếu user chưa set hoặc chưa login)
+            document.body.style.backgroundImage = 'none';
+            document.body.style.backgroundColor = '#f0f2f5'; 
+        }
+    }, [user]);
+
+    return (
+        <Routes>
+            {/* ===== PUBLIC ROUTES ===== */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/resetpassword/:token" element={<ResetPassword />} />
+            <Route path="/login-success/:token" element={<LoginSuccess />} />
+
+            {/* ===== CHAT ROUTE (RIÊNG BIỆT) ===== */}
+            <Route path="/chat" element={
+                <PrivateRoute>
+                    <Chat />
+                </PrivateRoute>
+            } />
+
+            {/* ===== MAIN LAYOUT ROUTES ===== */}
+            <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+                <Route path="/" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/me" element={<Profile />} />
+                <Route path="/profile/:id" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+            </Route>
+        </Routes>
+    );
+}
+
+// 🔥 COMPONENT GỐC: Chỉ chứa Provider
 function App() {
     return (
         <Router>
             <AuthProvider>
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/intro" element={<Intro />} />
-                    <Route path="/verify-email" element={<VerifyEmail />} />
-
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/resetpassword/:token" element={<ResetPassword />} />
-
-                    <Route path="/login-success/:token" element={<LoginSuccess />} />
-
-                    {/* ===== PRIVATE ROUTES (CÓ SIDEBAR) ===== */}
-                    <Route
-                        element={
-                            <PrivateRoute>
-                                <MainLayout />
-                            </PrivateRoute>
-                        }
-                    >
-                        <Route path="/" element={<Home />} />
-                        <Route path="/me" element={<Profile />} />
-                        <Route path="/profile/:id" element={<Profile />} />
-                    </Route>
-                </Routes>
+                <AppContent />
             </AuthProvider>
         </Router>
     );
