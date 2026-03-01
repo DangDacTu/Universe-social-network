@@ -22,7 +22,7 @@ const registerUser = async (req, res) => {
         //TẠO AVATAR ROBOT VỚI ROBOHASH
         // Mỗi username sẽ tạo ra một con robot độc nhất
         // Thêm ?set=set2 nếu muốn quái vật, ?set=set4 nếu muốn mèo
-        const defaultAvatar = `https://robohash.org/${username}`;
+        const defaultAvatar = `https://robohash.org/${username}?set=set2`;
         
         // 2. Tạo mã xác thực 6 số
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();

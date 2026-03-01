@@ -5,11 +5,13 @@ const uploadApi = {
     const formData = new FormData();
     formData.append("media", file);
 
-    const res = await axiosClient.post("/posts", formData, {
+    // Sửa endpoint từ "/posts" thành "/upload"
+    const res = await axiosClient.post("/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    const mediaUrl = res?.data?.media?.[0]?.url;
+    // Backend trả về trực tiếp { url: "...", type: "..." }
+    const mediaUrl = res.data.url;
     return { data: { url: mediaUrl } };
   },
 };

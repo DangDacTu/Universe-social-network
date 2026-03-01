@@ -1,3 +1,5 @@
+const Message = require("../models/Message");
+
 let users = [];
 
 // (Khi user đăng nhập, ta lưu userId của họ kèm với socketId của phiên kết nối)
@@ -18,30 +20,38 @@ const getUser = (userId) => {
 
 const socketModule = (io) => {
     io.on("connection", (socket) => {
-        // console.log("A user connected.");
-
-        // --- SỰ KIỆN 1: KHI USER VỪA VÀO APP ---
-        // Client sẽ gửi sự kiện "addUser" kèm theo ID của họ
-        socket.on("addUser", (userId) => {
+        // 1. Lấy userId từ query params (Frontend gửi lên)
+        const userId = socket.handshake.query.userId;
+        
+        if (userId) {
             addUser(userId, socket.id);
-            // Gửi danh sách những người đang online cho tất cả mọi người biết
             io.emit("getUsers", users);
-        });
+        }
 
         // --- SỰ KIỆN 2: GỬI TIN NHẮN ---
-        // Client gửi: người gửi, người nhận, nội dung
-        socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-            const user = getUser(receiverId);
-            
-            // Nếu người nhận đang Online thì gửi ngay lập tức
-            if (user) {
-                io.to(user.socketId).emit("getMessage", {
+        // Đổi tên sự kiện thành sendMessage (camelCase) như bạn muốn
+        socket.on("sendMessage", async (data) => {
+            const { receiverId, content, mediaType, mediaUrl } = data;
+            const senderId = userId; // Lấy từ session socket
+
+            try {
+                // 1. LƯU VÀO DATABASE (Quan trọng để không mất tin nhắn)
+                const newMessage = await Message.create({
                     senderId,
-                    text,
+                    receiverId,
+                    content,
+                    mediaType: mediaType || "text",
+                    mediaUrl: mediaUrl || "",
+                    isRead: false
                 });
-            } else {
-                // Người nhận Offline -> Có thể xử lý thông báo sau này
-                console.log(`User ${receiverId} is offline.`);
+
+                // 2. Gửi cho người nhận nếu họ đang online
+                const user = getUser(receiverId);
+                if (user) {
+                    io.to(user.socketId).emit("getMessage", newMessage);
+                }
+            } catch (err) {
+                console.error("Lỗi socket:", err);
             }
         });
 
