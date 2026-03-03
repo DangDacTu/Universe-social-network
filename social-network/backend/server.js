@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./src/config/db');
 const http = require('http');
 const { Server } = require('socket.io');
-const socketModule = require('./src/sockets/socket');
+const socketManager = require('./src/sockets/socket');
 const passport = require('passport');
 
 dotenv.config();
@@ -22,7 +22,7 @@ const io = new Server(server, {
     }
 });
 
-socketModule(io);
+socketManager.init(io);
 
 const PORT = process.env.PORT || 5000;
 

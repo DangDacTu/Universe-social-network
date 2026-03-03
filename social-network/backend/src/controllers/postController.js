@@ -24,6 +24,13 @@ exports.createPost = async (req, res) => {
         // Xác định loại file dựa trên mimetype
         type: file.mimetype.startsWith("image") ? "image" : "video",
       }));
+      media = req.files.map((file) => {
+        let type = "file";
+        if (file.mimetype.startsWith("image")) type = "image";
+        else if (file.mimetype.startsWith("video")) type = "video";
+        else if (file.mimetype.startsWith("audio")) type = "audio";
+        return { url: file.path, type };
+      });
     }
     // ----------------------------------
 
@@ -161,6 +168,13 @@ exports.toggleLike = async (req, res) => {
       post.likes.splice(index, 1);
     } else {
       post.likes.push(req.user.id);
+      // 🔥 TẠO THÔNG BÁO KHI CÓ LIKE MỚI
+      createNotification({
+        from: req.user.id,
+        to: post.author,
+        type: "like",
+        post: post._id,
+      });
     }
 
     await post.save();
@@ -240,6 +254,13 @@ exports.addComment = async (req, res) => {
           ? "image"
           : "video",
       }));
+      media = req.files.map((file) => {
+        let type = "file";
+        if (file.mimetype.startsWith("image")) type = "image";
+        else if (file.mimetype.startsWith("video")) type = "video";
+        else if (file.mimetype.startsWith("audio")) type = "audio";
+        return { url: file.path, type };
+      });
     }
 
     post.comments.push({
@@ -256,6 +277,14 @@ exports.addComment = async (req, res) => {
 
     const newComment = post.comments.at(-1);
 
+    // 🔥 TẠO THÔNG BÁO KHI CÓ COMMENT MỚI
+    createNotification({
+      from: req.user.id,
+      to: post.author,
+      type: "comment",
+      post: post._id,
+      commentId: newComment._id,
+    });
     res.status(201).json({
       ...newComment.toObject(),
       likeCount: 0,

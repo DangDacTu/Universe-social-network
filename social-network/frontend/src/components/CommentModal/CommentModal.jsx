@@ -202,7 +202,7 @@ export default function CommentModal({ postId, onClose }) {
                 ${newCommentId === c._id ? "comment-new" : ""}`}
             >
               <img
-                src={c.user?.avatar || DEFAULT_AVATAR}
+                src={c.user?.profilePicture || DEFAULT_AVATAR}
                 className="comment-avatar"
               />
 

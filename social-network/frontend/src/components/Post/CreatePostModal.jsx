@@ -2,11 +2,13 @@ import { useState } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
 import { FiImage } from "react-icons/fi";
+import { useAuth } from "../../context/AuthContext";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
 const MAX_MEDIA = 10; // 🔥 giới hạn media
 
 export default function CreatePostModal({ onClose, onSuccess }) {
+  const { user } = useAuth();
   const [content, setContent] = useState("");
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -85,7 +87,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
         {/* BODY */}
         <div className="modal-body">
           <div className="user-row">
-            <img src={DEFAULT_AVATAR} className="avatar" />
+            <img src={user?.profilePicture || DEFAULT_AVATAR} className="avatar" onError={(e) => e.target.src = DEFAULT_AVATAR} />
             <textarea
               placeholder="Có gì mới?"
               value={content}

@@ -1,25 +1,11 @@
 import "./post.css";
-import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
 
 export default function PostInput({ onOpen }) {
-  // --- 1. LẤY THÔNG TIN USER TỪ LOCALSTORAGE ---
-  const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR);
-
-  useEffect(() => {
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        // Ưu tiên profilePicture (mới), nếu không có thì avatar (cũ), cuối cùng là default
-        const url = user.profilePicture || user.avatar || DEFAULT_AVATAR;
-        setAvatarUrl(url);
-      }
-    } catch (error) {
-      console.error("Lỗi đọc user avatar:", error);
-    }
-  }, []);
+  const { user } = useAuth();
+  const avatarUrl = user?.profilePicture || DEFAULT_AVATAR;
 
   return (
     <div className="post-input">

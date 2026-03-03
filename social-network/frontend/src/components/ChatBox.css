@@ -230,6 +230,17 @@
   padding: 10px 20px;
   flex-shrink: 0;
   border-top: 1px solid #efefef;
+  position: relative; /* Để định vị bảng Emoji */
+}
+
+/* Bảng Emoji */
+.emoji-picker-container {
+  position: absolute;
+  bottom: 70px; /* Cách đáy lên trên thanh chat */
+  left: 20px;
+  z-index: 1000;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  border-radius: 8px;
 }
 
 .ig-input-wrapper {

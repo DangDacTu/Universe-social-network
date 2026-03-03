@@ -1,12 +1,30 @@
 const Notification = require("../models/Notification");
+const socketManager = require("../sockets/socket");
 
 /**
  * Tạo thông báo (gọi từ postController / userController)
  */
 const createNotification = async ({ from, to, type, post = null, commentId = null }) => {
   if (from.toString() === to.toString()) return null;
-  const notif = await Notification.create({ from, to, type, post, commentId });
-  return notif;
+  try {
+    const notif = await Notification.create({ from, to, type, post, commentId });
+
+    // GỬI THÔNG BÁO REAL-TIME
+    const receiver = socketManager.getUser(to.toString());
+    if (receiver) {
+      const io = socketManager.getIO();
+      // Lấy thông tin chi tiết của thông báo để gửi đi
+      const populatedNotif = await Notification.findById(notif._id)
+        .populate("from", "username profilePicture")
+        .lean();
+        
+      io.to(receiver.socketId).emit("new-notification", populatedNotif);
+    }
+    return notif;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return null;
+  }
 };
 
 /**

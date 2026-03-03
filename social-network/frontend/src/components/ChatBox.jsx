@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import uploadApi from "../api/uploadApi"; 
 import { getSocket } from "../services/socket"; 
 import "./ChatBox.css";
+import EmojiPicker from "emoji-picker-react";
 
 // Icons
 import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiVideo, FiMoreVertical, FiTrash, FiEdit2, FiX } from "react-icons/fi";
@@ -129,6 +130,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fileType, setFileType] = useState("image");
   const [fullImage, setFullImage] = useState(null);
+  const [showEmoji, setShowEmoji] = useState(false);
 
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -137,6 +139,11 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, previewUrl, isRecording]);
+
+  // Xử lý khi chọn Emoji
+  const onEmojiClick = (emojiData) => {
+    setText((prev) => prev + emojiData.emoji);
+  };
 
   /* LOGIC XÓA TIN NHẮN */
   const handleDeleteMessage = (msgId) => {
@@ -253,6 +260,13 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
 
       {/* INPUT */}
       <div className="ig-input-area">
+        {/* BẢNG EMOJI PICKER */}
+        {showEmoji && (
+            <div className="emoji-picker-container">
+                <EmojiPicker onEmojiClick={onEmojiClick} width={300} height={350} />
+            </div>
+        )}
+
         {isRecording ? (
             <div className="ig-recording-ui">
                 <span className="ig-rec-dot">Recording...</span>
@@ -260,7 +274,11 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
             </div>
         ) : (
             <div className="ig-input-wrapper">
-                <FiSmile size={24} className="ig-input-icon left" />
+                <FiSmile 
+                    size={24} 
+                    className="ig-input-icon left" 
+                    onClick={() => setShowEmoji(!showEmoji)} 
+                />
                 <input 
                     placeholder="Message..." className="ig-input-field" value={text}
                     onChange={e => setText(e.target.value)}
@@ -273,7 +291,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
                         <FiMic size={24} onClick={startRecording} />
                         <label><FiImage size={24} /><input type="file" hidden accept="image/*" onChange={e => handleSelectFile(e, 'image')} /></label>
                         <label><FiVideo size={24} /><input type="file" hidden accept="video/*" onChange={e => handleSelectFile(e, 'video')} /></label>
-                        <FiHeart size={24} />
+                        <FiHeart size={24} onClick={() => onSendMessage({ content: "❤️", mediaType: "text" })} />
                     </div>
                 )}
             </div>

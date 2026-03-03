@@ -19,7 +19,7 @@ import {
 
 const Profile = () => {
     const { id } = useParams();
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, updateUser } = useAuth();
     
     const [profile, setProfile] = useState(null);
     const [userPosts, setUserPosts] = useState([]); // State lưu bài viết
@@ -63,7 +63,7 @@ const Profile = () => {
         };
 
         fetchData();
-    }, [id, currentUser]);
+    }, [id, currentUser?._id]); // ✅ THAY ĐỔI: Chỉ phụ thuộc vào ID để tránh re-fetch không cần thiết
 
     // Xử lý khi xóa bài viết (Cập nhật giao diện ngay lập tức)
     const handlePostDeleted = (deletedPostId) => {
@@ -97,6 +97,10 @@ const Profile = () => {
 
     const handleUpdateSuccess = (updatedData) => {
         setProfile(prev => ({ ...prev, ...updatedData }));
+        // Cập nhật thông tin user trên toàn cục
+        if (updateUser) {
+            updateUser(updatedData);
+        }
     };
 
     const isMyProfile = currentUser && profile && currentUser._id === profile._id;

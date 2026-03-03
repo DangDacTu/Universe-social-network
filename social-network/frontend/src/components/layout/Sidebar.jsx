@@ -13,7 +13,7 @@ import { useState, useRef, useEffect } from "react";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Sidebar({ onCreate }) {
+export default function Sidebar({ onCreate, hasNewNotification, onNotifClick }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,9 +59,13 @@ export default function Sidebar({ onCreate }) {
 
         <button
           className={`sidebar-item ${location.pathname === "/notifications" ? "active" : ""}`}
-          onClick={() => navigate("/notifications")}
+          onClick={() => {
+            onNotifClick(); // Reset trạng thái khi người dùng click vào
+            navigate("/notifications");
+          }}
         >
           <FiHeart />
+          {hasNewNotification && <span className="notification-dot"></span>}
         </button>
 
         <button className="sidebar-item"

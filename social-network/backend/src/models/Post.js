@@ -86,7 +86,7 @@ const postSchema = new mongoose.Schema(
       default: "",
     },
     media: [
-      {
+       {
         url: { type: String, required: true },
         type: {
           type: String,

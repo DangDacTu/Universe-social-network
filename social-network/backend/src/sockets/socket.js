@@ -1,66 +1,68 @@
 const Message = require("../models/Message");
 
-let users = [];
+const socketManager = {
+    io: null,
+    users: [],
 
-// (Khi user đăng nhập, ta lưu userId của họ kèm với socketId của phiên kết nối)
-const addUser = (userId, socketId) => {
-    !users.some((user) => user.userId === userId) &&
-        users.push({ userId, socketId });
-};
+    init(ioInstance) {
+        this.io = ioInstance;
 
-// 2. Hàm xóa user khi ngắt kết nối
-const removeUser = (socketId) => {
-    users = users.filter((user) => user.socketId !== socketId);
-};
-
-// 3. Hàm tìm socketId của người nhận để gửi tin
-const getUser = (userId) => {
-    return users.find((user) => user.userId === userId);
-};
-
-const socketModule = (io) => {
-    io.on("connection", (socket) => {
-        // 1. Lấy userId từ query params (Frontend gửi lên)
-        const userId = socket.handshake.query.userId;
-        
-        if (userId) {
-            addUser(userId, socket.id);
-            io.emit("getUsers", users);
-        }
-
-        // --- SỰ KIỆN 2: GỬI TIN NHẮN ---
-        // Đổi tên sự kiện thành sendMessage (camelCase) như bạn muốn
-        socket.on("sendMessage", async (data) => {
-            const { receiverId, content, mediaType, mediaUrl } = data;
-            const senderId = userId; // Lấy từ session socket
-
-            try {
-                // 1. LƯU VÀO DATABASE (Quan trọng để không mất tin nhắn)
-                const newMessage = await Message.create({
-                    senderId,
-                    receiverId,
-                    content,
-                    mediaType: mediaType || "text",
-                    mediaUrl: mediaUrl || "",
-                    isRead: false
-                });
-
-                // 2. Gửi cho người nhận nếu họ đang online
-                const user = getUser(receiverId);
-                if (user) {
-                    io.to(user.socketId).emit("getMessage", newMessage);
-                }
-            } catch (err) {
-                console.error("Lỗi socket:", err);
+        this.io.on("connection", (socket) => {
+            // 1. Lấy userId từ query params (Frontend gửi lên)
+            const userId = socket.handshake.query.userId;
+            
+            if (userId) {
+                this.addUser(userId, socket.id);
+                this.io.emit("online-users", this.users.map(u => u.userId));
             }
-        });
 
-        // --- SỰ KIỆN 3: NGẮT KẾT NỐI (Tắt tab/Trình duyệt) ---
-        socket.on("disconnect", () => {
-            removeUser(socket.id);
-            io.emit("getUsers", users);
+            // --- SỰ KIỆN CHAT ---
+            socket.on("send-message", async (data) => {
+                const { receiverId, content, mediaType, mediaUrl } = data;
+                const senderId = userId;
+
+                try {
+                    const newMessage = await Message.create({ senderId, receiverId, content, mediaType: mediaType || "text", mediaUrl: mediaUrl || "", isRead: false });
+                    const user = this.getUser(receiverId);
+                    if (user) {
+                        this.io.to(user.socketId).emit("receive-message", newMessage);
+                    }
+                } catch (err) {
+                    console.error("Lỗi socket (send-message):", err);
+                }
+            });
+
+            // --- SỰ KIỆN NGẮT KẾT NỐI ---
+            socket.on("disconnect", () => {
+                this.removeUser(socket.id);
+                this.io.emit("online-users", this.users.map(u => u.userId));
+            });
         });
-    });
+    },
+
+    addUser(userId, socketId) {
+        const existingUserIndex = this.users.findIndex(u => u.userId === userId);
+        if (existingUserIndex !== -1) {
+            this.users[existingUserIndex].socketId = socketId;
+        } else {
+            this.users.push({ userId, socketId });
+        }
+    },
+
+    removeUser(socketId) {
+        this.users = this.users.filter((user) => user.socketId !== socketId);
+    },
+
+    getUser(userId) {
+        return this.users.find((user) => user.userId === userId);
+    },
+    
+    getIO() {
+        if (!this.io) {
+            throw new Error("Socket.io not initialized!");
+        }
+        return this.io;
+    }
 };
 
-module.exports = socketModule;
+module.exports = socketManager;
