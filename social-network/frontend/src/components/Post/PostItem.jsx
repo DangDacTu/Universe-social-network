@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import "./post.css";
 import axiosClient from "../../api/axiosClient";
-import { FiHeart, FiMessageCircle, FiMoreHorizontal } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import { FiHeart, FiMessageCircle, FiMoreHorizontal, FiRepeat, FiSend } from "react-icons/fi";
 import { AiFillHeart } from "react-icons/ai";
 import CommentModal from "../CommentModal/CommentModal";
 import { FiTrash2 } from "react-icons/fi";
@@ -13,6 +14,7 @@ const DEFAULT_AVATAR = "/avatar.jpg";
 export default function PostItem({ post, onDeleted }) {
   // 2. THÊM: Dòng này bắt buộc để tránh lỗi màn hình đen khi dữ liệu chưa tải xong
   if (!post) return null;
+  const navigate = useNavigate();
 
   const [activeIndex, setActiveIndex] = useState(null);
 
@@ -136,20 +138,23 @@ export default function PostItem({ post, onDeleted }) {
   return (
     <>
       <div className={`post-item ${removing ? "post-removing" : ""}`}>
-        {/* 4. SỬA: Thêm profilePicture vào fallback avatar */}
-        <img
-          src={post.author?.profilePicture || post.author?.avatar || DEFAULT_AVATAR}
-          className="post-avatar"
-          alt="avatar"
-          onError={(e) => e.target.src = DEFAULT_AVATAR} 
-        />
+        <Link to={`/profile/${post.author?._id}`}>
+          <img
+            src={post.author?.profilePicture || post.author?.avatar || DEFAULT_AVATAR}
+            className="post-avatar"
+            alt="avatar"
+            onError={(e) => e.target.src = DEFAULT_AVATAR} 
+          />
+        </Link>
 
         <div className="post-content">
           <div className="post-header">
             <div className="post-header-left">
-              <span className="post-username">
-                {post.author?.username || "Người dùng"}
-              </span>
+              <Link to={`/profile/${post.author?._id}`} className="post-username-link">
+                <span className="post-username">
+                  {post.author?.username || "Người dùng"}
+                </span>
+              </Link>
               <span className="post-time">
                 · {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
               </span>
@@ -245,6 +250,26 @@ export default function PostItem({ post, onDeleted }) {
               >
                 {commentCount}
               </span>
+            </div>
+
+            {/* ICON ĐĂNG LẠI */}
+            <div className="action-group">
+              <button
+                className="repost-btn"
+                onClick={() => alert("Chức năng Đăng lại đang được phát triển!")}
+              >
+                <FiRepeat size={20} />
+              </button>
+            </div>
+
+            {/* ICON GỬI */}
+            <div className="action-group">
+              <button
+                className="send-btn"
+                onClick={() => navigate('/chat')}
+              >
+                <FiSend size={20} />
+              </button>
             </div>
           </div>
         </div>

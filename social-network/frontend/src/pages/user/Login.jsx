@@ -32,7 +32,7 @@ const Login = () => {
             navigate('/', { replace: true });
         } catch (error) {
             console.error("Lỗi đăng nhập:", error);
-            alert('Login failed!');
+            alert('Đăng nhập thất bại!');
         }
     };
 
@@ -55,10 +55,8 @@ const Login = () => {
     return (
         <div className="login-wrapper">
             <div className="login-container">
-                <div className="threads-logo-bg"></div>
-                
-                <h1>Universe</h1>
-                <p className="sub-text">Connect and share with people in your universe.</p>
+                <img src="/logo-universe1.png" alt="Universe" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "20px", display: "block", margin: "0 auto 10px auto" }} />
+                <p className="sub-text">Kết nối và chia sẻ với mọi người trong vũ trụ của bạn.</p>
                 
                 <form onSubmit={handleSubmit}>
                     <input 
@@ -74,7 +72,7 @@ value={email}
                         <input 
                             className="login-input"
                             type={showPass ? "text" : "password"} 
-                            placeholder="Password" 
+                            placeholder="Mật khẩu" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
                             required 
@@ -89,12 +87,12 @@ value={email}
                     </div>
 
                     <button type="submit" className="login-btn">
-                        Log in
+                        Đăng nhập
                     </button>
                 </form>
                 
                 <div className="divider">
-                    <span>OR</span>
+                    <span>HOẶC</span>
                 </div>
                 
                 <button onClick={handleGoogleLogin} className="google-btn">
@@ -104,13 +102,13 @@ value={email}
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    Continue with Google
+                    Tiếp tục với Google
                 </button>
 
                 <div className="auth-links">
-                    <Link to="/forgot-password">Forgot password?</Link>
+                    <Link to="/forgot-password">Quên mật khẩu?</Link>
                     <span style={{margin: '0 5px'}}>•</span>
-                    <Link to="/register">Register</Link>
+                    <Link to="/register">Đăng ký</Link>
                 </div>
             </div>
         </div>

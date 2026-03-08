@@ -100,7 +100,6 @@ export default function ChatSidebar({ users, onlineUsers, selectedUser, onSelect
 
               <div className="ig-user-info">
                 <span className="ig-user-name">{user.username}</span>
-                <span className="ig-user-preview">Active now</span>
               </div>
             </div>
            );

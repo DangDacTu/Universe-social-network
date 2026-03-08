@@ -2,121 +2,118 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import settingsApi from "../../api/settingApi";
 import { useAuth } from "../../context/AuthContext";
-import { FiLock, FiKey, FiCheckCircle } from "react-icons/fi";
+import { FiLock, FiKey, FiCheckCircle, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function ChangePassword() {
     const { user } = useAuth();
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    // State quản lý dữ liệu nhập vào
+    const [formData, setFormData] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
+
+    // State quản lý ẩn/hiện mật khẩu
+    const [showPass, setShowPass] = useState({
+        old: false,
+        new: false,
+        confirm: false
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    // Xử lý nhập liệu
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError(""); // Xóa lỗi khi người dùng nhập lại
+    };
+
+    // Xử lý ẩn/hiện mật khẩu
+    const toggleShow = (field) => {
+        setShowPass({ ...showPass, [field]: !showPass[field] });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const { oldPassword, newPassword, confirmPassword } = formData;
 
         if (newPassword !== confirmPassword) {
-            alert("❌ Mật khẩu xác nhận không khớp");
-            return;
-        }
-        if (oldPassword === newPassword) {
-            alert("❌ Mật khẩu mới phải khác mật khẩu cũ");
-            return;
+            return setError("Mật khẩu xác nhận không khớp.");
         }
         if (newPassword.length < 6) {
-             alert("❌ Mật khẩu mới phải có ít nhất 6 ký tự");
-             return;
+             return setError("Mật khẩu mới phải có ít nhất 6 ký tự.");
         }
 
         try {
             setLoading(true);
             await settingsApi.changePassword({ oldPassword, newPassword });
-            
-            alert("✅ Đổi mật khẩu thành công. Vui lòng đăng nhập lại!");
-            localStorage.removeItem("accessToken");
-            
-            setOldPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-            
+            alert("Đổi mật khẩu thành công. Vui lòng đăng nhập lại!");
+            localStorage.removeItem("token");
             navigate("/login");
         } catch (err) {
-            alert(err.response?.data?.message || "❌ Mật khẩu cũ không đúng");
+            console.error("Change Password Error:", err); // Log lỗi chi tiết ra console
+            setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại.");
         } finally {
             setLoading(false);
         }
     };
 
+    // Helper render input để code gọn hơn
+    const renderInput = (label, name, placeholder, icon, showKey) => {
+        const Icon = icon;
+        return (
+            <div className="cp-input-group">
+                <label>{label}</label>
+                <div className="cp-input-wrapper">
+                    <Icon className="cp-icon" />
+                    <input
+                        type={showPass[showKey] ? "text" : "password"}
+                        name={name}
+                        placeholder={placeholder}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        className="cp-input"
+                        style={{ paddingRight: '40px' }}
+                        required
+                    />
+                    <button 
+                        type="button" 
+                        onClick={() => toggleShow(showKey)}
+                        style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: 0 }}
+                    >
+                        {showPass[showKey] ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="cp-container">
-            {/* Header: User Info căn giữa */}
             <div className="cp-header">
                 <div className="cp-avatar-wrapper">
-                    <img 
-                        src={user?.profilePicture || "/avatar.jpg"} 
-                        alt="avatar" 
-                        className="cp-avatar" 
-                    />
+                    <img src={user?.profilePicture || "/avatar.jpg"} alt="avatar" className="cp-avatar" />
                 </div>
-                <h3 className="cp-username">{user?.username}</h3>
-                <p className="cp-subtitle">Quản lý bảo mật tài khoản</p>
+                <div>
+                    <h3 className="cp-username">{user?.username}</h3>
+                    <p className="cp-subtitle">Quản lý bảo mật</p>
+                </div>
             </div>
 
+            {error && (
+                <div style={{ color: 'red', background: '#ffe6e6', padding: '10px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', textAlign: 'center' }}>
+                    ⚠️ {error}
+                </div>
+            )}
+
             <form className="cp-form" onSubmit={handleSubmit}>
-                {/* Mật khẩu cũ */}
-                <div className="cp-input-group">
-                    <label>Mật khẩu hiện tại</label>
-                    <div className="cp-input-wrapper">
-                        <FiLock className="cp-icon" />
-                        <input
-                            type="password"
-                            placeholder="Nhập mật khẩu cũ..."
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            className="cp-input"
-                            required
-                        />
-                    </div>
-                </div>
+                {renderInput("Mật khẩu hiện tại", "oldPassword", "Nhập mật khẩu cũ...", FiLock, "old")}
+                {renderInput("Mật khẩu mới", "newPassword", "Nhập mật khẩu mới...", FiKey, "new")}
+                {renderInput("Xác nhận mật khẩu", "confirmPassword", "Nhập lại mật khẩu mới...", FiCheckCircle, "confirm")}
 
-                {/* Mật khẩu mới */}
-                <div className="cp-input-group">
-                    <label>Mật khẩu mới</label>
-                    <div className="cp-input-wrapper">
-                        <FiKey className="cp-icon" />
-                        <input
-                            type="password"
-                            placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)..."
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="cp-input"
-                            required
-                        />
-                    </div>
-                </div>
-
-                {/* Xác nhận */}
-                <div className="cp-input-group">
-                    <label>Xác nhận mật khẩu mới</label>
-                    <div className="cp-input-wrapper">
-                        <FiCheckCircle className="cp-icon" />
-                        <input
-                            type="password"
-                            placeholder="Nhập lại mật khẩu mới..."
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="cp-input"
-                            required
-                        />
-                    </div>
-                </div>
-
-                {/* Quên mật khẩu */}
-                <div className="cp-forgot">
-                    <span onClick={() => navigate('/forgot-password')}>Bạn quên mật khẩu?</span>
-                </div>
-
-                {/* Button */}
                 <button type="submit" className="cp-btn-submit" disabled={loading}>
                     {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
                 </button>

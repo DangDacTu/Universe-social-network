@@ -11,15 +11,15 @@ const API_URL = "http://localhost:5000/api/settings";
 // 👉 TẠO INSTANCE RIÊNG
 const axiosInstance = axios.create({
     baseURL: API_URL,
-    withCredentials: true,
+    withCredentials: false,
 });
 
 // 👉 TỰ ĐỘNG GẮN TOKEN
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("token");
 
-        console.log("accessToken:", token); // 🔍 THÊM LOG
+        console.log("token:", token); // 🔍 THÊM LOG
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

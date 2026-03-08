@@ -45,13 +45,15 @@ export default function CreatePostModal({ onClose, onSuccess }) {
       setLoading(true);
       const formData = new FormData();
 
-      if (content) formData.append("content", content);
+      formData.append("content", content || "");
 
       media.forEach((file) => {
         formData.append("media", file);
       });
 
-      await axiosClient.post("/posts", formData);
+      await axiosClient.post("/posts", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       setContent("");
       setMedia([]);
@@ -60,7 +62,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
       onClose();
     } catch (err) {
       console.error("CREATE POST ERROR:", err);
-      alert("Đăng bài thất bại");
+      alert(err.response?.data?.message || "Đăng bài thất bại, vui lòng thử lại.");
     } finally {
       setLoading(false);
     }

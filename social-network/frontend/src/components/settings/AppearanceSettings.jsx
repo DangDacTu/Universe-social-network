@@ -48,6 +48,11 @@ export default function AppearanceSettings() {
         // Cập nhật context ngay để MainLayout đổi nền ngay lập tức
         updateUser({ background: item.value, backgroundType: item.type });
 
+        // 🔥 FIX: Cập nhật LocalStorage để giữ màu khi F5
+        const savedUser = JSON.parse(localStorage.getItem("user")) || {};
+        const newUser = { ...savedUser, background: item.value, backgroundType: item.type };
+        localStorage.setItem("user", JSON.stringify(newUser));
+
         try {
             await settingsApi.updateAppearance({ background: item.value, type: item.type });
         } catch (error) {
@@ -70,6 +75,11 @@ export default function AppearanceSettings() {
             setBgType('image');
             applyBackground(imageUrl, 'image');
             updateUser({ background: imageUrl, backgroundType: 'image' });
+
+            // 🔥 FIX: Cập nhật LocalStorage cho ảnh upload
+            const savedUser = JSON.parse(localStorage.getItem("user")) || {};
+            const newUser = { ...savedUser, background: imageUrl, backgroundType: 'image' };
+            localStorage.setItem("user", JSON.stringify(newUser));
 
             await settingsApi.updateAppearance({ background: imageUrl, type: 'image' });
         } catch (error) {

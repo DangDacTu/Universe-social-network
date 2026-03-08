@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useLocation } from "react-router-dom"; // Thêm hook này
 import { connectSocket, getSocket } from "../../services/socket";
 import messageApi from "../../api/messageApi";
 import userApi from "../../api/userApi";
@@ -10,7 +11,14 @@ import "./Chat.css";
 
 export default function Chat() {
   const { user } = useAuth();
+  const location = useLocation(); // Lấy thông tin route
+  
+  // State cho danh sách chat
+  const [activeTab, setActiveTab] = useState("inbox"); // "inbox" | "requests"
+  const [inboxUsers, setInboxUsers] = useState([]);
+  const [requestUsers, setRequestUsers] = useState([]);
   const [chatUsers, setChatUsers] = useState([]);
+  
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState({});
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -71,12 +79,42 @@ export default function Chat() {
     const fetchUsers = async () => {
         try {
             const res = await userApi.getChatAvailableUsers();
-            setChatUsers(res.data);
-            if (res.data.length > 0 && !selectedUser) setSelectedUser(res.data[0]);
+            // Backend trả về { inbox: [], requests: [] }
+            const { inbox, requests } = res.data;
+            
+            setInboxUsers(inbox);
+            setRequestUsers(requests);
+            
+            // Mặc định hiển thị Inbox
+            setChatUsers(inbox);
+
+            // Kiểm tra xem có userId được truyền từ trang Profile không
+            const targetUserId = location.state?.userId;
+            const allUsers = [...inbox, ...requests];
+            const targetUser = allUsers.find(u => u._id === targetUserId);
+
+            if (targetUser) {
+                setSelectedUser(targetUser);
+                // Nếu user nằm trong requests, tự động chuyển tab sang requests
+                if (requests.find(u => u._id === targetUserId)) {
+                    setActiveTab("requests");
+                    setChatUsers(requests);
+                }
+            } else if (inbox.length > 0 && !selectedUser) {
+                setSelectedUser(inbox[0]);
+            }
         } catch (e) {}
     };
     fetchUsers();
   }, []);
+
+  // Xử lý chuyển tab
+  const handleTabChange = (tab) => {
+      setActiveTab(tab);
+      if (tab === "inbox") setChatUsers(inboxUsers);
+      else setChatUsers(requestUsers);
+      setSelectedUser(null); // Reset người được chọn khi chuyển tab
+  };
 
   // Load lịch sử chat
   useEffect(() => {
@@ -120,12 +158,37 @@ export default function Chat() {
       <div className="chatLayout">
         <div className="chatContainer">
           <div className="chatSidebarWrapper">
+            {/* TABS CHUYỂN ĐỔI INBOX / REQUESTS */}
+            <div style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '10px' }}>
+                <button 
+                    onClick={() => handleTabChange("inbox")}
+                    style={{
+                        flex: 1, padding: '10px', border: 'none', background: 'none', cursor: 'pointer',
+                        fontWeight: activeTab === 'inbox' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'inbox' ? '2px solid black' : 'none'
+                    }}
+                >
+                    Hộp thư
+                </button>
+                <button 
+                    onClick={() => handleTabChange("requests")}
+                    style={{
+                        flex: 1, padding: '10px', border: 'none', background: 'none', cursor: 'pointer',
+                        fontWeight: activeTab === 'requests' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'requests' ? '2px solid black' : 'none'
+                    }}
+                >
+                    Tin nhắn chờ {requestUsers.length > 0 && <span style={{color:'red'}}>({requestUsers.length})</span>}
+                </button>
+            </div>
+
             <ChatSidebar users={chatUsers} onlineUsers={onlineUsers} selectedUser={selectedUser} onSelectUser={setSelectedUser} />
           </div>
           <div className="chatBoxWrapper">
             <ChatBox 
               messages={selectedUser ? messages[selectedUser._id] || [] : []}
               currentUserId={user._id} selectedUser={selectedUser} onSendMessage={handleSendMessage}
+              isOnline={selectedUser ? onlineUsers.includes(selectedUser._id) : false}
             />
           </div>
         </div>

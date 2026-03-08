@@ -1,4 +1,4 @@
-import { FiLock, FiShield, FiUser, FiBell, FiBookmark, FiActivity, FiEyeOff, FiMessageCircle, FiAtSign, FiLayout, FiHelpCircle, FiInfo } from "react-icons/fi";
+import { FiLock, FiUser, FiBell, FiBookmark, FiActivity, FiEyeOff, FiMessageCircle, FiAtSign, FiLayout, FiHelpCircle, FiInfo } from "react-icons/fi";
 import { BiArchive, BiBlock } from "react-icons/bi";
 import { MdOutlinePrivacyTip, MdOutlineCleaningServices } from "react-icons/md";
 
@@ -8,7 +8,6 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
             title: "Cài đặt chính",
             items: [
                 { id: "password", label: "Đổi mật khẩu", icon: <FiLock />, isDev: false },
-                { id: "privacy", label: "Quyền riêng tư", icon: <FiShield />, isDev: false },
                 // 🔥 THÊM MỤC NÀY
                 { id: "appearance", label: "Giao diện", icon: <FiLayout />, isDev: false }, 
             ]
@@ -17,7 +16,6 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
             title: "Cách bạn dùng ứng dụng",
             items: [
                 { id: "saved", label: "Đã lưu", icon: <FiBookmark />, isDev: true },
-                { id: "archive", label: "Kho lưu trữ", icon: <BiArchive />, isDev: true },
                 { id: "activity", label: "Hoạt động", icon: <FiActivity />, isDev: true },
                 { id: "notifications", label: "Thông báo", icon: <FiBell />, isDev: true },
             ]

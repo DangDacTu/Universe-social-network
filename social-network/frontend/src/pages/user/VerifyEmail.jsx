@@ -26,13 +26,13 @@ const VerifyEmail = () => {
 
         try {
             await authApi.verifyEmail({ email, code });
-            setMessage(" Account verified! Redirecting...");
+            setMessage(" Tài khoản đã xác thực! Đang chuyển hướng...");
             
             setTimeout(() => {
                 navigate("/login");
             }, 2000);
         } catch (error) {
-            const errorMsg = error.response?.data?.message || "Verification failed";
+            const errorMsg = error.response?.data?.message || "Xác thực thất bại";
             setMessage(` ${errorMsg}`);
         } finally {
             setIsLoading(false);
@@ -45,9 +45,9 @@ const VerifyEmail = () => {
                 {/* Logo */}
                 <div className="threads-logo-bg"></div>
                 
-                <h1>Verify Account</h1>
+                <h1>Xác thực tài khoản</h1>
                 <p className="sub-text">
-                    Enter the code sent to <br/>
+                    Nhập mã được gửi đến <br/>
                     <strong style={{color: '#fff'}}>{email}</strong>
                 </p>
 
@@ -67,7 +67,7 @@ const VerifyEmail = () => {
                         disabled={isLoading}
                         style={{ opacity: isLoading ? 0.7 : 1 }}
                     >
-                        {isLoading ? "Verifying..." : "Verify Code"}
+                        {isLoading ? "Đang xác thực..." : "Xác thực"}
                     </button>
                 </form>
 
@@ -78,7 +78,7 @@ const VerifyEmail = () => {
                 )}
                 
                  <div className="auth-links">
-                    <Link to="/register">← Back to Register</Link>
+                    <Link to="/register">← Quay lại Đăng ký</Link>
                 </div>
             </div>
         </div>

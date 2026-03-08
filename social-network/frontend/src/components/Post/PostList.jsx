@@ -32,11 +32,12 @@ export default function PostList({ reload }) {
       )}
 
       {posts.map((post) => (
-        <PostItem
-          key={post._id}
-          post={post}
-          onDeleted={handleRemovePost} // 👈 truyền xuống
-        />
+        <div key={post._id} style={{ borderBottom: "1px solid #ccc" }}>
+          <PostItem
+            post={post}
+            onDeleted={handleRemovePost} // 👈 truyền xuống
+          />
+        </div>
       ))}
     </div>
   );

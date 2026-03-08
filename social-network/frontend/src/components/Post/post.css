@@ -150,7 +150,6 @@ body {
   align-items: flex-start;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid #eee;
 }
 
 .post-content {
@@ -173,6 +172,15 @@ body {
 .post-time {
   font-size: 13px;
   color: #888;
+}
+
+/* THÊM: Style cho link username */
+.post-username-link {
+  text-decoration: none;
+  color: inherit;
+}
+.post-username-link:hover .post-username {
+  text-decoration: underline;
 }
 
 /* Text */
@@ -580,6 +588,20 @@ body {
   margin-right: 6px;
 }
 
+.repost-btn,
+.send-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #555;
+  transition: transform 0.15s ease;
+}
+
+.repost-btn:hover,
+.send-btn:hover {
+  transform: scale(1.1);
+}
 
 /* ===== ACTION BAR (THREADS STYLE) ===== */
 .post-actions {

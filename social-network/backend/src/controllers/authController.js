@@ -12,7 +12,7 @@ const registerUser = async (req, res) => {
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'Người dùng đã tồn tại' });
         }
 
         // 1. Hash password
@@ -41,30 +41,30 @@ const registerUser = async (req, res) => {
         if (user) {
             // 4. Gửi email xác thực
             const message = `
-                <h1>Welcome to Universe!</h1>
-                <p>Thank you for registering. Please use the code below to verify your account:</p>
+                <h1>Chào mừng đến với Universe!</h1>
+                <p>Cảm ơn bạn đã đăng ký. Vui lòng sử dụng mã bên dưới để xác thực tài khoản:</p>
                 <h2 style="color: #000; letter-spacing: 5px;">${verificationCode}</h2>
-                <p>This code expires in 1 hour.</p>
+                <p>Mã này sẽ hết hạn sau 1 giờ.</p>
             `;
 
             try {
                 await sendEmail({
                     to: user.email,
-                    subject: "Universe - Verify your account",
+                    subject: "Universe - Xác thực tài khoản của bạn",
                     text: message,
                 });
 
                 res.status(201).json({
                     success: true,
-                    message: "Registration successful! Please check your email.",
+                    message: "Đăng ký thành công! Vui lòng kiểm tra email.",
                     email: user.email 
                 });
             } catch (error) {
                 // Nếu gửi mail lỗi, có thể cân nhắc xóa user
-                return res.status(500).json({ message: "User created but failed to send verification email." });
+                return res.status(500).json({ message: "Tạo user thành công nhưng gửi email xác thực thất bại." });
             }
         } else {
-            res.status(400).json({ message: 'Invalid user data' });
+            res.status(400).json({ message: 'Dữ liệu người dùng không hợp lệ' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -84,7 +84,7 @@ const verifyEmail = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(400).json({ message: "Invalid or expired verification code" });
+            return res.status(400).json({ message: "Mã xác thực không hợp lệ hoặc đã hết hạn" });
         }
 
         user.isVerified = true;
@@ -92,7 +92,7 @@ const verifyEmail = async (req, res) => {
         user.verificationTokenExpires = undefined;
         await user.save();
 
-        res.status(200).json({ success: true, message: "Email verified successfully!" });
+        res.status(200).json({ success: true, message: "Xác thực email thành công!" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -110,7 +110,7 @@ const loginUser = async (req, res) => {
             // Kiểm tra kích hoạt
             if (!user.isVerified) {
                 return res.status(401).json({ 
-                    message: 'Please verify your email first!', 
+                    message: 'Vui lòng xác thực email trước!', 
                     needVerification: true, 
                     email: user.email 
                 });
@@ -121,10 +121,12 @@ const loginUser = async (req, res) => {
                 username: user.username,
                 email: user.email,
                 profilePicture: user.profilePicture, // Frontend sẽ hiển thị Robot từ link này
+                background: user.background,
+                backgroundType: user.backgroundType,
                 token: generateToken(user._id),
             });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -137,7 +139,7 @@ const forgotPassword = async (req, res) => {
     const { email } = req.body;
     try {
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: "Email not found" });
+        if (!user) return res.status(404).json({ message: "Email không tồn tại" });
 
         const resetToken = crypto.randomBytes(20).toString('hex');
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
@@ -145,16 +147,16 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
-        const message = `<p>Click here to reset password: <a href="${resetUrl}">${resetUrl}</a></p>`;
+        const message = `<p>Nhấn vào đây để đặt lại mật khẩu: <a href="${resetUrl}">${resetUrl}</a></p>`;
 
         try {
-            await sendEmail({ to: user.email, subject: "Password Reset", text: message });
-            res.status(200).json({ success: true, data: "Email Sent" });
+            await sendEmail({ to: user.email, subject: "Đặt lại mật khẩu", text: message });
+            res.status(200).json({ success: true, data: "Đã gửi email" });
         } catch (error) {
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save();
-            return res.status(500).json({ message: "Email could not be sent" });
+            return res.status(500).json({ message: "Không thể gửi email" });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -171,7 +173,7 @@ const resetPassword = async (req, res) => {
             resetPasswordExpire: { $gt: Date.now() },
         });
 
-        if (!user) return res.status(400).json({ message: "Invalid Token" });
+        if (!user) return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);
@@ -179,7 +181,7 @@ const resetPassword = async (req, res) => {
         user.resetPasswordExpire = undefined;
         await user.save();
 
-        res.status(200).json({ success: true, message: "Password Updated" });
+        res.status(200).json({ success: true, message: "Cập nhật mật khẩu thành công" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

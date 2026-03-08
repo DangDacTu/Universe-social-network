@@ -5,10 +5,10 @@ const { createNotification } = require("./notificationController");
 ====================== */
 exports.createPost = async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content = "" } = req.body;
 
     // Kiểm tra: Phải có nội dung hoặc có file ảnh/video
-    if (!content && (!req.files || req.files.length === 0)) {
+    if (!content.trim() && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Bài viết phải có nội dung hoặc media",
       });
@@ -18,12 +18,6 @@ exports.createPost = async (req, res) => {
 
     // --- LOGIC MỚI: DÙNG CLOUDINARY ---
     if (req.files?.length > 0) {
-      media = req.files.map((file) => ({
-        // Cloudinary trả về link ảnh online trong thuộc tính 'path'
-        url: file.path,
-        // Xác định loại file dựa trên mimetype
-        type: file.mimetype.startsWith("image") ? "image" : "video",
-      }));
       media = req.files.map((file) => {
         let type = "file";
         if (file.mimetype.startsWith("image")) type = "image";
@@ -248,12 +242,6 @@ exports.addComment = async (req, res) => {
     // 🟢 XỬ LÝ MEDIA TỪ CLOUDINARY
     let media = [];
     if (req.files?.length > 0) {
-      media = req.files.map((file) => ({
-        url: file.path, // Cloudinary URL
-        type: file.mimetype.startsWith("image")
-          ? "image"
-          : "video",
-      }));
       media = req.files.map((file) => {
         let type = "file";
         if (file.mimetype.startsWith("image")) type = "image";

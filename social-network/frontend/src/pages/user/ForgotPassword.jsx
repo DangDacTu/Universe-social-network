@@ -15,9 +15,9 @@ const ForgotPassword = () => {
 
         try {
             await authApi.forgotPassword(email);
-            setMessage("Email sent! Please check your inbox.");
+            setMessage("Đã gửi email! Vui lòng kiểm tra hộp thư đến.");
         } catch (error) {
-            setMessage("Email not found or error sending mail.");
+            setMessage("Email không tồn tại hoặc lỗi gửi mail.");
         } finally {
             setIsLoading(false);
         }
@@ -28,14 +28,14 @@ const ForgotPassword = () => {
             <div className="login-container">
                 <div className="threads-logo-bg"></div>
 
-                <h2>Reset Password</h2>
-                <p className="sub-text">Enter your email to receive a reset link.</p>
+                <h2>Đặt lại mật khẩu</h2>
+                <p className="sub-text">Nhập email của bạn để nhận liên kết đặt lại mật khẩu.</p>
 
                 <form onSubmit={handleSubmit}>
                     <input 
                         className="login-input"
                         type="email" 
-                        placeholder="Enter your email" 
+                        placeholder="Nhập email của bạn" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
                         required 
@@ -47,7 +47,7 @@ const ForgotPassword = () => {
                         disabled={isLoading}
                         style={{ opacity: isLoading ? 0.7 : 1 }}
                     >
-                        {isLoading ? "Sending..." : "Send Reset Link"}
+                        {isLoading ? "Đang gửi..." : "Gửi liên kết"}
                     </button>
                 </form>
 
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
                 )}
 
                 <div className="auth-links">
-                    <Link to="/login">← Back to Login</Link>
+                    <Link to="/login">← Quay lại Đăng nhập</Link>
                 </div>
             </div>
         </div>

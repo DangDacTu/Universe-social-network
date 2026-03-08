@@ -8,6 +8,8 @@ const {
     getAllUsers,
     getChatAvailableUsers,
     searchUsers,
+    getUserFollowers,
+    getUserFollowing,
 } = require('../controllers/userController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -31,5 +33,11 @@ router.put('/:id/follow', protect, followUser);
 
 // Unfollow user
 router.put('/:id/unfollow', protect, unfollowUser);
+
+// Lay danh sach followers va following cua user (co the dung de hien thi o profile)
+router.get("/:id/followers", getUserFollowers);
+
+// Lay danh sach following cua user
+router.get("/:id/following", getUserFollowing);
 
 module.exports = router;

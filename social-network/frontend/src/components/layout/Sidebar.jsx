@@ -47,7 +47,8 @@ export default function Sidebar({ onCreate, hasNewNotification, onNotifClick }) 
           <FiHome />
         </button>
 
-        <button className="sidebar-item"
+        <button 
+          className={`sidebar-item ${isActive("/search") ? "active" : ""}`}
           onClick={() => navigate("/search")}
         >
           <FiSearch />
@@ -58,7 +59,7 @@ export default function Sidebar({ onCreate, hasNewNotification, onNotifClick }) 
         </button>
 
         <button
-          className={`sidebar-item ${location.pathname === "/notifications" ? "active" : ""}`}
+          className={`sidebar-item ${isActive("/notifications") ? "active" : ""}`}
           onClick={() => {
             onNotifClick(); // Reset trạng thái khi người dùng click vào
             navigate("/notifications");
@@ -68,7 +69,8 @@ export default function Sidebar({ onCreate, hasNewNotification, onNotifClick }) 
           {hasNewNotification && <span className="notification-dot"></span>}
         </button>
 
-        <button className="sidebar-item"
+        <button 
+          className={`sidebar-item ${isActive("/chat") ? "active" : ""}`}
           onClick={() => navigate("/chat")}
         >
           <FiSend />

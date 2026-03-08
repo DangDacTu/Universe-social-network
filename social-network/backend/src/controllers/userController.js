@@ -12,7 +12,7 @@ const getUserProfile = async (req, res) => {
         if (user && user.isVerified) {
             res.json(user);
         } else {
-            res.status(404).json({ message: 'User not found or not verified' });
+            res.status(404).json({ message: 'Người dùng không tồn tại hoặc chưa xác thực' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -32,6 +32,10 @@ const updateUserProfile = async (req, res) => {
             user.profilePicture = req.body.profilePicture || user.profilePicture;
             // giới tính   
             user.gender = req.body.gender || user.gender;
+            
+            // Cập nhật giao diện (background)
+            if (req.body.background) user.background = req.body.background;
+            if (req.body.type) user.backgroundType = req.body.type;
 
             // Nếu đổi mật khẩu
             if (req.body.password) {
@@ -46,10 +50,12 @@ const updateUserProfile = async (req, res) => {
                 email: updatedUser.email,
                 bio: updatedUser.bio,
                 profilePicture: updatedUser.profilePicture,
+                background: updatedUser.background,
+                backgroundType: updatedUser.backgroundType,
                 token: req.body.token,
             });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ message: 'Người dùng không tồn tại' });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -62,25 +68,27 @@ const followUser = async (req, res) => {
     if (req.user._id.toString() !== req.params.id) {
         try {
             const userToFollow = await User.findById(req.params.id);
-            const currentUser = await User.findById(req.user._id);
 
-            if (!userToFollow.followers.includes(req.user._id)) {
-                await userToFollow.updateOne({ $push: { followers: req.user._id } });
-                await currentUser.updateOne({ $push: { following: req.params.id } });
+            // Tối ưu: Dùng $addToSet để tránh trùng lặp và giảm câu lệnh kiểm tra
+            const result = await userToFollow.updateOne({ $addToSet: { followers: req.user._id } });
+
+            // Chỉ khi follow thành công (có user được thêm vào) thì mới thực hiện các bước sau
+            if (result.modifiedCount > 0) {
+                await User.updateOne({ _id: req.user._id }, { $addToSet: { following: req.params.id } });
                 await createNotification({
                     from: req.user._id,
                     to: userToFollow._id,
                     type: 'follow',
                 });
-                res.status(200).json({ message: 'User has been followed' });
+                res.status(200).json({ message: 'Đã theo dõi người dùng' });
             } else {
-                res.status(403).json({ message: 'You already follow this user' });
+                res.status(403).json({ message: 'Bạn đã theo dõi người dùng này' });
             }
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     } else {
-        res.status(403).json({ message: 'You cannot follow yourself' });
+        res.status(403).json({ message: 'Bạn không thể tự theo dõi chính mình' });
     }
 };
 
@@ -89,21 +97,15 @@ const followUser = async (req, res) => {
 const unfollowUser = async (req, res) => {
     if (req.user._id.toString() !== req.params.id) {
         try {
-            const userToUnfollow = await User.findById(req.params.id);
-            const currentUser = await User.findById(req.user._id);
-
-            if (userToUnfollow.followers.includes(req.user._id)) {
-                await userToUnfollow.updateOne({ $pull: { followers: req.user._id } });
-                await currentUser.updateOne({ $pull: { following: req.params.id } });
-                res.status(200).json({ message: 'User has been unfollowed' });
-            } else {
-                res.status(403).json({ message: 'You dont follow this user' });
-            }
+            // Tối ưu: Dùng $pull trực tiếp, nó sẽ không báo lỗi nếu user không tồn tại trong list
+            await User.updateOne({ _id: req.params.id }, { $pull: { followers: req.user._id } });
+            await User.updateOne({ _id: req.user._id }, { $pull: { following: req.params.id } });
+            res.status(200).json({ message: 'Đã hủy theo dõi người dùng' });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     } else {
-        res.status(403).json({ message: 'You cannot unfollow yourself' });
+        res.status(403).json({ message: 'Bạn không thể tự hủy theo dõi chính mình' });
     }
 };
 
@@ -123,7 +125,7 @@ const getAllUsers = async (req, res) => {
 };
 
 /**
- * @desc    Get users that current user can chat with (mutual follow)
+ * @desc    Get users that current user can chat with (Following or Followers)
  * @route   GET /api/users/chat-available
  * @access  Private
  */
@@ -132,21 +134,37 @@ const getChatAvailableUsers = async (req, res) => {
         const currentUser = await User.findById(req.user._id);
 
         if (!currentUser) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Người dùng không tồn tại" });
         }
 
+        // Lấy danh sách:
+        // 1. Người mình đang follow (để mình nhắn tin cho họ)
+        // 2. Người đang follow mình (để hiển thị tin nhắn chờ từ họ)
         const users = await User.find({
             _id: {
                 $ne: currentUser._id,           // không lấy chính mình
-                $in: currentUser.following      // mình follow họ
             },
-            followers: {
-                $in: [currentUser._id]          // họ follow lại mình
-            },
+            $or: [
+                { _id: { $in: currentUser.following } }, // Mình follow họ
+                { _id: { $in: currentUser.followers } }  // Họ follow mình
+            ],
             isVerified: true,
         }).select("_id username profilePicture");
 
-        res.status(200).json(users);
+        // Phân loại:
+        // - Inbox: Người mình ĐANG follow (bạn bè, người quen)
+        // - Requests: Người follow mình nhưng mình KHÔNG follow lại (tin nhắn chờ)
+        const followingSet = new Set(currentUser.following.map(id => id.toString()));
+        
+        const inbox = [];
+        const requests = [];
+
+        users.forEach(user => {
+            if (followingSet.has(user._id.toString())) inbox.push(user);
+            else requests.push(user);
+        });
+
+        res.status(200).json({ inbox, requests });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -177,4 +195,32 @@ const searchUsers = async (req, res) => {
 };
 
 
-module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, searchUsers };
+// @desc    Get user followers list
+// @route   GET /api/users/:id/followers
+const getUserFollowers = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).populate("followers", "_id username profilePicture");
+        if (!user) {
+            return res.status(404).json({ message: "Người dùng không tồn tại" });
+        }
+        res.status(200).json(user.followers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get user following list
+// @route   GET /api/users/:id/following
+const getUserFollowing = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).populate("following", "_id username profilePicture");
+        if (!user) {
+            return res.status(404).json({ message: "Người dùng không tồn tại" });
+        }
+        res.status(200).json(user.following);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, searchUsers, getUserFollowers, getUserFollowing };

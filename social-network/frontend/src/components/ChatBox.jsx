@@ -6,7 +6,7 @@ import "./ChatBox.css";
 import EmojiPicker from "emoji-picker-react";
 
 // Icons
-import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiVideo, FiMoreVertical, FiTrash, FiEdit2, FiX } from "react-icons/fi";
+import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiMoreVertical, FiTrash, FiEdit2, FiX } from "react-icons/fi";
 import { HiOutlinePhone, HiOutlineVideoCamera } from "react-icons/hi";
 import { RiMessengerLine } from "react-icons/ri"; 
 
@@ -122,7 +122,7 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
 /* =========================================================
    COMPONENT CHÍNH: CHAT BOX
    ========================================================= */
-export default function ChatBox({ messages, currentUserId, selectedUser, onSendMessage }) {
+export default function ChatBox({ messages, currentUserId, selectedUser, onSendMessage, isOnline }) {
   const navigate = useNavigate();
   const messagesEndRef = useRef(null);
   const [text, setText] = useState("");
@@ -135,7 +135,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
+  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, previewUrl, isRecording]);
@@ -158,11 +158,12 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
   };
 
   /* UPLOAD & SEND */
-  const handleSelectFile = (e, type) => {
+  const handleSelectFile = (e) => {
       const file = e.target.files[0];
       if(file){
           setPreviewFile(file);
           setPreviewUrl(URL.createObjectURL(file));
+          const type = file.type.startsWith('video') ? 'video' : 'image';
           setFileType(type);
       }
       e.target.value = "";
@@ -206,8 +207,8 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
     return (
       <div className="ig-empty-state">
         <div className="ig-empty-icon-circle"><RiMessengerLine size={50} /></div>
-        <h2>Your messages</h2>
-        <p>Send a message to start a chat.</p>
+        <h2>Tin nhắn của bạn</h2>
+        <p>Gửi tin nhắn để bắt đầu trò chuyện.</p>
       </div>
     );
   }
@@ -220,7 +221,9 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
             <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-header-avatar" alt="header avatar"/>
             <div className="ig-header-info">
                 <span className="ig-header-name">{selectedUser.username}</span>
-                <span className="ig-header-status">Active now</span>
+                <span className="ig-header-status" style={{ color: isOnline ? "#0095f6" : "#8e8e8e", fontWeight: isOnline ? "600" : "400" }}>
+                    {isOnline ? "Online" : "Offline"}
+                </span>
             </div>
         </div>
         <div className="ig-header-actions">
@@ -237,7 +240,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
             <h3>{selectedUser.username}</h3>
             <p>{selectedUser.username} • Universe</p>
             <button className="ig-view-profile-btn" onClick={() => navigate(`/profile/${selectedUser._id}`)}>
-                View profile
+                Xem trang cá nhân
             </button>
         </div>
 
@@ -269,8 +272,8 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
 
         {isRecording ? (
             <div className="ig-recording-ui">
-                <span className="ig-rec-dot">Recording...</span>
-                <button onClick={stopRecording} className="ig-send-text-btn">Send Voice</button>
+                <span className="ig-rec-dot">Đang ghi âm...</span>
+                <button onClick={stopRecording} className="ig-send-text-btn">Gửi Voice</button>
             </div>
         ) : (
             <div className="ig-input-wrapper">
@@ -280,17 +283,16 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
                     onClick={() => setShowEmoji(!showEmoji)} 
                 />
                 <input 
-                    placeholder="Message..." className="ig-input-field" value={text}
+                    placeholder="Nhắn tin..." className="ig-input-field" value={text}
                     onChange={e => setText(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSendTextOrMedia()}
                 />
                 {text.trim() || previewFile ? (
-                     <button className="ig-send-text-btn" onClick={handleSendTextOrMedia}>Send</button>
+                     <button className="ig-send-text-btn" onClick={handleSendTextOrMedia}>Gửi</button>
                 ) : (
                     <div className="ig-right-icons">
                         <FiMic size={24} onClick={startRecording} />
-                        <label><FiImage size={24} /><input type="file" hidden accept="image/*" onChange={e => handleSelectFile(e, 'image')} /></label>
-                        <label><FiVideo size={24} /><input type="file" hidden accept="video/*" onChange={e => handleSelectFile(e, 'video')} /></label>
+                        <label><FiImage size={24} /><input type="file" hidden accept="image/*,video/*" onChange={handleSelectFile} /></label>
                         <FiHeart size={24} onClick={() => onSendMessage({ content: "❤️", mediaType: "text" })} />
                     </div>
                 )}

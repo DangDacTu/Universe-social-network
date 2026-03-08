@@ -1,137 +1,119 @@
-/* Lớp phủ mờ đằng sau */
-.modal-overlay {
+.edit-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Màu đen mờ */
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px); /* Hiệu ứng làm mờ nền phía sau */
-}
-
-/* Hộp Modal chính */
-.modal-container {
-    background: #181818; /* Màu nền xám đen */
-    width: 90%;
-    max-width: 450px;
-    padding: 24px;
-    border-radius: 16px;
-    border: 1px solid #333;
-    color: #fff;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    justify-content: center;
     animation: fadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+.edit-modal-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 90vh;
+    border: 1px solid #dbdbdb;
 }
 
-.modal-header {
+/* HEADER */
+.edit-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #efefef;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 15px;
 }
 
-.modal-header h3 {
-    margin: 0;
+.edit-modal-title {
     font-size: 18px;
     font-weight: 700;
+    margin: 0;
+    color: #000;
 }
 
 .close-btn {
     background: none;
     border: none;
-    color: #fff;
-    font-size: 24px;
     cursor: pointer;
-    line-height: 1;
-}
-
-/* Phần Avatar */
-.avatar-upload-section {
+    padding: 4px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-bottom: 25px;
-}
-
-.avatar-preview {
-    width: 100px;
-    height: 100px;
+    justify-content: center;
+    color: #000;
     border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 12px;
-    border: 2px solid #333;
+    transition: background 0.2s;
 }
 
-/* Ẩn input file mặc định xấu xí */
-input[type="file"] {
-    display: none;
+.close-btn:hover {
+    background-color: #f5f5f5;
 }
 
-/* Label giả làm nút bấm */
-.custom-file-upload {
-    color: #0095f6; /* Màu xanh giống Instagram */
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: color 0.2s;
+/* BODY */
+.edit-modal-body {
+    padding: 24px;
+    overflow-y: auto;
 }
 
-.custom-file-upload:hover {
-    color: #fff;
-}
-
-/* Các ô nhập liệu */
+/* Form Groups */
 .form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.form-label {
     display: block;
     font-size: 14px;
-    color: #a8a8a8;
+    font-weight: 600;
     margin-bottom: 8px;
-    font-weight: 500;
+    color: #000;
 }
 
-.modal-input {
+.form-input, .form-textarea, .form-select {
     width: 100%;
-    background: #262626;
-    border: 1px solid #363636;
-    color: #fff;
     padding: 12px 16px;
+    background-color: #efefef; /* Màu xám chuẩn Threads */
+    border: 1px solid transparent;
     border-radius: 12px;
     font-size: 15px;
+    color: #000;
     outline: none;
     box-sizing: border-box;
+    transition: all 0.2s;
     font-family: inherit;
 }
 
-.modal-input:focus {
-    border-color: #fff;
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+    background-color: #fff;
+    border-color: #dbdbdb;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
 }
 
-/* Nút Lưu */
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* BUTTON */
 .save-btn {
     width: 100%;
-    background: #fff;
-    color: #000;
-    border: none;
     padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
     border-radius: 12px;
-    font-weight: 600;
     font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
-    margin-top: 10px;
     transition: opacity 0.2s;
 }
 
@@ -140,17 +122,62 @@ input[type="file"] {
 }
 
 .save-btn:disabled {
-    opacity: 0.5;
+    background-color: #ccc;
     cursor: not-allowed;
 }
 
-select.modal-input {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat;
-    background-position: right 15px top 50%;
-    background-size: 12px auto;
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* AVATAR UPLOAD STYLES */
+.edit-avatar-wrapper {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 10px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
     cursor: pointer;
+    border: 1px solid #dbdbdb;
+}
+
+.edit-avatar-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.edit-avatar-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.edit-avatar-wrapper:hover .edit-avatar-overlay {
+    opacity: 1;
+}
+
+.edit-avatar-label {
+    font-size: 14px;
+    color: #0095f6;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.loader-small {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #fff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }

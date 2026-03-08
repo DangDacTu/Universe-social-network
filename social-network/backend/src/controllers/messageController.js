@@ -7,24 +7,25 @@ const Message = require("../models/Message");
 const User = require("../models/User");
 
 /**
- * Kiểm tra 2 user có follow nhau không
+ * Kiểm tra quyền chat: Chỉ cần 1 chiều follow là có thể chat
+ * (A follow B -> A nhắn được cho B, B nhận được tin nhắn chờ và có thể reply)
  * @param {String} currentUserId
  * @param {String} otherUserId
  * @returns {Boolean}
  */
-const checkMutualFollow = async (currentUserId, otherUserId) => {
+const checkCanChat = async (currentUserId, otherUserId) => {
     const currentUser = await User.findById(currentUserId);
     const otherUser = await User.findById(otherUserId);
 
     if (!currentUser || !otherUser) return false;
 
-    const isCurrentUserFollowing =
-        currentUser.following.includes(otherUserId);
+    // Cho phép chat nếu:
+    // 1. Mình follow họ (Mình gửi tin nhắn đi)
+    // 2. Họ follow mình (Họ gửi tin nhắn đến -> Tin nhắn chờ)
+    const isFollowing = currentUser.following.includes(otherUserId);
+    const isFollowedBy = currentUser.followers.includes(otherUserId);
 
-    const isOtherUserFollowing =
-        otherUser.following.includes(currentUserId);
-
-    return isCurrentUserFollowing && isOtherUserFollowing;
+    return isFollowing || isFollowedBy;
 };
 
 /**
@@ -37,11 +38,11 @@ const getChatHistory = async (req, res) => {
         const currentUserId = req.user.id; // từ middleware auth
         const { userId } = req.params; // userId của người chat cùng
 
-        // KIỂM TRA FOLLOW 2 CHIỀU
-        const canChat = await checkMutualFollow(currentUserId, userId);
+        // KIỂM TRA QUYỀN CHAT (1 CHIỀU LÀ ĐỦ)
+        const canChat = await checkCanChat(currentUserId, userId);
         if (!canChat) {
             return res.status(403).json({
-                message: "You must follow each other to view chat history",
+                message: "Bạn phải theo dõi người dùng này hoặc được họ theo dõi để nhắn tin",
             });
         }
 

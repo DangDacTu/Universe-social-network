@@ -1,122 +1,143 @@
-import { useState } from "react";
-import axios from "axios";
-import userApi from "../api/userApi";
-import "./EditProfileModal.css";
+import { useState } from 'react';
+import axiosClient from '../api/axiosClient';
+import uploadApi from '../api/uploadApi';
+import { FiX, FiCamera } from 'react-icons/fi';
+import './EditProfileModal.css';
 
 const EditProfileModal = ({ user, onClose, onUpdateSuccess }) => {
-    const [username, setUsername] = useState(user?.username || "");
-    const [bio, setBio] = useState(user?.bio || "");
-    const [gender, setGender] = useState(user?.gender || "other");
-    const [imageFile, setImageFile] = useState(null);
-    const [previewImage, setPreviewImage] = useState(user?.profilePicture || "https://via.placeholder.com/150");
-    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        username: user?.username || '',
+        bio: user?.bio || '',
+        gender: user?.gender || 'other',
+        profilePicture: user?.profilePicture || '',
+    });
+    const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImageFile(file);
-            setPreviewImage(URL.createObjectURL(file));
-        }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        setLoading(true);
+        try {
+            // Gọi API update profile
+            const { data } = await axiosClient.put(`/users/${user._id}`, formData);
+            
+            if (onUpdateSuccess) {
+                onUpdateSuccess(data);
+            }
+            onClose();
+        } catch (error) {
+            console.error("Update failed", error);
+            alert("Cập nhật thất bại: " + (error.response?.data?.message || error.message));
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        // LOG ĐỂ DEBUG
-        console.log("Bắt đầu cập nhật...");
+    const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
         try {
-            let profilePictureUrl = user.profilePicture;
-
-            // 1. Upload ảnh (Nếu có chọn)
-            if (imageFile) {
-                console.log(" Đang upload ảnh...");
-                
-                const formData = new FormData();
-                formData.append("file", imageFile);
-                
-                // THÔNG TIN CHÍNH XÁC TỪ ẢNH CỦA BẠN
-                const CLOUD_NAME = "dz5hsjleb"; 
-                const UPLOAD_PRESET = "universe-social-network"; 
-                
-                formData.append("upload_preset", UPLOAD_PRESET);
-
-                try {
-                    const res = await axios.post(
-                        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, 
-                        formData
-                    );
-                    profilePictureUrl = res.data.secure_url;
-                    console.log("Upload thành công:", profilePictureUrl);
-                } catch (uploadError) {
-                    // IN LỖI CHI TIẾT RA CONSOLE
-                    console.error("Lỗi Cloudinary Chi Tiết:", uploadError.response?.data);
-                    alert(`Lỗi Upload: ${uploadError.response?.data?.error?.message || "Kiểm tra lại Cloud Name/Preset"}`);
-                    setIsLoading(false);
-                    return; 
-                }
-            }
-
-            // 2. Gửi về Backend
-            const updatedData = {
-                username,
-                bio,
-                gender,
-                profilePicture: profilePictureUrl,
-            };
-
-            await userApi.updateUser(user._id, updatedData);
-            
-            onUpdateSuccess(updatedData);
-            onClose();
-
+            setUploading(true);
+            // Upload ảnh lên server/cloudinary
+            const res = await uploadApi.uploadFile(file);
+            setFormData(prev => ({ ...prev, profilePicture: res.data.url }));
         } catch (error) {
-            console.error("Lỗi Backend:", error);
-            alert("Lỗi khi lưu thông tin xuống Server.");
+            console.error("Upload failed", error);
+            alert("Lỗi tải ảnh: " + (error.response?.data?.message || error.message));
         } finally {
-            setIsLoading(false);
+            setUploading(false);
         }
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
-                <div className="modal-header">
-                    <h3>Edit Profile</h3>
-                    <button onClick={onClose} className="close-btn">✕</button>
+        <div className="edit-modal-overlay" onClick={onClose}>
+            <div className="edit-modal-container" onClick={e => e.stopPropagation()}>
+                
+                {/* Header */}
+                <div className="edit-modal-header">
+                    <h3 className="edit-modal-title">Chỉnh sửa trang cá nhân</h3>
+                    <button className="close-btn" onClick={onClose}>
+                        <FiX size={24} />
+                    </button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="avatar-upload-section">
-                        <img src={previewImage} alt="Avatar Preview" className="avatar-preview" />
-                        <label htmlFor="file-upload" className="custom-file-upload">Change Photo</label>
-                        <input id="file-upload" type="file" accept="image/*" onChange={handleImageChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Username</label>
-                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="modal-input" required />
-                    </div>
+                {/* Body */}
+                <div className="edit-modal-body">
+                    <form onSubmit={handleSubmit}>
+                        
+                        {/* Avatar Upload */}
+                        <div className="form-group" style={{ textAlign: 'center' }}>
+                            <div className="edit-avatar-wrapper">
+                                <img 
+                                    src={formData.profilePicture || "https://via.placeholder.com/150"} 
+                                    alt="Avatar" 
+                                    className="edit-avatar-preview" 
+                                />
+                                <label htmlFor="avatar-upload" className="edit-avatar-overlay">
+                                    {uploading ? <div className="loader-small"></div> : <FiCamera size={24} />}
+                                </label>
+                                <input 
+                                    id="avatar-upload" 
+                                    type="file" 
+                                    accept="image/*" 
+                                    hidden 
+                                    onChange={handleImageChange} 
+                                />
+                            </div>
+                            <label htmlFor="avatar-upload" className="edit-avatar-label">Đổi ảnh đại diện</label>
+                        </div>
 
-                    <div className="form-group">
-                        <label>Gender</label>
-                        <select 
-                            value={gender} 
-                            onChange={(e) => setGender(e.target.value)}
-                            className="modal-input" // Dùng chung class với input để đẹp
-                        >
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+                        {/* Username */}
+                        <div className="form-group">
+                            <label className="form-label">Tên người dùng</label>
+                            <input 
+                                type="text" 
+                                name="username"
+                                className="form-input"
+                                value={formData.username}
+                                onChange={handleChange}
+                                placeholder="Nhập tên người dùng"
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Bio</label>
-                        <textarea value={bio} onChange={(e) => setBio(e.target.value)} className="modal-input" rows="3" placeholder="Bio..." />
-                    </div>
-                    <button type="submit" className="save-btn" disabled={isLoading}>{isLoading ? "Saving..." : "Done"}</button>
-                </form>
+                        {/* Bio */}
+                        <div className="form-group">
+                            <label className="form-label">Tiểu sử</label>
+                            <textarea 
+                                name="bio"
+                                className="form-textarea"
+                                value={formData.bio}
+                                onChange={handleChange}
+                                placeholder="Viết gì đó về bạn..."
+                            />
+                        </div>
+
+                        {/* Gender */}
+                        <div className="form-group">
+                            <label className="form-label">Giới tính</label>
+                            <select 
+                                name="gender" 
+                                className="form-select"
+                                value={formData.gender}
+                                onChange={handleChange}
+                            >
+                                <option value="male">Nam</option>
+                                <option value="female">Nữ</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" className="save-btn" disabled={loading || uploading}>
+                            {loading ? "Đang lưu..." : "Xong"}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

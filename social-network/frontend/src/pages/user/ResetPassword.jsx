@@ -22,13 +22,13 @@ const ResetPassword = () => {
 
         // 1. Kiểm tra độ dài 8 ký tự
         if (password.length < 8) {
-            setMessage("Password must be at least 8 characters.");
+            setMessage("Mật khẩu phải có ít nhất 8 ký tự.");
             return;
         }
 
         // 2. Kiểm tra khớp mật khẩu
         if (password !== confirmPassword) {
-            setMessage("Confirm password does not match.");
+            setMessage("Mật khẩu xác nhận không khớp.");
             return;
         }
 
@@ -36,13 +36,13 @@ const ResetPassword = () => {
 
         try {
             await authApi.resetPassword(token, password);
-            setMessage("Password reset successfully! Redirecting...");
+            setMessage("Đặt lại mật khẩu thành công! Đang chuyển hướng...");
             
             setTimeout(() => {
                 navigate("/login");
             }, 2000);
         } catch (error) {
-            const errorMsg = error.response?.data?.message || "Token expired or invalid.";
+            const errorMsg = error.response?.data?.message || "Token hết hạn hoặc không hợp lệ.";
             setMessage(`Error: ${errorMsg}`);
         } finally {
             setIsLoading(false);
@@ -67,8 +67,8 @@ const ResetPassword = () => {
             <div className="reset-container">
                 <div className="threads-logo-bg"></div>
 
-                <h2>Reset Password</h2>
-                <p className="sub-text">Enter your new password below.</p>
+                <h2>Đặt lại mật khẩu</h2>
+                <p className="sub-text">Nhập mật khẩu mới của bạn bên dưới.</p>
 
                 <form onSubmit={handleSubmit}>
                     
@@ -77,7 +77,7 @@ const ResetPassword = () => {
                         <input 
                             className="reset-input"
                             type={showPass ? "text" : "password"} // Thay đổi type dựa vào state
-                            placeholder="New Password (min 8 chars)" 
+                            placeholder="Mật khẩu mới (tối thiểu 8 ký tự)" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
                             required 
@@ -97,7 +97,7 @@ const ResetPassword = () => {
                         <input 
                             className="reset-input"
                             type={showConfirmPass ? "text" : "password"} // Thay đổi type dựa vào state
-                            placeholder="Confirm New Password" 
+                            placeholder="Xác nhận mật khẩu mới" 
                             value={confirmPassword} 
                             onChange={(e) => setConfirmPassword(e.target.value)} 
                             required 
@@ -117,7 +117,7 @@ const ResetPassword = () => {
                         disabled={isLoading}
                         style={{ opacity: isLoading ? 0.7 : 1 }}
                     >
-                        {isLoading ? "Updating..." : "Change Password"}
+                        {isLoading ? "Đang cập nhật..." : "Đổi mật khẩu"}
                     </button>
                 </form>
 

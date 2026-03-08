@@ -8,7 +8,7 @@ const mediaSchema = new mongoose.Schema(
     url: { type: String, required: true },
     type: {
       type: String,
-      enum: ["image", "video"],
+      enum: ["image", "video", "audio"],
       required: true,
     },
   },
@@ -90,7 +90,7 @@ const postSchema = new mongoose.Schema(
         url: { type: String, required: true },
         type: {
           type: String,
-          enum: ["image", "video"],
+          enum: ["image", "video", "audio"],
           required: true,
         },
       },
