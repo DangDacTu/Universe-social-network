@@ -16,13 +16,10 @@ const ShareModal = ({ post, onClose }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                // Lấy danh sách người có thể chat (Inbox + Requests)
                 const res = await userApi.getChatAvailableUsers();
                 const { inbox, requests } = res.data;
                 
-                // Gộp chung lại để hiển thị, loại bỏ trùng lặp nếu có
                 const allUsers = [...inbox, ...requests];
-                // Lọc unique theo _id
                 const uniqueUsers = Array.from(new Map(allUsers.map(item => [item._id, item])).values());
                 
                 setUsers(uniqueUsers);
@@ -50,18 +47,14 @@ const ShareModal = ({ post, onClose }) => {
         setSending(true);
 
         const socket = getSocket();
-        // Tạo link bài viết (giả sử route là /post/:id hoặc modal post detail)
-        // Nếu bạn dùng modal để xem post, link có thể là trang chủ hoặc profile
         const postLink = `${window.location.origin}/post/${post._id}`;
         
-        // Gửi tin nhắn cho từng người được chọn
         selectedUsers.forEach(receiverId => {
-            // Emit sự kiện giống như trong ChatBox
             socket.emit("send-message", {
                 senderId: currentUser._id,
                 receiverId: receiverId,
                 content: postLink,
-                mediaType: 'text' // Gửi dưới dạng text link
+                mediaType: 'text'
             });
         });
 
@@ -72,7 +65,6 @@ const ShareModal = ({ post, onClose }) => {
         }, 500);
     };
 
-    // Filter users theo search term
     const filteredUsers = users.filter(u => 
         u.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -80,16 +72,14 @@ const ShareModal = ({ post, onClose }) => {
     return (
         <div className="share-modal-overlay" onClick={onClose}>
             <div className="share-modal-container" onClick={e => e.stopPropagation()}>
-                {/* Header */}
                 <div className="share-modal-header">
-                    <div style={{width: 24}}></div> {/* Spacer */}
+                    <div style={{width: 24}}></div>
                     <span className="share-modal-title">Chia sẻ</span>
                     <button className="share-close-btn" onClick={onClose}>
                         <FiX size={24} />
                     </button>
                 </div>
 
-                {/* Search */}
                 <div className="share-search-wrapper">
                     <span className="share-search-label">Tới:</span>
                     <input 
@@ -102,7 +92,6 @@ const ShareModal = ({ post, onClose }) => {
                     />
                 </div>
 
-                {/* List */}
                 <div className="share-user-list">
                     {loading ? (
                         <div style={{padding: 20, textAlign: 'center', color: '#888'}}>Đang tải...</div>
@@ -132,7 +121,6 @@ const ShareModal = ({ post, onClose }) => {
                     )}
                 </div>
 
-                {/* Footer */}
                 <div className="share-modal-footer">
                     <button 
                         className="share-send-btn" 

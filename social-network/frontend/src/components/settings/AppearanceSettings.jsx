@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import settingsApi from "../../api/settingApi"; // Đảm bảo bạn đã có API này
-import uploadApi from "../../api/uploadApi";    // Đảm bảo bạn đã có API này
+import settingsApi from "../../api/settingApi"; 
+import uploadApi from "../../api/uploadApi";    
 import { FiCheck, FiImage, FiUploadCloud, FiLayout } from "react-icons/fi";
 
 // Danh sách 12 màu/gradient mẫu
@@ -29,7 +29,6 @@ export default function AppearanceSettings() {
 
     // Hàm áp dụng background ngay lập tức (Preview trực tiếp lên body)
     const applyBackground = (value, type) => {
-        // Lưu vào localStorage để F5 không bị mất màu
         localStorage.setItem('universe_bg', value);
         localStorage.setItem('universe_bg_type', type);
 
@@ -50,7 +49,7 @@ export default function AppearanceSettings() {
         setBgType(item.type);
         applyBackground(item.value, item.type);
         // Cập nhật context ngay để MainLayout đổi nền ngay lập tức
-        // 🔥 QUAN TRỌNG: Hàm này giờ đã có trong AuthContext, nó sẽ lưu vào localStorage 'user'
+        // Hàm này giờ đã có trong AuthContext, nó sẽ lưu vào localStorage 'user'
         if (updateUser) {
             updateUser({ background: item.value, backgroundType: item.type });
         }

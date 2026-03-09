@@ -5,7 +5,7 @@ import { FiImage } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
 const DEFAULT_AVATAR = "/avatar.jpg";
-const MAX_MEDIA = 10; // 🔥 giới hạn media
+const MAX_MEDIA = 10; 
 
 export default function CreatePostModal({ onClose, onSuccess }) {
   const { user } = useAuth();
@@ -97,7 +97,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             />
           </div>
 
-          {/* 🔥 THREADS STYLE PREVIEW */}
+          {/* THREADS STYLE PREVIEW */}
           {media.length > 0 && (
             <div
               className={`preview-scroll ${media.length === 1 ? "single" : "multiple"
@@ -105,7 +105,7 @@ export default function CreatePostModal({ onClose, onSuccess }) {
             >
               {media.map((file, index) => (
                 <div className="preview-item" key={index}>
-                  {/* ❌ REMOVE */}
+                  {/* REMOVE */}
                   <button
                     className="preview-remove"
                     onClick={() => handleRemoveMedia(index)}

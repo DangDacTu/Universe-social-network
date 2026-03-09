@@ -46,7 +46,7 @@ const ReplyIcon = () => (
 export default function CommentModal({ postId, onClose }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
-  const [files, setFiles] = useState([]); // ✅ THÊM
+  const [files, setFiles] = useState([]); 
   const [previews, setPreviews] = useState([]);
   const [replyingId, setReplyingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -57,7 +57,7 @@ export default function CommentModal({ postId, onClose }) {
 
   /* ====== THÊM CHO SCROLL + HIGHLIGHT ====== */
   const commentListRef = useRef(null);
-  const fileInputRef = useRef(null); // ✅ THÊM
+  const fileInputRef = useRef(null); 
   const [newCommentId, setNewCommentId] = useState(null);
 
   /* ======================
@@ -214,7 +214,7 @@ export default function CommentModal({ postId, onClose }) {
                     <p className="comment-content">{c.content}</p>
                   )}
 
-                  {/* ✅ CHỈ THÊM MEDIA – KHÔNG ĐỔI LAYOUT */}
+                  {/* CHỈ THÊM MEDIA – KHÔNG ĐỔI LAYOUT */}
                   {c.media?.length > 0 &&
                     c.media.map((m, i) =>
                       m.type === "image" ? (

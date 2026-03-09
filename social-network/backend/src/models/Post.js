@@ -37,7 +37,6 @@ const replySchema = new mongoose.Schema(
       default: null,
     },
 
-    // 🔥 replies con (reply của reply)
     replies: [],
   },
   { timestamps: true }
@@ -80,7 +79,6 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    // 🔥 THÊM TRƯỜNG NÀY CHO TÍNH NĂNG REPOST
     repostData: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post",

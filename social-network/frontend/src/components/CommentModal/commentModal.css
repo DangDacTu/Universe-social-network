@@ -118,7 +118,7 @@
   font-size: 12px;
 }
 
-/* ❤️ like icon */
+/* like icon */
 .comment-like {
   display: flex;
   align-items: center;
@@ -344,8 +344,8 @@
 /* ẢNH COMMENT */
 .comment-media-img {
   max-width: 280px;
-  max-height: 280px;      /* ✅ GIỚI HẠN CHIỀU CAO */
-  object-fit: cover;     /* ✅ CẮT ẢNH GỌN */
+  max-height: 280px;      
+  object-fit: cover;     
   border-radius: 8px;
 }
 

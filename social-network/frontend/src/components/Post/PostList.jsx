@@ -18,7 +18,7 @@ export default function PostList({ reload }) {
     }
   };
 
-  // 🔥 HÀM XÓA POST KHÔNG RELOAD
+  // HÀM XÓA POST KHÔNG RELOAD
   const handleRemovePost = (postId) => {
     setPosts((prev) => prev.filter((p) => p._id !== postId));
   };
@@ -35,7 +35,7 @@ export default function PostList({ reload }) {
         <div key={post._id} style={{ borderBottom: "1px solid #ccc" }}>
           <PostItem
             post={post}
-            onDeleted={handleRemovePost} // 👈 truyền xuống
+            onDeleted={handleRemovePost}
           />
         </div>
       ))}

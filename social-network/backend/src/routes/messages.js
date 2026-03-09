@@ -1,6 +1,3 @@
-/**
- * Route cho chức năng chat
- */
 const express = require("express");
 const router = express.Router();
 

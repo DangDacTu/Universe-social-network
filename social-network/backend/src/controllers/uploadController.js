@@ -1,4 +1,3 @@
-// File mới hoàn toàn
 exports.uploadFile = (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {

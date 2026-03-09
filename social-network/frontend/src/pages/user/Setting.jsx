@@ -2,9 +2,9 @@ import { useState } from "react";
 import SettingsMenu from "../../components/settings/SettingsMenu";
 import ChangePassword from "../../components/settings/ChangePassword";
 import PrivacySettings from "../../components/settings/PrivacySettings";
-import AppearanceSettings from "../../components/settings/AppearanceSettings"; // 🔥 Import file mới
+import AppearanceSettings from "../../components/settings/AppearanceSettings"; 
 import AboutSettings from "../../components/settings/AboutSettings";
-import SavedPosts from "../../components/settings/SavedPosts"; // 🔥 Import SavedPosts
+import SavedPosts from "../../components/settings/SavedPosts"; 
 import "./Settings.css";
 
 export default function Settings() {
@@ -30,14 +30,14 @@ export default function Settings() {
                         </div>
                     )}
 
-                    {/* 🔥 TAB GIAO DIỆN MỚI */}
+                    {/* TAB GIAO DIỆN MỚI */}
                     {activeTab === "appearance" && (
                         <div className="settings-card">
                             <AppearanceSettings />
                         </div>
                     )}
 
-                    {/* 🔥 TAB ĐÃ LƯU */}
+                    {/* TAB ĐÃ LƯU */}
                     {activeTab === "saved" && (
                         <div className="settings-card">
                             <SavedPosts />

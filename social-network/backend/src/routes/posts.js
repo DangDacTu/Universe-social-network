@@ -7,7 +7,7 @@ const upload = require("../middlewares/uploadMiddleware");
 router.post("/", protect, upload.array("media", 10), postController.createPost);
 router.get("/", protect, postController.getAllPosts);
 
-// 🔥 DELETE POST
+// DELETE POST
 router.delete("/:id", protect, postController.deletePost);
 
 // COMMENTS
@@ -22,28 +22,28 @@ router.post(
 // LIKE POST
 router.post("/:id/like", protect, postController.toggleLike);
 
-// 🔥 LIKE COMMENT
+// LIKE COMMENT
 router.post(
   "/:id/comments/:commentId/like",
   protect,
   postController.toggleLikeComment
 );
 
-// 🔥 ADD REPLY
+// ADD REPLY
 router.post(
   "/:id/comments/:commentId/replies",
   protect,
   postController.addReply
 );
 
-// 🔥 DELETE COMMENT
+// DELETE COMMENT
 router.delete(
   "/:id/comments/:commentId",
   protect,
   postController.deleteComment
 );
 
-//  ROUTE LẤY BÀI VIẾT CỦA 1 USER
+// ROUTE LẤY BÀI VIẾT CỦA 1 USER
 router.get("/user/:userId", protect, postController.getUserPosts);
 
 module.exports = router;

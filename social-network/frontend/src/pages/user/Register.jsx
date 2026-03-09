@@ -89,7 +89,7 @@ const Register = () => {
                     <div className="input-wrapper">
                         <input 
                             className="register-input"
-                            type={showPass ? "text" : "password"} // Toggle type
+                            type={showPass ? "text" : "password"}
                             placeholder="Mật khẩu" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
@@ -108,7 +108,7 @@ const Register = () => {
                     <div className="input-wrapper">
                         <input 
                             className="register-input"
-                            type={showConfirmPass ? "text" : "password"} // Toggle type
+                            type={showConfirmPass ? "text" : "password"} 
                             placeholder="Xác nhận mật khẩu" 
                             value={confirmPassword} 
                             onChange={(e) => setConfirmPassword(e.target.value)} 

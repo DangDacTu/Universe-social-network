@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useLocation } from "react-router-dom"; // Thêm hook này
+import { useLocation } from "react-router-dom";
 import { connectSocket, getSocket } from "../../services/socket";
 import messageApi from "../../api/messageApi";
 import userApi from "../../api/userApi";
@@ -11,10 +11,9 @@ import "./Chat.css";
 
 export default function Chat() {
   const { user } = useAuth();
-  const location = useLocation(); // Lấy thông tin route
+  const location = useLocation();
   
-  // State cho danh sách chat
-  const [activeTab, setActiveTab] = useState("inbox"); // "inbox" | "requests"
+  const [activeTab, setActiveTab] = useState("inbox");
   const [inboxUsers, setInboxUsers] = useState([]);
   const [requestUsers, setRequestUsers] = useState([]);
   const [chatUsers, setChatUsers] = useState([]);
@@ -27,17 +26,14 @@ export default function Chat() {
     if (!user) return;
     const socket = connectSocket(user._id);
 
-    // 1. Nhận tin nhắn mới
     socket.on("receive-message", (msg) => {
       if (msg.senderId === user._id) return;
       addMessageToState(msg.senderId, msg);
     });
 
-    // 2. Xử lý tin nhắn bị XÓA (MỚI)
     socket.on("message-deleted", ({ messageId }) => {
       setMessages(prev => {
         const newState = { ...prev };
-        // Lặp qua tất cả cuộc hội thoại để tìm và xóa tin nhắn đó
         for (const uid in newState) {
           newState[uid] = newState[uid].filter(m => m._id !== messageId);
         }
@@ -45,7 +41,6 @@ export default function Chat() {
       });
     });
 
-    // 3. Xử lý tin nhắn bị SỬA (MỚI)
     socket.on("message-edited", ({ messageId, newContent }) => {
       setMessages(prev => {
         const newState = { ...prev };
@@ -74,28 +69,23 @@ export default function Chat() {
     };
   }, [user]);
 
-  // Load danh sách user
   useEffect(() => {
     const fetchUsers = async () => {
         try {
             const res = await userApi.getChatAvailableUsers();
-            // Backend trả về { inbox: [], requests: [] }
             const { inbox, requests } = res.data;
             
             setInboxUsers(inbox);
             setRequestUsers(requests);
             
-            // Mặc định hiển thị Inbox
             setChatUsers(inbox);
 
-            // Kiểm tra xem có userId được truyền từ trang Profile không
             const targetUserId = location.state?.userId;
             const allUsers = [...inbox, ...requests];
             const targetUser = allUsers.find(u => u._id === targetUserId);
 
             if (targetUser) {
                 setSelectedUser(targetUser);
-                // Nếu user nằm trong requests, tự động chuyển tab sang requests
                 if (requests.find(u => u._id === targetUserId)) {
                     setActiveTab("requests");
                     setChatUsers(requests);
@@ -108,15 +98,13 @@ export default function Chat() {
     fetchUsers();
   }, []);
 
-  // Xử lý chuyển tab
   const handleTabChange = (tab) => {
       setActiveTab(tab);
       if (tab === "inbox") setChatUsers(inboxUsers);
       else setChatUsers(requestUsers);
-      setSelectedUser(null); // Reset người được chọn khi chuyển tab
+      setSelectedUser(null);
   };
 
-  // Load lịch sử chat
   useEffect(() => {
     if (!selectedUser) return;
     const fetchHistory = async () => {
@@ -158,7 +146,6 @@ export default function Chat() {
       <div className="chatLayout">
         <div className="chatContainer">
           <div className="chatSidebarWrapper">
-            {/* TABS CHUYỂN ĐỔI INBOX / REQUESTS */}
             <div style={{ display: 'flex', borderBottom: '1px solid #eee', marginBottom: '10px' }}>
                 <button 
                     onClick={() => handleTabChange("inbox")}

@@ -4,24 +4,23 @@ import axiosClient from "../../api/axiosClient";
 import { Link, useNavigate } from "react-router-dom";
 import { FiHeart, FiMessageCircle, FiMoreHorizontal, FiRepeat, FiSend, FiBookmark } from "react-icons/fi";
 import { AiFillHeart } from "react-icons/ai";
-import { FaBookmark } from "react-icons/fa"; // Icon bookmark đặc
+import { FaBookmark } from "react-icons/fa"; 
 import CommentModal from "../CommentModal/CommentModal";
 import { FiTrash2 } from "react-icons/fi";
-import { useAuth } from "../../context/AuthContext"; // 🔥 Import useAuth
+import { useAuth } from "../../context/AuthContext";
 import userApi from "../../api/userApi";
-import ShareModal from "../ShareModal/ShareModal"; // Import ShareModal
+import ShareModal from "../ShareModal/ShareModal";
 
-// 1. SỬA: Xóa dòng BACKEND_URL vì Cloudinary dùng link tuyệt đối
-// const BACKEND_URL = "http://localhost:5000"; 
 const DEFAULT_AVATAR = "/avatar.jpg";
 
 export default function PostItem({ post, onDeleted }) {
-  // 2. THÊM: Dòng này bắt buộc để tránh lỗi màn hình đen khi dữ liệu chưa tải xong
-  if (!post) return null;
   const navigate = useNavigate();
-  const { user, updateUser } = useAuth(); // 🔥 Lấy user từ context
+  const { user, updateUser } = useAuth(); 
 
-  // 🔥 CHUYỂN LÊN ĐẦU: Xác định bài viết hiển thị (Bài gốc hay bài repost)
+  //Dòng này bắt buộc để tránh lỗi màn hình đen khi dữ liệu chưa tải xong
+  if (!post) return null;
+
+  // CHUYỂN LÊN ĐẦU: Xác định bài viết hiển thị (Bài gốc hay bài repost)
   // Để các state bên dưới (commentCount) có thể dùng dữ liệu của bài gốc
   const isRepost = !!post.repostData;
   const displayPost = isRepost ? post.repostData : post;
@@ -52,7 +51,7 @@ export default function PostItem({ post, onDeleted }) {
       COMMENT COUNT
   ====================== */
   const [commentCount, setCommentCount] = useState(
-    displayPost.comments?.length || 0 // 🔥 SỬA: Lấy số comment của bài hiển thị (bài gốc)
+    displayPost.comments?.length || 0
   );
 
   /* ======================
@@ -95,7 +94,6 @@ export default function PostItem({ post, onDeleted }) {
     try {
       await axiosClient.delete(`/posts/${post._id}`);
       setTimeout(() => {
-        // Kiểm tra an toàn trước khi gọi
         if (typeof onDeleted === "function") {
             onDeleted(post._id);
         }
@@ -110,7 +108,6 @@ export default function PostItem({ post, onDeleted }) {
   /* ======================
       MEDIA VIEWER
   ====================== */
-  // 3. SỬA: Lọc bỏ media lỗi để tránh crash
   const mediaList = (displayPost.media || []).filter(item => item && item.url);
   
   const activeMedia =
@@ -150,7 +147,6 @@ export default function PostItem({ post, onDeleted }) {
   const handleRepost = async () => {
     if (!window.confirm("Bạn muốn đăng lại bài viết này lên trang cá nhân?")) return;
     try {
-        // Gọi API repost (Route này phải khớp với backend bạn vừa thêm)
         await axiosClient.post(`/users/repost/${post._id}`);
         alert("Đã đăng lại thành công!");
     } catch (error) {
@@ -163,15 +159,12 @@ export default function PostItem({ post, onDeleted }) {
   /* ======================
       SAVE / BOOKMARK LOGIC
   ====================== */
-  // Kiểm tra xem bài viết đã được lưu chưa dựa trên mảng savedPosts của user
   const isSaved = user?.savedPosts?.includes(post._id);
 
   const handleToggleSave = async () => {
       try {
           const res = await userApi.toggleSavePost(post._id);
-          // Cập nhật lại thông tin user trong context (bao gồm mảng savedPosts mới)
           updateUser({ savedPosts: res.data.savedPosts });
-          // alert(res.data.message); // Có thể bỏ alert nếu muốn trải nghiệm mượt hơn
       } catch (error) {
           console.error("Lỗi lưu bài viết:", error);
       }
@@ -181,7 +174,6 @@ export default function PostItem({ post, onDeleted }) {
   return (
     <>
       <div className={`post-item ${removing ? "post-removing" : ""}`}>
-        {/* Cột trái: Avatar */}
         <Link to={`/profile/${displayPost.author?._id}`}>
           <img
             src={displayPost.author?.profilePicture || displayPost.author?.avatar || DEFAULT_AVATAR}
@@ -191,10 +183,8 @@ export default function PostItem({ post, onDeleted }) {
           />
         </Link>
 
-        {/* Cột phải: Nội dung */}
         <div className="post-content">
           
-          {/* 🔥 HEADER REPOST: Chỉ hiện nếu đây là bài đăng lại */}
           {isRepost && (
              <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                  <FiRepeat size={12} /> 
@@ -214,14 +204,12 @@ export default function PostItem({ post, onDeleted }) {
               </span>
             </div>
 
-            {/* LOGIC HIỆN NÚT XÓA (GIỮ NGUYÊN TỪ FILE GỐC CỦA BẠN) */}
-            {/* Chỉ xóa được bài wrapper (bài repost) nếu là chính chủ */}
             {String(post.author?._id) === String(currentUserId) && (
               <div className="post-menu" ref={menuRef}>
                 <button
                   className="post-menu-btn"
                   onClick={(e) => {
-                      e.stopPropagation(); // Thêm cái này để tránh click nhầm vào post
+                      e.stopPropagation();
                       setOpenMenu((p) => !p)
                   }}
                 >
@@ -247,7 +235,6 @@ export default function PostItem({ post, onDeleted }) {
             <div className="post-text">{displayPost.content}</div>
           )}
 
-          {/* 5. SỬA: DÙNG TRỰC TIẾP item.url CHO CLOUDINARY (BỎ BACKEND_URL) */}
           {(displayPost.media || []).length > 0 && (
             <div
               className={`post-media-scroll ${
@@ -280,7 +267,7 @@ export default function PostItem({ post, onDeleted }) {
             <div className="action-group">
               <button
                 className={`like-btn ${liked ? "liked" : ""}`}
-                onClick={handleLike} // Lưu ý: Like này đang like bài wrapper (nếu là repost). Nếu muốn like bài gốc phải sửa logic handleLike
+                onClick={handleLike}
               >
                 {liked ? <AiFillHeart size={20} /> : <FiHeart size={20} />}
               </button>
@@ -307,7 +294,6 @@ export default function PostItem({ post, onDeleted }) {
               </span>
             </div>
 
-            {/* ICON ĐĂNG LẠI */}
             <div className="action-group">
               <button
                 className="repost-btn"
@@ -317,7 +303,6 @@ export default function PostItem({ post, onDeleted }) {
               </button>
             </div>
 
-            {/* ICON GỬI */}
             <div className="action-group">
               <button
                 className="send-btn"
@@ -327,7 +312,6 @@ export default function PostItem({ post, onDeleted }) {
               </button>
             </div>
 
-            {/* 🔥 ICON LƯU BÀI VIẾT (Góc phải đối diện tim) */}
             <div className="action-group" style={{ marginLeft: "auto" }}>
                 <button 
                     className={`save-btn ${isSaved ? "saved" : ""}`}
@@ -342,7 +326,7 @@ export default function PostItem({ post, onDeleted }) {
 
       {openComment && (
         <CommentModal
-          postId={displayPost._id} // 🔥 SỬA: Truyền ID bài gốc để comment lưu vào đúng chỗ
+          postId={displayPost._id}
           onClose={() => setOpenComment(false)}
           onCommentAdded={() => setCommentCount((c) => c + 1)}
         />
@@ -350,7 +334,7 @@ export default function PostItem({ post, onDeleted }) {
 
       {showShareModal && (
         <ShareModal 
-          post={displayPost} // Chia sẻ bài viết đang hiển thị (hoặc bài gốc nếu là repost)
+          post={displayPost}
           onClose={() => setShowShareModal(false)} 
         />
       )}

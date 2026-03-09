@@ -120,10 +120,10 @@ const loginUser = async (req, res) => {
                 _id: user._id,
                 username: user.username,
                 email: user.email,
-                profilePicture: user.profilePicture, // Frontend sẽ hiển thị Robot từ link này
+                profilePicture: user.profilePicture,
                 background: user.background,
                 backgroundType: user.backgroundType,
-                savedPosts: user.savedPosts, // 🔥 Thêm dòng này
+                savedPosts: user.savedPosts,
                 token: generateToken(user._id),
             });
         } else {

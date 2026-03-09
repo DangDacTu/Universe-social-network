@@ -68,7 +68,7 @@
   cursor: pointer;
 
   overflow: hidden;        /* giới hạn hitbox */
-  pointer-events: auto;    /* ✅ BẮT BUỘC */
+  pointer-events: auto;    
 }
 
 .sidebar-logo img {
@@ -76,7 +76,7 @@
   height: 107px;
   object-fit: contain;
 
-  pointer-events: none;    /* ❗ CHỈ ẢNH KHÔNG BẮT CLICK */
+  pointer-events: none;    
 }
 
 .sidebar-item {
@@ -103,7 +103,7 @@
   position: absolute;
   bottom: 60px;
 
-  /* 👇 neo vào TRONG sidebar */
+  /* neo vào TRONG sidebar */
   left: 12px;
 
   background: #fff;

@@ -76,12 +76,12 @@ const ResetPassword = () => {
                     <div className="input-wrapper">
                         <input 
                             className="reset-input"
-                            type={showPass ? "text" : "password"} // Thay đổi type dựa vào state
+                            type={showPass ? "text" : "password"} 
                             placeholder="Mật khẩu mới (tối thiểu 8 ký tự)" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
                             required 
-                            minLength="8" // HTML validation
+                            minLength="8"
                         />
                         <button 
                             type="button" 
@@ -96,7 +96,7 @@ const ResetPassword = () => {
                     <div className="input-wrapper">
                         <input 
                             className="reset-input"
-                            type={showConfirmPass ? "text" : "password"} // Thay đổi type dựa vào state
+                            type={showConfirmPass ? "text" : "password"} 
                             placeholder="Xác nhận mật khẩu mới" 
                             value={confirmPassword} 
                             onChange={(e) => setConfirmPassword(e.target.value)} 

@@ -4,7 +4,6 @@
     height: 100%;
     display: flex;
     justify-content: center;
-    /* MainLayout đã có padding-top, ở đây không cần thêm quá nhiều */
 }
 
 /* Khung chính của Search — kéo dài hết màn hình như Home */
@@ -24,7 +23,7 @@
 
 /* --- HEADER --- */
 .search-header {
-    padding: 20px 24px; /* Đồng bộ với padding của profile-scroll */
+    padding: 20px 24px; 
     border-bottom: 1px solid #efefef;
     background: #fff;
     z-index: 10;
@@ -78,8 +77,8 @@
 
 .search-input {
     width: 100%;
-    padding: 10px 40px 10px 44px; /* Chừa chỗ cho icon trái và nút X phải */
-    border-radius: 8px; /* Bo góc nhẹ kiểu Instagram */
+    padding: 10px 40px 10px 44px; 
+    border-radius: 8px; 
     border: none;
     background-color: #efefef;
     font-size: 16px;
@@ -91,7 +90,7 @@
 
 .search-input:focus {
     background-color: #fff;
-    box-shadow: 0 0 0 1px #dbdbdb; /* Viền mỏng khi focus */
+    box-shadow: 0 0 0 1px #dbdbdb; 
 }
 
 .search-clear-btn {
@@ -197,7 +196,7 @@
 /* Loading Spinner */
 .spinner {
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #0095f6; /* Màu xanh Universe/Insta */
+    border-top: 3px solid #0095f6; 
     border-radius: 50%;
     width: 24px;
     height: 24px;

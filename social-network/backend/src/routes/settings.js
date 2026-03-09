@@ -1,8 +1,3 @@
-/**
- * @file settings.js
- * @author moi
- * @description Routes quản lý cài đặt tài khoản người dùng
- */
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middlewares/authMiddleware');

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import userApi from '../../api/userApi';
 import axiosClient from '../../api/axiosClient';
 import EditProfileModal from '../../components/EditProfileModal';
-import PostItem from '../../components/Post/PostItem.jsx'; // Import PostItem
+import PostItem from '../../components/Post/PostItem.jsx';
 import './Profile.css';
 
 import { 
@@ -24,15 +24,13 @@ const Profile = () => {
     const { user: currentUser, updateUser } = useAuth();
     
     const [profile, setProfile] = useState(null);
-    const [userPosts, setUserPosts] = useState([]); // State lưu bài viết
+    const [userPosts, setUserPosts] = useState([]);
     const [loadingPosts, setLoadingPosts] = useState(false);
     const [followed, setFollowed] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    // 🔥 State quản lý Tab (posts | reposts)
     const [activeTab, setActiveTab] = useState('posts');
 
-    // State cho Modal Follow
     const [showFollowModal, setShowFollowModal] = useState(false);
     const [followList, setFollowList] = useState([]);
     const [modalTitle, setModalTitle] = useState("");
@@ -46,7 +44,6 @@ const Profile = () => {
                 const userId = id || currentUser?._id;
                 if (!userId) return;
 
-                // 1. Lấy thông tin Profile
                 const { data: userData } = await userApi.getUser(userId);
                 setProfile(userData);
 
@@ -56,13 +53,11 @@ const Profile = () => {
                     setFollowed(false);
                 }
 
-                // 2. Lấy danh sách bài viết của User
                 setLoadingPosts(true);
                 try {
                     let url = `/posts/user/${userId}`;
-                    // Nếu đang ở tab Repost thì gọi API lấy repost
                     if (activeTab === 'reposts') {
-                        url = `/users/${userId}/reposts`; // Đảm bảo bạn đã map route này ở backend
+                        url = `/users/${userId}/reposts`;
                     }
 
                     const { data: postsData } = await axiosClient.get(url);
@@ -79,9 +74,8 @@ const Profile = () => {
         };
 
         fetchData();
-    }, [id, currentUser?._id, activeTab]); // 🔥 Thêm activeTab vào dependency
+    }, [id, currentUser?._id, activeTab]);
 
-    // Xử lý khi xóa bài viết (Cập nhật giao diện ngay lập tức)
     const handlePostDeleted = (deletedPostId) => {
         setUserPosts((prev) => prev.filter((p) => p._id !== deletedPostId));
     };
@@ -113,22 +107,18 @@ const Profile = () => {
 
     const handleUpdateSuccess = (updatedData) => {
         setProfile(prev => ({ ...prev, ...updatedData }));
-        // Cập nhật thông tin user trên toàn cục
         if (updateUser) {
             updateUser(updatedData);
         }
     };
 
     const handleMessage = () => {
-        // Chuyển hướng sang trang chat và truyền ID của người muốn chat
         navigate('/chat', { state: { userId: profile._id } });
     };
 
-    // Hàm mở danh sách Followers
     const handleShowFollowers = async () => {
         if (!profile) return;
         try {
-            // Gọi API lấy danh sách followers
             const res = await axiosClient.get(`/users/${profile._id}/followers`);
             setFollowList(res.data);
             setModalTitle("Người theo dõi");
@@ -138,11 +128,9 @@ const Profile = () => {
         }
     };
 
-    // Hàm mở danh sách Following
     const handleShowFollowing = async () => {
         if (!profile) return;
         try {
-            // Gọi API lấy danh sách following
             const res = await axiosClient.get(`/users/${profile._id}/following`);
             setFollowList(res.data);
             setModalTitle("Đang theo dõi");
@@ -156,7 +144,6 @@ const Profile = () => {
 
     return (
         <>
-            {/* CSS Inline cho Modal Follow */}
             <style>{`
                 .follow-modal-overlay {
                     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -190,7 +177,6 @@ const Profile = () => {
                         ) : (
                             <div className="profile-container">
                                 
-                                {/* HEADER NAV */}
                                 <div className="profile-nav-header">
                                     <Link to="/" className="profile-back-btn">
                                         <FiArrowLeft size={24} />
@@ -198,7 +184,6 @@ const Profile = () => {
                                     <span className="nav-title">{profile.username}</span>
                                 </div>
 
-                                {/* THÔNG TIN PROFILE */}
                                 <div className="profile-header">
                                     <div className="profile-info">
                                         <h2 className="profile-username">{profile.username}</h2>
@@ -236,7 +221,6 @@ const Profile = () => {
                                     </div>
                                 </div>
 
-                                {/* NÚT HÀNH ĐỘNG */}
                                 <div className="profile-actions">
                                     {isMyProfile ? (
                                         <button 
@@ -256,7 +240,6 @@ const Profile = () => {
                                         </button>
                                     )}
 
-                                    {/* NÚT NHẮN TIN: Chỉ hiện khi không phải là mình và ĐÃ FOLLOW */}
                                     {!isMyProfile && followed && (
                                         <button 
                                             className="action-btn secondary"
@@ -276,7 +259,6 @@ const Profile = () => {
                                     </button>
                                 </div>
 
-                                {/* TABS */}
                                 <div className="profile-tabs">
                                     <div 
                                         className={`tab-item ${activeTab === 'posts' ? 'active' : ''}`}
@@ -292,19 +274,16 @@ const Profile = () => {
                                     </div>
                                 </div>
 
-                                {/* DANH SÁCH BÀI VIẾT */}
                                 <div className="profile-posts-list">
                                     {loadingPosts ? (
                                         <div style={{textAlign: 'center', padding: '20px', color: '#888'}}>Đang tải bài viết...</div>
                                     ) : userPosts.length > 0 ? (
                                         userPosts.map((post) => (
                                             <div key={post._id} style={{ borderBottom: "1px solid #cccccc" }}>
-                                                {/* Hiển thị bài viết */}
                                                 <PostItem post={post} onDeleted={handlePostDeleted} />
                                             </div>
                                         ))
                                     ) : (
-                                        // EMPTY STATE KHI KHÔNG CÓ BÀI
                                         <div className="profile-posts empty">
                                             <div className="empty-icon-circle">
                                                 <FiMessageSquare size={24} />
@@ -322,7 +301,6 @@ const Profile = () => {
                                     />
                                 )}
 
-                                {/* MODAL HIỂN THỊ DANH SÁCH FOLLOW */}
                                 {showFollowModal && (
                                     <div className="follow-modal-overlay" onClick={() => setShowFollowModal(false)}>
                                         <div className="follow-modal" onClick={e => e.stopPropagation()}>

@@ -4,9 +4,9 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #000; /* Nền đen tuyệt đối */
+    background-color: #000; 
     color: #fff;
-    overflow: hidden; /* Tránh thanh cuộn */
+    overflow: hidden; 
 }
 
 /* --- LAYOUT CHÍNH --- */
@@ -82,7 +82,6 @@ form {
 .login-input {
     width: 100%;
     padding: 16px;
-    /* Padding phải lớn hơn để không bị icon che chữ */
     padding-right: 45px; 
     background-color: #1e1e1e;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -102,7 +101,7 @@ form {
 /* Icon con mắt (Nút bấm) */
 .eye-icon {
     position: absolute;
-    right: 15px; /* Cách lề phải 15px */
+    right: 15px; 
     background: none;
     border: none;
     cursor: pointer;
@@ -112,7 +111,7 @@ form {
     justify-content: center;
     padding: 0;
     transition: color 0.2s;
-    height: 100%; /* Full chiều cao để dễ bấm */
+    height: 100%; 
 }
 
 .eye-icon:hover {

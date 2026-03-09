@@ -74,9 +74,9 @@ form {
 .verify-input-code {
     width: 100%;
     padding: 14px;
-    background-color: #1e1e1e; /* Màu xám chuẩn Threads */
+    background-color: #1e1e1e; 
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px; /* Bo góc chuẩn Threads */
+    border-radius: 16px; 
     color: #fff;
     outline: none;
     transition: all 0.2s;
@@ -141,7 +141,7 @@ form {
 .threads-logo-bg {
     margin-bottom: 20px;
     display: inline-block;
-    width: 50px; /* Đồng bộ kích thước logo 50px */
+    width: 50px; 
     height: 50px;
     background: url('https://upload.wikimedia.org/wikipedia/commons/c/c8/Threads_logo.svg') no-repeat center center;
     background-size: contain;

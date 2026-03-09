@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Hiệu ứng áp dụng màu nền ngay khi load trang (Chống giật màu trắng)
     useEffect(() => {
         const savedBg = localStorage.getItem('universe_bg');
         const savedType = localStorage.getItem('universe_bg_type');
@@ -24,7 +23,6 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        // Kiểm tra LocalStorage khi load lại trang
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
@@ -51,8 +49,6 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
-    // 🔥 THÊM HÀM NÀY: Cập nhật thông tin user cục bộ (không gọi API)
-    // Giúp giao diện cập nhật ngay lập tức và đồng bộ localStorage
     const updateUser = (data) => {
         setUser((prev) => {
             const updatedUser = { ...prev, ...data };

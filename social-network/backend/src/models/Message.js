@@ -10,7 +10,6 @@ const messageSchema = new mongoose.Schema(
     mediaUrl: { type: String, default: "" },
     mediaType: { 
         type: String, 
-        // 👇 THÊM 'video' VÀO ĐÂY
         enum: ["text", "image", "audio", "video"], 
         default: "text" 
     },

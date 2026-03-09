@@ -1,4 +1,3 @@
-/* Layout giống Search / Profile — full màn hình */
 .notif-wrapper-center {
   width: 100%;
   height: 100%;
@@ -72,7 +71,7 @@
   -ms-overflow-style: none;
 }
 
-/* List item — kiểu Instagram */
+/* List item */
 .notif-list {
   display: flex;
   flex-direction: column;

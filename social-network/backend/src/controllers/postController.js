@@ -1,13 +1,12 @@
 const Post = require("../models/Post");
 const { createNotification } = require("./notificationController");
 /* ======================
-   CREATE POST (ĐÃ SỬA CHO CLOUDINARY)
+   CREATE POST
 ====================== */
 exports.createPost = async (req, res) => {
   try {
     const { content = "" } = req.body;
 
-    // Kiểm tra: Phải có nội dung hoặc có file ảnh/video
     if (!content.trim() && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Bài viết phải có nội dung hoặc media",
@@ -16,7 +15,6 @@ exports.createPost = async (req, res) => {
 
     let media = [];
 
-    // --- LOGIC MỚI: DÙNG CLOUDINARY ---
     if (req.files?.length > 0) {
       media = req.files.map((file) => {
         let type = "file";
@@ -26,7 +24,6 @@ exports.createPost = async (req, res) => {
         return { url: file.path, type };
       });
     }
-    // ----------------------------------
 
     const post = await Post.create({
       author: req.user.id,
@@ -36,7 +33,7 @@ exports.createPost = async (req, res) => {
 
     const populatedPost = await post.populate(
       "author",
-      "username profilePicture" // Lưu ý: check lại model User của bạn là 'profilePicture' hay 'avatar' nhé
+      "username profilePicture"
     );
 
     res.status(201).json(populatedPost);
@@ -56,13 +53,10 @@ exports.deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
-    // 🔒 Chỉ chủ post được xóa
     if (post.author.toString() !== req.user.id.toString()) {
       return res.status(403).json({ message: "Không có quyền xóa post" });
     }
 
-    // Lưu ý: Code này xóa post trong DB, nhưng ảnh trên Cloudinary vẫn còn.
-    // Nếu muốn xóa sạch cả trên Cloudinary, cần dùng thư viện cloudinary.uploader.destroy() ở đây.
     await post.deleteOne();
 
     res.json({ message: "Xóa post thành công" });
@@ -76,9 +70,8 @@ exports.deletePost = async (req, res) => {
 ====================== */
 exports.getAllPosts = async (req, res) => {
   try {
-    // 🔥 SỬA: Thêm điều kiện repostData: null để chỉ lấy bài gốc (không lấy bài repost)
     const posts = await Post.find({ repostData: null })
-      .populate("author", "username profilePicture") // Đổi avatar -> profilePicture cho khớp model User
+      .populate("author", "username profilePicture")
       .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
 
@@ -89,13 +82,12 @@ exports.getAllPosts = async (req, res) => {
 };
 
 /* ======================
-   GET USER POSTS (PROFILE) - MỚI THÊM
+   GET USER POSTS (PROFILE)
 ====================== */
 exports.getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    // 🔥 SỬA: Thêm điều kiện repostData: null để chỉ lấy bài gốc
     const posts = await Post.find({ author: userId, repostData: null })
       .populate("author", "username profilePicture")
       .populate("comments.user", "username profilePicture")
@@ -164,7 +156,6 @@ exports.toggleLike = async (req, res) => {
       post.likes.splice(index, 1);
     } else {
       post.likes.push(req.user.id);
-      // 🔥 TẠO THÔNG BÁO KHI CÓ LIKE MỚI
       createNotification({
         from: req.user.id,
         to: post.author,
@@ -229,7 +220,6 @@ exports.addComment = async (req, res) => {
   try {
     const { content = "" } = req.body;
 
-    // ❗ Phải có text hoặc có media
     if (!content.trim() && (!req.files || req.files.length === 0)) {
       return res.status(400).json({
         message: "Comment phải có nội dung hoặc media",
@@ -241,7 +231,6 @@ exports.addComment = async (req, res) => {
       return res.status(404).json({ message: "Post không tồn tại" });
     }
 
-    // 🟢 XỬ LÝ MEDIA TỪ CLOUDINARY
     let media = [];
     if (req.files?.length > 0) {
       media = req.files.map((file) => {
@@ -262,12 +251,10 @@ exports.addComment = async (req, res) => {
 
     await post.save();
 
-    // Populate để frontend render ngay
     await post.populate("comments.user", "username profilePicture");
 
     const newComment = post.comments.at(-1);
 
-    // 🔥 TẠO THÔNG BÁO KHI CÓ COMMENT MỚI
     createNotification({
       from: req.user.id,
       to: post.author,
@@ -313,7 +300,6 @@ exports.addReply = async (req, res) => {
       replies: [],
     };
 
-    // Reply cấp 2 trở lên
     if (parentReplyId) {
       const parentReply = comment.replies.id(parentReplyId);
       if (!parentReply) {
@@ -321,10 +307,8 @@ exports.addReply = async (req, res) => {
           .status(404)
           .json({ message: "Reply cha không tồn tại" });
       }
-
       parentReply.replies.push(newReply);
     } else {
-      // Reply cấp 1
       comment.replies.push(newReply);
     }
 
@@ -366,14 +350,12 @@ exports.deleteComment = async (req, res) => {
     const isPostOwner =
       post.author.toString() === userId;
 
-    // 🔒 CHECK QUYỀN
     if (!isCommentOwner && !isPostOwner) {
       return res
         .status(403)
         .json({ message: "Không có quyền xóa comment" });
     }
 
-    // XÓA COMMENT
     comment.deleteOne();
     await post.save();
 

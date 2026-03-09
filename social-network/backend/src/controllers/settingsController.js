@@ -1,8 +1,3 @@
-/**
- * @file settingController.js
- * @author moi
- * @description Controller quản lý cài đặt tài khoản người dùng
- */
 const Settings = require('../models/Settings');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
@@ -30,22 +25,17 @@ const getUserSettings = async (req, res) => {
  * @route PUT /api/settings
  */
 const updateUserSettings = async (req, res) => {
-    console.log(">>> [DEBUG] Update Settings Body:", req.body);
-
     try {
-        // 1. Cập nhật vào bảng Settings
         const updatedSettings = await Settings.findOneAndUpdate(
             { userId: req.user._id },
-            { ...req.body, userId: req.user._id }, // Đảm bảo có userId khi tạo mới
-            { new: true, upsert: true } // Tạo mới nếu chưa có
+            { ...req.body, userId: req.user._id },
+            { new: true, upsert: true }
         );
 
-        // 2. 🔥 ĐỒNG BỘ SANG BẢNG USER (Quan trọng để F5 không mất)
-        // Kiểm tra !== undefined để cho phép lưu chuỗi rỗng (khi reset về mặc định)
         if (req.body.background !== undefined) {
             await User.findByIdAndUpdate(req.user._id, {
                 background: req.body.background,
-                backgroundType: req.body.type || req.body.backgroundType // Frontend gửi 'type', Model User dùng 'backgroundType'
+                backgroundType: req.body.type || req.body.backgroundType
             });
         }
 
@@ -62,26 +52,20 @@ const updateUserSettings = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
-        
-        // Kiểm tra xem req.user có tồn tại không
         if (!req.user) {
             return res.status(401).json({ message: 'Không tìm thấy thông tin xác thực.' });
         }
 
         const user = await User.findById(req.user._id);
-
         if (!user) return res.status(404).json({ message: 'Người dùng không tồn tại' });
         
-        // 🔥 FIX: Nếu user đăng nhập bằng Google thì không có password
         if (!user.password) {
             return res.status(400).json({ message: 'Tài khoản này đăng nhập bằng Google/Facebook, không thể đổi mật khẩu.' });
         }
 
-        // Kiểm tra mật khẩu cũ
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Mật khẩu cũ không chính xác' });
         
-        // Hash mật khẩu mới trước khi lưu
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
         await user.save();

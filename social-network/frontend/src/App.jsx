@@ -1,4 +1,4 @@
-import { useEffect } from "react"; // 🔥 Import useEffect
+import { useEffect } from "react"; 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import MainLayout from "./components/layout/MainLayout";
@@ -24,11 +24,11 @@ const PrivateRoute = ({ children }) => {
     return user ? children : <Navigate to="/login" />;
 };
 
-// 🔥 COMPONENT CON: Chứa logic đổi nền và Routes
+// COMPONENT CON: Chứa logic đổi nền và Routes
 function AppContent() {
-    const { user } = useAuth(); // Lấy user để check cài đặt background
+    const { user } = useAuth();
 
-    // 🔥 EFFECT: Tự động đổi nền khi user thay đổi cài đặt
+    // EFFECT: Tự động đổi nền khi user thay đổi cài đặt
     useEffect(() => {
         if (user?.background) {
             if (user.backgroundType === 'image') {
@@ -80,7 +80,7 @@ function AppContent() {
     );
 }
 
-// 🔥 COMPONENT GỐC: Chỉ chứa Provider
+// COMPONENT GỐC: Chỉ chứa Provider
 function App() {
     return (
         <Router>

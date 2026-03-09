@@ -2,7 +2,7 @@
    GLOBAL FIX
 ====================== */
 
-/* ❗ Chặn scroll ngang toàn trang */
+/* Chặn scroll ngang toàn trang */
 body {
   overflow-x: hidden;
 }
@@ -209,7 +209,7 @@ body {
 
   padding-bottom: 6px;
 
-  /* 🔥 QUAN TRỌNG: chỉ scroll trong ảnh */
+  /* chỉ scroll trong ảnh */
   overscroll-behavior-x: contain;
 }
 
@@ -344,7 +344,7 @@ body {
   position: relative;
 }
 
-/* ❌ BUTTON */
+/* BUTTON */
 .preview-remove {
   position: absolute;
   top: 6px;
@@ -382,7 +382,7 @@ body {
   justify-content: center;
 
   padding: 24px;
-  /* 🔥 khoảng thở giống Threads */
+  /* khoảng thở giống Threads */
 }
 
 .media-viewer-content {
@@ -399,7 +399,7 @@ body {
 .media-viewer-content video {
   max-width: 100%;
   max-height: 85vh;
-  /* 🔥 quan trọng: KHÔNG chiếm full màn hình */
+  /* KHÔNG chiếm full màn hình */
   width: auto;
   height: auto;
 
@@ -435,7 +435,7 @@ body {
   border-radius: 12px;
 }
 
-/* ❌ FIXED CLOSE */
+/* FIXED CLOSE */
 .viewer-close {
   position: fixed;
   top: 16px;
@@ -453,7 +453,7 @@ body {
   cursor: pointer;
 }
 
-/* ◀ ▶ FIXED NAV */
+/* FIXED NAV */
 .viewer-nav {
   position: fixed;
   top: 50%;
@@ -494,7 +494,7 @@ body {
 .media-slider {
   display: flex;
   transition: transform 0.35s ease;
-  /* 🔥 animation trượt */
+  /* animation trượt */
   width: 100%;
 }
 
@@ -623,7 +623,7 @@ body {
   align-items: center;
   gap: 4px;
 
-  min-width: 50px; /* 🔥 CỐ ĐỊNH → KHÔNG BỊ ĐẨY */
+  min-width: 50px; 
 }
 
 /* count chung */

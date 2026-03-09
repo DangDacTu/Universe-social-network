@@ -54,7 +54,7 @@ export default function ChangePassword() {
             localStorage.removeItem("token");
             navigate("/login");
         } catch (err) {
-            console.error("Change Password Error:", err); // Log lỗi chi tiết ra console
+            console.error("Change Password Error:", err); 
             setError(err.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại.");
         } finally {
             setLoading(false);

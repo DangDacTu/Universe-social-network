@@ -41,7 +41,6 @@ export default function SavedPosts() {
                     ) : posts.length > 0 ? (
                         posts.map((post) => (
                             <div key={post._id} style={{ borderBottom: "1px solid #eee" }}>
-                                {/* Hiển thị bài viết */}
                                 <PostItem post={post} /> 
                             </div>
                         ))

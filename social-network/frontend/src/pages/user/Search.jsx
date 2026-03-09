@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import userApi from "../../api/userApi";
 import { useAuth } from "../../context/AuthContext";
-import "./Search.css"; // Import file CSS mới
+import "./Search.css"; 
 import { FiArrowLeft, FiSearch, FiX, FiChevronRight, FiUser } from "react-icons/fi";
 
 const Search = () => {

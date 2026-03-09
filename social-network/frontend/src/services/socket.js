@@ -16,7 +16,7 @@ export const connectSocket = (userId) => {
             transports: ["websocket"], // Bắt buộc dùng websocket để nhanh nhất
             reconnectionAttempts: 5,   // Thử kết nối lại 5 lần nếu mất mạng
             
-            // 🔥 QUAN TRỌNG: Gửi userId ngay trong lúc bắt tay
+            // Gửi userId ngay trong lúc bắt tay
             // Backend sẽ đọc cái này ở dòng: socket.handshake.query.userId
             query: {
                 userId: userId
@@ -25,11 +25,11 @@ export const connectSocket = (userId) => {
 
         // Debug log để biết đã kết nối chưa
         socket.on("connect", () => {
-            console.log("🟢 Socket Connected:", socket.id);
+            console.log(" Socket Connected:", socket.id);
         });
         
         socket.on("connect_error", (err) => {
-            console.error("🔴 Socket Error:", err.message);
+            console.error(" Socket Error:", err.message);
         });
     }
     return socket;
@@ -38,7 +38,7 @@ export const connectSocket = (userId) => {
 // Hàm lấy socket instance để dùng ở các component khác
 export const getSocket = () => {
     if (!socket) {
-        console.warn("⚠️ Socket chưa được khởi tạo!");
+        console.warn(" Socket chưa được khởi tạo!");
     }
     return socket;
 };
@@ -48,6 +48,6 @@ export const disconnectSocket = () => {
     if (socket) {
         socket.disconnect();
         socket = null;
-        console.log("🔴 Socket Disconnected");
+        console.log(" Socket Disconnected");
     }
 };

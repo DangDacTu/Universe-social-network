@@ -81,7 +81,7 @@
 .form-input, .form-textarea, .form-select {
     width: 100%;
     padding: 12px 16px;
-    background-color: #efefef; /* Màu xám chuẩn Threads */
+    background-color: #efefef; 
     border: 1px solid transparent;
     border-radius: 12px;
     font-size: 15px;

@@ -20,7 +20,6 @@ body {
   display: flex;
   height: 100vh;
   background-color: var(--ig-primary-background);
-  /* Nếu bạn có Sidebar chính của App bên trái (của toàn trang web), hãy giữ margin-left */
   margin-left: 80px; 
 }
 
@@ -28,15 +27,15 @@ body {
 .chatContainer {
   display: flex;
   width: 100%;
-  max-width: 100%; /* Full width */
+  max-width: 100%; 
   height: 100vh;
-  border: 1px solid var(--ig-border-color); /* Viền mỏng bao quanh */
+  border: 1px solid var(--ig-border-color); 
   background: var(--ig-primary-background);
 }
 
 /* CỘT TRÁI (Chat Sidebar) */
 .chatSidebarWrapper {
-  width: 350px; /* Instagram sidebar thường rộng khoảng 350px */
+  width: 350px; 
   border-right: 1px solid var(--ig-border-color);
   display: flex;
   flex-direction: column;

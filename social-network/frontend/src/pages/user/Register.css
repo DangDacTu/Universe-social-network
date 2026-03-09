@@ -37,7 +37,7 @@ body {
 /* --- KHUNG REGISTER (GLASS EFFECT) --- */
 .register-container {
     width: 100%;
-    max-width: 420px; /* Rộng hơn Login một chút */
+    max-width: 420px; 
     text-align: center;
     padding: 30px;
     background: rgba(10, 10, 10, 0.6); 
@@ -81,7 +81,6 @@ form {
 .register-input {
     width: 100%;
     padding: 16px;
-    /* Quan trọng: Padding phải lớn hơn để không bị icon che chữ */
     padding-right: 45px; 
     background-color: #1e1e1e;
     border: 1px solid rgba(255, 255, 255, 0.1);

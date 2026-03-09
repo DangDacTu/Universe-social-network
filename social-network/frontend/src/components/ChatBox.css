@@ -112,12 +112,12 @@
   display: flex; 
 }
 
-/* 🔥 KÍCH THƯỚC ẢNH & VIDEO (NHỎ GỌN) 🔥 */
+/* KÍCH THƯỚC ẢNH & VIDEO (NHỎ GỌN) */
 .ig-msg-img, .ig-msg-video {
   width: auto;
   height: auto;
-  max-width: 240px;     /* Giới hạn chiều rộng */
-  max-height: 320px;    /* Giới hạn chiều cao */
+  max-width: 240px;     
+  max-height: 320px;   
   object-fit: contain;
   border-radius: 18px;
   display: block;

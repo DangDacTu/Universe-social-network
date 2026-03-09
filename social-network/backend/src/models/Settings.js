@@ -1,8 +1,3 @@
-/**
- * @file Settings.js
- * @author moi
- * @description Schema lưu cài đặt tài khoản người dùng
- */
 const mongoose = require('mongoose');
 
 const SettingsSchema = new mongoose.Schema({

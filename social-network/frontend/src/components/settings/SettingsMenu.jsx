@@ -9,7 +9,6 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
             items: [
                 { id: "password", label: "Đổi mật khẩu", icon: <FiLock />, isDev: false },
                 { id: "privacy", label: "Quyền riêng tư", icon: <FiShield />, isDev: false },
-                // 🔥 THÊM MỤC NÀY
                 { id: "appearance", label: "Giao diện", icon: <FiLayout />, isDev: false }, 
             ]
         },
@@ -22,7 +21,6 @@ export default function SettingsMenu({ activeTab, setActiveTab }) {
                 { id: "notifications", label: "Thông báo", icon: <FiBell />, isDev: true },
             ]
         },
-        // ... (Giữ nguyên các mục khác)
         {
             title: "Thông tin & Hỗ trợ",
             items: [

@@ -12,23 +12,20 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// 2. Cấu hình Storage (ĐÃ SỬA LỖI)
+// 2. Cấu hình Storage
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
     // Tự động xác định đây là video hay ảnh dựa trên mimetype
-    // Ví dụ: image/png -> isVideo = false; video/mp4 -> isVideo = true
-    // Lưu ý: Cloudinary xử lý Audio (mp3, wav) chung nhóm với Video (resource_type: "video")
     const isRaw = file.mimetype.startsWith("video") || file.mimetype.startsWith("audio");
     
     return {
       folder: "universe_social_network", // Tên thư mục trên Cloudinary
       
-      // 🔥 QUAN TRỌNG 1: Thay vì để "auto", ta chỉ định rõ ràng
+      // Thay vì để "auto", ta chỉ định rõ ràng
       resource_type: isRaw ? "video" : "image",
       
-      // 🔥 QUAN TRỌNG 2: Bỏ 'allowed_formats' mảng cứng, thay bằng lấy đuôi file gốc
-      // Điều này giúp tránh lỗi Cloudinary từ chối file mp4 hợp lệ
+      // Bỏ 'allowed_formats' mảng cứng, thay bằng lấy đuôi file gốc
       format: file.mimetype.split("/")[1], 
       
       public_id: `post-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
@@ -41,7 +38,7 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype.startsWith("image") ||
     file.mimetype.startsWith("video") ||
-    file.mimetype.startsWith("audio") // 🔥 Cho phép thêm Audio
+    file.mimetype.startsWith("audio") 
   ) {
     cb(null, true);
   } else {

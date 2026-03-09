@@ -1,32 +1,25 @@
-/* =========================================
-   1. LAYOUT TỔNG THỂ (MAIN WRAPPER)
-   ========================================= */
 .settings-wrapper {
     min-height: 100vh;
-    background: transparent; /* Không lớp nền riêng, dùng nền từ MainLayout */
+    background: transparent;
     display: flex;
     justify-content: center;
     padding: 30px 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Khung chứa chính: Bo tròn mạnh + Bóng đổ mềm */
 .settings-container {
     width: 100%;
     max-width: 1100px;
     display: flex;
     background: #fff;
     border: none; 
-    border-radius: 20px; /* Bo góc lớn */
-    height: 85vh; /* Chiều cao cố định để scroll bên trong */
-    min-height: 650px; /* Thêm min-height để màn hình nhỏ không bị quá hẹp */
+    border-radius: 20px;
+    height: 85vh;
+    min-height: 650px;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
 }
 
-/* =========================================
-   2. MENU BÊN TRÁI (SIDEBAR)
-   ========================================= */
 .settings-menu {
     width: 280px;
     background: #fff;
@@ -47,19 +40,16 @@
     letter-spacing: -0.5px;
 }
 
-/* Container cuộn cho menu */
 .menu-scroll-container {
     flex: 1;
     overflow-y: auto;
     padding: 0 10px;
 }
 
-/* Custom Scrollbar */
 .menu-scroll-container::-webkit-scrollbar { width: 5px; }
 .menu-scroll-container::-webkit-scrollbar-thumb { background-color: #e0e0e0; border-radius: 10px; }
 .menu-scroll-container::-webkit-scrollbar-track { background: transparent; }
 
-/* Nhóm (Section) trong menu */
 .menu-section {
     margin-bottom: 24px;
 }
@@ -79,7 +69,6 @@
     gap: 4px;
 }
 
-/* MENU ITEM: Style "Viên thuốc" */
 .settings-menu-item {
     display: flex;
     align-items: center;
@@ -119,9 +108,6 @@
     color: #000;
 }
 
-/* =========================================
-   3. NỘI DUNG BÊN PHẢI (CONTENT AREA)
-   ========================================= */
 .settings-content {
     flex: 1 1 0%;
     min-width: 0;
@@ -132,18 +118,14 @@
     background: #fff;
 }
 
-/* Settings Card: Khung chứa nội dung từng tab — luôn cùng kích thước mọi tab */
 .settings-card {
     width: 100%;
-    flex: 1; /* Sử dụng flex: 1 để chiếm hết chiều cao còn lại thay vì min-height */
+    flex: 1;
     display: flex;
     flex-direction: column;
     margin: 0 auto;
-    /* Nếu bạn muốn đóng khung viền cho nội dung thì uncomment dòng dưới */
-    /* border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; */
 }
 
-/* Header chung cho các section bên phải */
 .section-heading {
     font-size: 24px;
     font-weight: 600;
@@ -153,33 +135,25 @@
     padding-bottom: 15px;
 }
 
-/* =========================================
-   4. FORM ĐỔI MẬT KHẨU (FULL WIDTH)
-   Class prefix: .cp-
-   ========================================= */
-
-/* Container: Rộng 100% để lấp đầy settings-content */
 .cp-container,
 .settings-form-container {
     width: 100%;
     max-width: 100%; 
     margin: 0;
     padding: 0;
-    height: 100%; /* 🔥 Đảm bảo chiều cao luôn lấp đầy */
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-/* 🔥 Wrapper nội dung thống nhất cho các tab */
 .settings-body {
-    padding: 20px; /* Padding giống AboutSettings */
+    padding: 20px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Khoảng cách giữa các phần tử con */
+    gap: 20px;
 }
 
-/* Header: Avatar + Tên nằm ngang */
 .cp-header {
     display: flex;
     flex-direction: row;
@@ -209,7 +183,6 @@
     object-fit: cover;
 }
 
-/* Wrapper chứa text info trong header */
 .cp-header-info {
     display: flex;
     flex-direction: column;
@@ -228,14 +201,13 @@
     margin: 0;
 }
 
-/* Form Layout */
 .cp-form {
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 100%;
-    max-width: 480px; /* Giới hạn chiều rộng để cân đối với About */
-    margin: 0 auto; /* Căn giữa form */
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 .cp-input-group {
@@ -253,7 +225,6 @@
     margin-left: 0;
 }
 
-/* Wrapper chứa Input và Icon */
 .cp-input-wrapper {
     position: relative;
     width: 100%;
@@ -272,7 +243,7 @@
 
 .cp-input {
     width: 100%;
-    padding: 14px 14px 14px 44px; /* Padding trái lớn chừa chỗ cho icon */
+    padding: 14px 14px 14px 44px;
     border: 1px solid #dbdbdb;
     border-radius: 12px;
     font-size: 15px;
@@ -293,7 +264,6 @@
     color: #1a1a1a;
 }
 
-/* Link Quên mật khẩu */
 .cp-forgot {
     text-align: right;
     margin-top: -5px;
@@ -310,7 +280,6 @@
     text-decoration: underline;
 }
 
-/* Nút Submit Chính */
 .cp-btn-submit {
     margin-top: 15px;
     width: 100%;
@@ -343,9 +312,6 @@
 }
 
 
-/* =========================================
-   5. QUYỀN RIÊNG TƯ (TOGGLE SWITCH & LIST)
-   ========================================= */
 .toggle-list-wrapper {
     width: 100%;
 }
@@ -378,7 +344,6 @@
     line-height: 1.5;
 }
 
-/* Nút gạt (Switch) */
 .switch {
     position: relative;
     display: inline-block;
@@ -409,7 +374,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
-/* Checked State */
 input:checked + .slider {
     background-color: #0095f6;
 }
@@ -418,11 +382,9 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 
-/* Round Slider */
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
 
-/* Loading Text */
 .loading-text {
     text-align: center;
     color: #999;
@@ -430,21 +392,17 @@ input:checked + .slider:before {
     margin-top: 60px;
 }
 
-/* =========================================
-   6. MOBILE RESPONSIVE
-   ========================================= */
 @media (max-width: 768px) {
     .settings-wrapper { padding: 10px; background: transparent; }
     
     .settings-container {
         flex-direction: column;
-        height: 85vh; /* Giữ fixed height để khung các tab luôn giống nhau */
-        min-height: 650px; /* Tránh khung quá nhỏ */
+        height: 85vh;
+        min-height: 650px;
         border-radius: 0;
         box-shadow: none;
     }
 
-    /* Menu ngang trên mobile */
     .settings-menu {
         width: 100%;
         height: auto;
@@ -477,18 +435,13 @@ input:checked + .slider:before {
     }
     .settings-menu-item.active .menu-icon { color: #fff; }
 
-    /* Content Area */
     .settings-content { padding: 20px; }
     
-    /* Responsive Form đổi pass */
     .cp-container { width: 100%; max-width: 100%; }
 }
-/* =========================================
-   6. APPEARANCE SETTINGS (GIAO DIỆN)
-   ========================================= */
 
 .appearance-section {
-    margin-bottom: 0; /* Để gap của .settings-body xử lý khoảng cách */
+    margin-bottom: 0;
 }
 
 .appearance-title {
@@ -498,7 +451,6 @@ input:checked + .slider:before {
     color: #262626;
 }
 
-/* Grid Màu */
 .color-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
@@ -524,20 +476,18 @@ input:checked + .slider:before {
 }
 
 .color-item.active {
-    border-color: #0095f6; /* Viền xanh khi được chọn */
+    border-color: #0095f6;
     transform: scale(1.05);
 }
 
 .check-icon {
-    color: #262626; /* Màu icon check */
+    color: #262626;
     font-size: 24px;
     filter: drop-shadow(0 1px 2px rgba(255,255,255,0.5));
 }
-/* Nếu nền tối thì icon check màu trắng */
 .color-item[style*="#18191a"] .check-icon { color: #fff; }
 
 
-/* Upload Ảnh Custom */
 .custom-bg-upload {
     display: block;
     width: 100%;
@@ -602,7 +552,6 @@ input:checked + .slider:before {
     opacity: 1;
 }
 
-/* Loader */
 .loader {
     width: 30px;
     height: 30px;

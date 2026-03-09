@@ -9,14 +9,12 @@ const createNotification = async ({ from, to, type, post = null, commentId = nul
   try {
     const notif = await Notification.create({ from, to, type, post, commentId });
 
-    // GỬI THÔNG BÁO REAL-TIME
     const receiver = socketManager.getUser(to.toString());
     if (receiver) {
       const io = socketManager.getIO();
-      // Lấy thông tin chi tiết của thông báo để gửi đi
       const populatedNotif = await Notification.findById(notif._id)
         .populate("from", "username profilePicture")
-        .populate("post", "content media") // 🔥 THÊM DÒNG NÀY
+        .populate("post", "content media")
         .lean();
         
       io.to(receiver.socketId).emit("new-notification", populatedNotif);
@@ -29,7 +27,7 @@ const createNotification = async ({ from, to, type, post = null, commentId = nul
 };
 
 /**
- * Lấy danh sách thông báo của user hiện tại (kiểu Instagram)
+ * Lấy danh sách thông báo của user hiện tại
  * @route GET /api/notifications
  */
 const getMyNotifications = async (req, res) => {

@@ -5,14 +5,10 @@ import { getSocket } from "../services/socket";
 import "./ChatBox.css";
 import EmojiPicker from "emoji-picker-react";
 
-// Icons
 import { FiImage, FiHeart, FiSmile, FiInfo, FiMic, FiMoreVertical, FiTrash, FiEdit2, FiX } from "react-icons/fi";
 import { HiOutlinePhone, HiOutlineVideoCamera } from "react-icons/hi";
 import { RiMessengerLine } from "react-icons/ri"; 
 
-/* =========================================================
-   COMPONENT CON: MESSAGE ITEM (Đã sửa lỗi thu hồi media)
-   ========================================================= */
 const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -33,7 +29,6 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
         setIsEditing(false); setShowMenu(false);
     };
 
-    // Toggle Menu (quan trọng: dùng stopPropagation để ko kích hoạt xem ảnh)
     const toggleMenu = (e) => {
         e.stopPropagation(); 
         setShowMenu(!showMenu);
@@ -45,9 +40,8 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
         <div className={`ig-message-row ${isMe ? "me" : "other"}`}>
              {!isMe && <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-small-avatar" alt="avatar" />}
              
-             {/* Group chứa nội dung + nút 3 chấm */}
              <div className="ig-message-group">
-                 
+                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                  {/* Khối hiển thị nội dung */}
                  <div className={`ig-message-bubble ${isMedia ? "media" : ""} ${isMe ? "me" : "other"}`}>
                     {isEditing ? (
@@ -57,7 +51,7 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
                                 onChange={(e) => setEditText(e.target.value)}
                                 autoFocus
                                 onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
-                                onClick={(e) => e.stopPropagation()} // Chặn click lan ra ngoài
+                                onClick={(e) => e.stopPropagation()}
                             />
                             <div className="ig-edit-btns">
                                 <span onClick={(e) => { e.stopPropagation(); handleSaveEdit(); }}>Lưu</span>
@@ -67,8 +61,6 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
                     ) : (
                         <>
                             {msg.mediaType === "text" && <span>{msg.content}</span>}
-                            
-                            {/* ẢNH: Click vào thì xem full */}
                             {msg.mediaType === "image" && (
                                 <img 
                                     src={msg.mediaUrl} 
@@ -77,13 +69,9 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
                                     onClick={(e) => { e.stopPropagation(); onPreviewImage(msg.mediaUrl); }}
                                 />
                             )}
-                            
-                            {/* VIDEO */}
                             {msg.mediaType === "video" && (
                                 <video controls src={msg.mediaUrl} className="ig-msg-video" onClick={(e) => e.stopPropagation()} />
                             )}
-                            
-                            {/* AUDIO */}
                             {msg.mediaType === "audio" && (
                                 <audio controls src={msg.mediaUrl} onClick={(e) => e.stopPropagation()} />
                             )}
@@ -91,7 +79,16 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
                     )}
                  </div>
 
-                 {/* NÚT 3 CHẤM (Hiện cho TẤT CẢ loại tin nhắn của mình) */}
+                 <div style={{ 
+                    fontSize: '11px', 
+                    marginTop: '4px', 
+                    color: '#8e8e8e',
+                    padding: '0 4px'
+                 }}>
+                    {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                 </div>
+                 </div>
+
                  {isMe && !isEditing && (
                     <div className="ig-more-menu-wrapper" ref={menuRef}>
                         <button className="ig-more-btn" onClick={toggleMenu}>
@@ -100,13 +97,11 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
 
                         {showMenu && (
                             <div className="ig-dropdown-menu">
-                                {/* Chỉ hiện nút Sửa nếu là Text */}
                                 {msg.mediaType === "text" && (
                                     <div className="ig-menu-item" onClick={(e) => { e.stopPropagation(); setIsEditing(true); setShowMenu(false); }}>
                                         <FiEdit2 /> Sửa
                                     </div>
                                 )}
-                                {/* Luôn hiện nút Gỡ */}
                                 <div className="ig-menu-item delete" onClick={(e) => { e.stopPropagation(); onDelete(msg._id); }}>
                                     <FiTrash /> Gỡ
                                 </div>
@@ -119,9 +114,6 @@ const MessageItem = ({ msg, isMe, selectedUser, onPreviewImage, onDelete, onEdit
     );
 };
 
-/* =========================================================
-   COMPONENT CHÍNH: CHAT BOX
-   ========================================================= */
 export default function ChatBox({ messages, currentUserId, selectedUser, onSendMessage, isOnline }) {
   const navigate = useNavigate();
   const messagesEndRef = useRef(null);
@@ -140,15 +132,12 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, previewUrl, isRecording]);
 
-  // Xử lý khi chọn Emoji
   const onEmojiClick = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);
   };
 
-  /* LOGIC XÓA TIN NHẮN */
   const handleDeleteMessage = (msgId) => {
       if(window.confirm("Bạn muốn thu hồi tin nhắn này?")) {
-          // Gửi sự kiện xóa lên server
           getSocket().emit("delete-message", { messageId: msgId, receiverId: selectedUser._id });
       }
   };
@@ -157,7 +146,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
       getSocket().emit("edit-message", { messageId: msgId, receiverId: selectedUser._id, newContent });
   };
 
-  /* UPLOAD & SEND */
   const handleSelectFile = (e) => {
       const file = e.target.files[0];
       if(file){
@@ -184,7 +172,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
        }
   }
 
-  /* RECORDING */
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -215,7 +202,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
 
   return (
     <div className="ig-chatbox">
-      {/* HEADER */}
       <div className="ig-chat-header">
         <div className="ig-header-user">
             <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-header-avatar" alt="header avatar"/>
@@ -233,7 +219,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         </div>
       </div>
 
-      {/* MESSAGE LIST */}
       <div className="ig-messages-list">
         <div className="ig-profile-intro">
             <img src={selectedUser.profilePicture || "/avatar.jpg"} className="ig-intro-avatar" alt="intro"/>
@@ -253,7 +238,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         <div ref={messagesEndRef} />
       </div>
       
-      {/* PREVIEW UPLOAD */}
       {previewUrl && (
           <div className="ig-preview-area">
               {fileType === 'video' ? <video src={previewUrl} style={{height:100}}/> : <img src={previewUrl} style={{height: 100}} alt="preview"/>}
@@ -261,9 +245,7 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
           </div>
       )}
 
-      {/* INPUT */}
       <div className="ig-input-area">
-        {/* BẢNG EMOJI PICKER */}
         {showEmoji && (
             <div className="emoji-picker-container">
                 <EmojiPicker onEmojiClick={onEmojiClick} width={300} height={350} />
@@ -300,7 +282,6 @@ export default function ChatBox({ messages, currentUserId, selectedUser, onSendM
         )}
       </div>
 
-      {/* FULLSCREEN IMAGE */}
       {fullImage && <div className="image-overlay" onClick={()=>setFullImage(null)}><img src={fullImage} onClick={e=>e.stopPropagation()} alt="full"/></div>}
     </div>
   );
