@@ -123,6 +123,7 @@ const loginUser = async (req, res) => {
                 profilePicture: user.profilePicture, // Frontend sẽ hiển thị Robot từ link này
                 background: user.background,
                 backgroundType: user.backgroundType,
+                savedPosts: user.savedPosts, // 🔥 Thêm dòng này
                 token: generateToken(user._id),
             });
         } else {

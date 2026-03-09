@@ -34,6 +34,16 @@ const userApi = {
     // 7. Unfollow
     unfollow(id) {
         return axiosClient.put(`/users/${id}/unfollow`);
+    },
+
+    // 8. Lưu / Bỏ lưu bài viết
+    toggleSavePost(postId) {
+        return axiosClient.put(`/users/save/${postId}`);
+    },
+
+    // 9. Lấy danh sách bài đã lưu
+    getSavedPosts() {
+        return axiosClient.get('/users/saved-posts');
     }
 };
 

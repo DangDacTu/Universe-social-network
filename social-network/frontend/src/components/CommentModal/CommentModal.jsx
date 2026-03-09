@@ -3,8 +3,6 @@ import axiosClient from "../../api/axiosClient";
 import { FiMoreHorizontal, FiTrash2, FiImage } from "react-icons/fi";
 import "./commentModal.css";
 
-const DEFAULT_AVATAR = "/avatar.jpg";
-
 /* ======================
    TIME AGO
 ====================== */

@@ -3,6 +3,8 @@ import SettingsMenu from "../../components/settings/SettingsMenu";
 import ChangePassword from "../../components/settings/ChangePassword";
 import PrivacySettings from "../../components/settings/PrivacySettings";
 import AppearanceSettings from "../../components/settings/AppearanceSettings"; // 🔥 Import file mới
+import AboutSettings from "../../components/settings/AboutSettings";
+import SavedPosts from "../../components/settings/SavedPosts"; // 🔥 Import SavedPosts
 import "./Settings.css";
 
 export default function Settings() {
@@ -32,6 +34,20 @@ export default function Settings() {
                     {activeTab === "appearance" && (
                         <div className="settings-card">
                             <AppearanceSettings />
+                        </div>
+                    )}
+
+                    {/* 🔥 TAB ĐÃ LƯU */}
+                    {activeTab === "saved" && (
+                        <div className="settings-card">
+                            <SavedPosts />
+                        </div>
+                    )}
+
+                    {/* Tab Giới thiệu */}
+                    {activeTab === "about" && (
+                        <div className="settings-card">
+                            <AboutSettings />
                         </div>
                     )}
                 </div>

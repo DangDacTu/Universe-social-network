@@ -80,6 +80,12 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // 🔥 THÊM TRƯỜNG NÀY CHO TÍNH NĂNG REPOST
+    repostData: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post",
+      default: null,
+    },
     content: {
       type: String,
       trim: true,

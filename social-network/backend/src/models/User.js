@@ -44,10 +44,15 @@ const userSchema = new mongoose.Schema({
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    // 🔥 THÊM: Danh sách bài viết đã lưu
+    savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
     isAdmin: {
         type: Boolean,
         default: false,
-    }
+    },
+    background: { type: String, default: "#f0f2f5" },
+    backgroundType: { type: String, default: "color" },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

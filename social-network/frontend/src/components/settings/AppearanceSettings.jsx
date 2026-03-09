@@ -23,12 +23,16 @@ const PRESET_THEMES = [
 export default function AppearanceSettings() {
     const { user, updateUser } = useAuth();
     // Khởi tạo state từ user context (nếu có lưu) hoặc mặc định
-    const [currentBg, setCurrentBg] = useState(user?.background || '#f0f2f5');
-    const [bgType, setBgType] = useState(user?.backgroundType || 'color'); 
+    const [currentBg, setCurrentBg] = useState(user?.background || localStorage.getItem('universe_bg') || '#f0f2f5');
+    const [bgType, setBgType] = useState(user?.backgroundType || localStorage.getItem('universe_bg_type') || 'color'); 
     const [loading, setLoading] = useState(false);
 
     // Hàm áp dụng background ngay lập tức (Preview trực tiếp lên body)
     const applyBackground = (value, type) => {
+        // Lưu vào localStorage để F5 không bị mất màu
+        localStorage.setItem('universe_bg', value);
+        localStorage.setItem('universe_bg_type', type);
+
         if (type === 'image') {
             document.body.style.backgroundImage = `url(${value})`;
             document.body.style.backgroundSize = 'cover';
@@ -46,12 +50,10 @@ export default function AppearanceSettings() {
         setBgType(item.type);
         applyBackground(item.value, item.type);
         // Cập nhật context ngay để MainLayout đổi nền ngay lập tức
-        updateUser({ background: item.value, backgroundType: item.type });
-
-        // 🔥 FIX: Cập nhật LocalStorage để giữ màu khi F5
-        const savedUser = JSON.parse(localStorage.getItem("user")) || {};
-        const newUser = { ...savedUser, background: item.value, backgroundType: item.type };
-        localStorage.setItem("user", JSON.stringify(newUser));
+        // 🔥 QUAN TRỌNG: Hàm này giờ đã có trong AuthContext, nó sẽ lưu vào localStorage 'user'
+        if (updateUser) {
+            updateUser({ background: item.value, backgroundType: item.type });
+        }
 
         try {
             await settingsApi.updateAppearance({ background: item.value, type: item.type });
@@ -74,12 +76,10 @@ export default function AppearanceSettings() {
             setCurrentBg(imageUrl);
             setBgType('image');
             applyBackground(imageUrl, 'image');
-            updateUser({ background: imageUrl, backgroundType: 'image' });
-
-            // 🔥 FIX: Cập nhật LocalStorage cho ảnh upload
-            const savedUser = JSON.parse(localStorage.getItem("user")) || {};
-            const newUser = { ...savedUser, background: imageUrl, backgroundType: 'image' };
-            localStorage.setItem("user", JSON.stringify(newUser));
+            
+            if (updateUser) {
+                updateUser({ background: imageUrl, backgroundType: 'image' });
+            }
 
             await settingsApi.updateAppearance({ background: imageUrl, type: 'image' });
         } catch (error) {
@@ -101,51 +101,53 @@ export default function AppearanceSettings() {
                 </div>
             </div>
             
-            {/* PHẦN 1: MÀU SẮC & GRADIENT */}
-            <div className="appearance-section">
-                <h4 className="appearance-title">Chọn màu có sẵn</h4>
-                <div className="color-grid">
-                    {PRESET_THEMES.map((theme) => (
-                        <div 
-                            key={theme.id}
-                            className={`color-item ${currentBg === theme.value ? 'active' : ''}`}
-                            style={{ background: theme.value }}
-                            onClick={() => handleSelectPreset(theme)}
-                            title={theme.name}
-                        >
-                            {currentBg === theme.value && <FiCheck className="check-icon" />}
-                        </div>
-                    ))}
+            <div className="settings-body">
+                {/* PHẦN 1: MÀU SẮC & GRADIENT */}
+                <div className="appearance-section">
+                    <h4 className="appearance-title">Chọn màu có sẵn</h4>
+                    <div className="color-grid">
+                        {PRESET_THEMES.map((theme) => (
+                            <div 
+                                key={theme.id}
+                                className={`color-item ${currentBg === theme.value ? 'active' : ''}`}
+                                style={{ background: theme.value }}
+                                onClick={() => handleSelectPreset(theme)}
+                                title={theme.name}
+                            >
+                                {currentBg === theme.value && <FiCheck className="check-icon" />}
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* PHẦN 2: TẢI ẢNH LÊN */}
-            <div className="appearance-section">
-                <h4 className="appearance-title">Hoặc tải ảnh của bạn</h4>
-                
-                <label className="custom-bg-upload">
-                    <input type="file" hidden accept="image/*" onChange={handleUploadImage} disabled={loading} />
+                {/* PHẦN 2: TẢI ẢNH LÊN */}
+                <div className="appearance-section">
+                    <h4 className="appearance-title">Hoặc tải ảnh của bạn</h4>
                     
-                    <div className="upload-placeholder">
-                        {loading ? (
-                            <div className="loader"></div>
-                        ) : bgType === 'image' && currentBg && !currentBg.startsWith('#') && !currentBg.startsWith('linear') ? (
-                            <img src={currentBg} alt="Custom bg" className="preview-bg-img" />
-                        ) : (
-                            <div className="upload-content">
-                                <FiUploadCloud size={32} />
-                                <span>Nhấn để tải ảnh nền (HD)</span>
+                    <label className="custom-bg-upload">
+                        <input type="file" hidden accept="image/*" onChange={handleUploadImage} disabled={loading} />
+                        
+                        <div className="upload-placeholder">
+                            {loading ? (
+                                <div className="loader"></div>
+                            ) : bgType === 'image' && currentBg && !currentBg.startsWith('#') && !currentBg.startsWith('linear') ? (
+                                <img src={currentBg} alt="Custom bg" className="preview-bg-img" />
+                            ) : (
+                                <div className="upload-content">
+                                    <FiUploadCloud size={32} />
+                                    <span>Nhấn để tải ảnh nền (HD)</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Overlay hiệu ứng khi hover */}
+                        {!loading && (
+                            <div className="upload-overlay">
+                                <FiImage /> Thay đổi ảnh
                             </div>
                         )}
-                    </div>
-
-                    {/* Overlay hiệu ứng khi hover */}
-                    {!loading && (
-                        <div className="upload-overlay">
-                            <FiImage /> Thay đổi ảnh
-                        </div>
-                    )}
-                </label>
+                    </label>
+                </div>
             </div>
         </div>
     );

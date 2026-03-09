@@ -19,6 +19,7 @@
     border: none; 
     border-radius: 20px; /* Bo góc lớn */
     height: 85vh; /* Chiều cao cố định để scroll bên trong */
+    min-height: 650px; /* Thêm min-height để màn hình nhỏ không bị quá hẹp */
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
 }
@@ -134,7 +135,9 @@
 /* Settings Card: Khung chứa nội dung từng tab — luôn cùng kích thước mọi tab */
 .settings-card {
     width: 100%;
-    min-height: 100%;
+    flex: 1; /* Sử dụng flex: 1 để chiếm hết chiều cao còn lại thay vì min-height */
+    display: flex;
+    flex-direction: column;
     margin: 0 auto;
     /* Nếu bạn muốn đóng khung viền cho nội dung thì uncomment dòng dưới */
     /* border: 1px solid #e0e0e0; border-radius: 16px; padding: 30px; */
@@ -156,11 +159,24 @@
    ========================================= */
 
 /* Container: Rộng 100% để lấp đầy settings-content */
-.cp-container {
+.cp-container,
+.settings-form-container {
     width: 100%;
     max-width: 100%; 
     margin: 0;
     padding: 0;
+    height: 100%; /* 🔥 Đảm bảo chiều cao luôn lấp đầy */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 🔥 Wrapper nội dung thống nhất cho các tab */
+.settings-body {
+    padding: 20px; /* Padding giống AboutSettings */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Khoảng cách giữa các phần tử con */
 }
 
 /* Header: Avatar + Tên nằm ngang */
@@ -218,6 +234,8 @@
     flex-direction: column;
     gap: 24px;
     width: 100%;
+    max-width: 480px; /* Giới hạn chiều rộng để cân đối với About */
+    margin: 0 auto; /* Căn giữa form */
 }
 
 .cp-input-group {
@@ -328,11 +346,6 @@
 /* =========================================
    5. QUYỀN RIÊNG TƯ (TOGGLE SWITCH & LIST)
    ========================================= */
-.settings-form-container {
-    width: 100%;
-    max-width: 100%;
-}
-
 .toggle-list-wrapper {
     width: 100%;
 }
@@ -425,7 +438,8 @@ input:checked + .slider:before {
     
     .settings-container {
         flex-direction: column;
-        height: auto;
+        height: 85vh; /* Giữ fixed height để khung các tab luôn giống nhau */
+        min-height: 650px; /* Tránh khung quá nhỏ */
         border-radius: 0;
         box-shadow: none;
     }
@@ -474,7 +488,7 @@ input:checked + .slider:before {
    ========================================= */
 
 .appearance-section {
-    margin-bottom: 40px;
+    margin-bottom: 0; /* Để gap của .settings-body xử lý khoảng cách */
 }
 
 .appearance-title {

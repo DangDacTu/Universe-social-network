@@ -16,6 +16,7 @@ const createNotification = async ({ from, to, type, post = null, commentId = nul
       // Lấy thông tin chi tiết của thông báo để gửi đi
       const populatedNotif = await Notification.findById(notif._id)
         .populate("from", "username profilePicture")
+        .populate("post", "content media") // 🔥 THÊM DÒNG NÀY
         .lean();
         
       io.to(receiver.socketId).emit("new-notification", populatedNotif);

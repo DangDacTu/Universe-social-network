@@ -92,8 +92,28 @@ const changePassword = async (req, res) => {
     }
 };
 
+/**
+ * Cập nhật giao diện (Background)
+ * @route PUT /api/settings/appearance
+ */
+const updateAppearance = async (req, res) => {
+    try {
+        const { background, type } = req.body;
+        const user = await User.findById(req.user._id);
+        
+        user.background = background;
+        user.backgroundType = type;
+        await user.save();
+
+        res.json({ message: "Đã lưu giao diện vĩnh viễn" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getUserSettings,
     updateUserSettings,
     changePassword,
+    updateAppearance,
 };

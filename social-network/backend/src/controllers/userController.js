@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Post = require('../models/Post'); // 🔥 Import Model Post
 const { createNotification } = require('./notificationController');
 
 // @desc    Get user profile by ID
@@ -52,6 +53,7 @@ const updateUserProfile = async (req, res) => {
                 profilePicture: updatedUser.profilePicture,
                 background: updatedUser.background,
                 backgroundType: updatedUser.backgroundType,
+                savedPosts: updatedUser.savedPosts, // 🔥 Thêm dòng này
                 token: req.body.token,
             });
         } else {
@@ -223,4 +225,118 @@ const getUserFollowing = async (req, res) => {
     }
 };
 
-module.exports = { getUserProfile, updateUserProfile, followUser, unfollowUser, getAllUsers, getChatAvailableUsers, searchUsers, getUserFollowers, getUserFollowing };
+// @desc    Đăng lại bài viết (Repost)
+// @route   POST /api/users/repost/:id (ID của bài viết gốc)
+const repostPost = async (req, res) => {
+    try {
+        const originalPostId = req.params.id;
+        
+        // Kiểm tra bài gốc có tồn tại không
+        const originalPost = await Post.findById(originalPostId);
+        if (!originalPost) {
+            return res.status(404).json({ message: "Bài viết không tồn tại" });
+        }
+
+        // Tạo bài viết mới với repostData trỏ về bài gốc
+        const newRepost = new Post({
+            author: req.user._id,
+            repostData: originalPostId, // Lưu ID bài gốc
+            content: "", // Repost thường không có content riêng hoặc content rỗng
+            media: []
+        });
+
+        await newRepost.save();
+        
+        // Populate để trả về dữ liệu đầy đủ cho frontend hiển thị ngay
+        await newRepost.populate("author", "username profilePicture");
+        await newRepost.populate({
+            path: "repostData",
+            populate: { path: "author", select: "username profilePicture" }
+        });
+
+        res.status(201).json(newRepost);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Lấy danh sách bài đăng lại của user
+// @route   GET /api/users/:id/reposts
+const getUserReposts = async (req, res) => {
+    try {
+        // Tìm các bài viết của user này MÀ có trường repostData (tức là bài repost)
+        const posts = await Post.find({ author: req.params.id, repostData: { $ne: null } })
+            .sort({ createdAt: -1 })
+            .populate("author", "username profilePicture")
+            .populate({
+                path: "repostData",
+                populate: { path: "author", select: "username profilePicture" }
+            });
+
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Lưu hoặc Bỏ lưu bài viết
+// @route   PUT /api/users/save/:id
+const toggleSavePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const user = await User.findById(req.user._id);
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const index = user.savedPosts.indexOf(postId);
+
+        if (index !== -1) {
+            // Nếu đã lưu -> Bỏ lưu
+            user.savedPosts.splice(index, 1);
+            await user.save();
+            res.json({ message: "Đã bỏ lưu bài viết", savedPosts: user.savedPosts, isSaved: false });
+        } else {
+            // Chưa lưu -> Lưu
+            user.savedPosts.push(postId);
+            await user.save();
+            res.json({ message: "Đã lưu bài viết", savedPosts: user.savedPosts, isSaved: true });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Lấy danh sách bài viết đã lưu
+// @route   GET /api/users/saved-posts
+const getSavedPosts = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id)
+            .populate({
+                path: 'savedPosts',
+                populate: { path: 'author', select: 'username profilePicture' }
+            });
+
+        // Lọc bỏ các bài viết null (đã bị xóa gốc)
+        const validPosts = user.savedPosts.filter(post => post !== null);
+        
+        res.json(validPosts.reverse()); // Mới nhất lên đầu
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { 
+    getUserProfile, 
+    updateUserProfile, 
+    followUser, 
+    unfollowUser, 
+    getAllUsers, 
+    getChatAvailableUsers, 
+    searchUsers, 
+    getUserFollowers, 
+    getUserFollowing,
+    repostPost,      // 🔥 Export mới
+    getUserReposts,   // 🔥 Export mới
+    toggleSavePost, // 🔥 Export mới
+    getSavedPosts   // 🔥 Export mới
+};

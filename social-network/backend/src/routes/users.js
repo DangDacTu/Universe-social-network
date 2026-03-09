@@ -10,6 +10,10 @@ const {
     searchUsers,
     getUserFollowers,
     getUserFollowing,
+    repostPost,
+    getUserReposts,
+    toggleSavePost,
+    getSavedPosts,
 } = require('../controllers/userController');
 const { protect } = require('../middlewares/authMiddleware');
 
@@ -18,6 +22,9 @@ router.get('/', getAllUsers);
 
 // Tim kiem user theo username
 router.get('/search', searchUsers);
+
+// 🔥 Lấy danh sách bài đã lưu (Đặt trước /:id để tránh trùng route)
+router.get('/saved-posts', protect, getSavedPosts);
 
 // Lay danh sach user co the chat (follow 2 chieu)
 router.get('/chat-available', protect, getChatAvailableUsers);
@@ -39,5 +46,14 @@ router.get("/:id/followers", getUserFollowers);
 
 // Lay danh sach following cua user
 router.get("/:id/following", getUserFollowing);
+
+// 🔥 Đăng lại bài viết (Repost)
+router.post('/repost/:id', protect, repostPost);
+
+// 🔥 Lấy danh sách bài đăng lại của user
+router.get('/:id/reposts', getUserReposts);
+
+// 🔥 Lưu / Bỏ lưu bài viết
+router.put('/save/:id', protect, toggleSavePost);
 
 module.exports = router;

@@ -43,8 +43,8 @@ export default function ChangePassword() {
         if (newPassword !== confirmPassword) {
             return setError("Mật khẩu xác nhận không khớp.");
         }
-        if (newPassword.length < 6) {
-             return setError("Mật khẩu mới phải có ít nhất 6 ký tự.");
+        if (newPassword.length < 8) {
+             return setError("Mật khẩu mới phải có ít nhất 8 ký tự.");
         }
 
         try {
@@ -92,32 +92,34 @@ export default function ChangePassword() {
     };
 
     return (
-        <div className="cp-container">
+        <div className="settings-form-container">
             <div className="cp-header">
                 <div className="cp-avatar-wrapper">
                     <img src={user?.profilePicture || "/avatar.jpg"} alt="avatar" className="cp-avatar" />
                 </div>
-                <div>
+                <div className="cp-header-info">
                     <h3 className="cp-username">{user?.username}</h3>
                     <p className="cp-subtitle">Quản lý bảo mật</p>
                 </div>
             </div>
 
-            {error && (
-                <div style={{ color: 'red', background: '#ffe6e6', padding: '10px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', textAlign: 'center' }}>
-                    ⚠️ {error}
-                </div>
-            )}
+            <div className="settings-body">
+                {error && (
+                    <div style={{ color: 'red', background: '#ffe6e6', padding: '10px', borderRadius: '8px', fontSize: '14px', textAlign: 'center' }}>
+                        ⚠️ {error}
+                    </div>
+                )}
 
-            <form className="cp-form" onSubmit={handleSubmit}>
-                {renderInput("Mật khẩu hiện tại", "oldPassword", "Nhập mật khẩu cũ...", FiLock, "old")}
-                {renderInput("Mật khẩu mới", "newPassword", "Nhập mật khẩu mới...", FiKey, "new")}
-                {renderInput("Xác nhận mật khẩu", "confirmPassword", "Nhập lại mật khẩu mới...", FiCheckCircle, "confirm")}
+                <form className="cp-form" onSubmit={handleSubmit}>
+                    {renderInput("Mật khẩu hiện tại", "oldPassword", "Nhập mật khẩu cũ...", FiLock, "old")}
+                    {renderInput("Mật khẩu mới", "newPassword", "Nhập mật khẩu mới...", FiKey, "new")}
+                    {renderInput("Xác nhận mật khẩu", "confirmPassword", "Nhập lại mật khẩu mới...", FiCheckCircle, "confirm")}
 
-                <button type="submit" className="cp-btn-submit" disabled={loading}>
-                    {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
-                </button>
-            </form>
+                    <button type="submit" className="cp-btn-submit" disabled={loading}>
+                        {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

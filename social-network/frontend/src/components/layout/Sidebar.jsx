@@ -54,14 +54,14 @@ export default function Sidebar({ onCreate, hasNewNotification, onNotifClick }) 
           <FiSearch />
         </button>
 
-        <button className="sidebar-item create" onClick={onCreate}>
+        <button className="sidebar-item create" onClick={() => onCreate && onCreate()}>
           <FiPlusSquare />
         </button>
 
         <button
           className={`sidebar-item ${isActive("/notifications") ? "active" : ""}`}
           onClick={() => {
-            onNotifClick(); // Reset trạng thái khi người dùng click vào
+            if (onNotifClick) onNotifClick(); // Reset trạng thái khi người dùng click vào
             navigate("/notifications");
           }}
         >

@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import userApi from '../../api/userApi';
 import axiosClient from '../../api/axiosClient';
 import EditProfileModal from '../../components/EditProfileModal';
-import Sidebar from '../../components/layout/Sidebar';
 import PostItem from '../../components/Post/PostItem.jsx'; // Import PostItem
 import './Profile.css';
 
@@ -15,7 +14,8 @@ import {
     FiUserCheck, 
     FiShare2, 
     FiMessageSquare,
-    FiX
+    FiX,
+    FiRepeat
 } from "react-icons/fi";
 
 const Profile = () => {
@@ -28,6 +28,9 @@ const Profile = () => {
     const [loadingPosts, setLoadingPosts] = useState(false);
     const [followed, setFollowed] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
+    // 🔥 State quản lý Tab (posts | reposts)
+    const [activeTab, setActiveTab] = useState('posts');
 
     // State cho Modal Follow
     const [showFollowModal, setShowFollowModal] = useState(false);
@@ -56,7 +59,13 @@ const Profile = () => {
                 // 2. Lấy danh sách bài viết của User
                 setLoadingPosts(true);
                 try {
-                    const { data: postsData } = await axiosClient.get(`/posts/user/${userId}`);
+                    let url = `/posts/user/${userId}`;
+                    // Nếu đang ở tab Repost thì gọi API lấy repost
+                    if (activeTab === 'reposts') {
+                        url = `/users/${userId}/reposts`; // Đảm bảo bạn đã map route này ở backend
+                    }
+
+                    const { data: postsData } = await axiosClient.get(url);
                     setUserPosts(postsData);
                 } catch (postError) {
                     console.error("Lỗi lấy bài viết:", postError);
@@ -70,7 +79,7 @@ const Profile = () => {
         };
 
         fetchData();
-    }, [id, currentUser?._id]); // ✅ THAY ĐỔI: Chỉ phụ thuộc vào ID để tránh re-fetch không cần thiết
+    }, [id, currentUser?._id, activeTab]); // 🔥 Thêm activeTab vào dependency
 
     // Xử lý khi xóa bài viết (Cập nhật giao diện ngay lập tức)
     const handlePostDeleted = (deletedPostId) => {
@@ -173,7 +182,6 @@ const Profile = () => {
                 .follow-name { font-weight: 600; font-size: 15px; }
             `}</style>
 
-            <Sidebar />
             <main className="profile-main-layout">
                 <div className="profile-content-box">
                     <div className="profile-scroll">
@@ -270,7 +278,18 @@ const Profile = () => {
 
                                 {/* TABS */}
                                 <div className="profile-tabs">
-                                    <div className="tab-item active">Bài Đăng</div>
+                                    <div 
+                                        className={`tab-item ${activeTab === 'posts' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('posts')}
+                                    >
+                                        Bài Đăng
+                                    </div>
+                                    <div 
+                                        className={`tab-item ${activeTab === 'reposts' ? 'active' : ''}`}
+                                        onClick={() => setActiveTab('reposts')}
+                                    >
+                                        Đăng lại
+                                    </div>
                                 </div>
 
                                 {/* DANH SÁCH BÀI VIẾT */}
@@ -290,7 +309,7 @@ const Profile = () => {
                                             <div className="empty-icon-circle">
                                                 <FiMessageSquare size={24} />
                                             </div>
-                                            <p>Chưa có bài viết nào.</p>
+                                            <p>{activeTab === 'posts' ? "Chưa có bài viết nào." : "Chưa có bài đăng lại nào."}</p>
                                         </div>
                                     )}
                                 </div>

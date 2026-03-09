@@ -589,7 +589,8 @@ body {
 }
 
 .repost-btn,
-.send-btn {
+.send-btn,
+.save-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -599,8 +600,13 @@ body {
 }
 
 .repost-btn:hover,
-.send-btn:hover {
+.send-btn:hover,
+.save-btn:hover {
   transform: scale(1.1);
+}
+
+.save-btn.saved {
+  color: #000;
 }
 
 /* ===== ACTION BAR (THREADS STYLE) ===== */

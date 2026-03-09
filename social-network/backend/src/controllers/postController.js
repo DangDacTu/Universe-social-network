@@ -76,7 +76,8 @@ exports.deletePost = async (req, res) => {
 ====================== */
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
+    // 🔥 SỬA: Thêm điều kiện repostData: null để chỉ lấy bài gốc (không lấy bài repost)
+    const posts = await Post.find({ repostData: null })
       .populate("author", "username profilePicture") // Đổi avatar -> profilePicture cho khớp model User
       .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
@@ -94,7 +95,8 @@ exports.getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    const posts = await Post.find({ author: userId })
+    // 🔥 SỬA: Thêm điều kiện repostData: null để chỉ lấy bài gốc
+    const posts = await Post.find({ author: userId, repostData: null })
       .populate("author", "username profilePicture")
       .populate("comments.user", "username profilePicture")
       .sort({ createdAt: -1 });
